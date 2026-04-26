@@ -524,7 +524,7 @@ async function callGroqAPI(trimmedHist, retries, delay){
       'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       messages: buildMessages(trimmedHist),
       max_tokens: 40,
       temperature: 0.9
@@ -547,7 +547,7 @@ async function callGroqAPI(trimmedHist, retries, delay){
 
 async function askGemini(txt){
   hist.push({role:'user', parts:[{text:txt}]});
-  const trimmedHist = hist.slice(-8);
+  const trimmedHist = hist.slice(-4);
   const reply = await callGroqAPI(trimmedHist);
   hist.push({role:'model', parts:[{text:reply}]});
   return reply;
