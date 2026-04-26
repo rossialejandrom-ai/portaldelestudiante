@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BUDDY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width:100%; height:100%;
+  background:#000;
+  overflow:hidden;
+  font-family:'Press Start 2P', monospace;
+}
+
+/* ── FULL SCREEN PIXEL FACE ── */
+/* The tablet IS the face — only black + eyes + mouth */
+.pixel-face {
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  image-rendering:pixelated;
+  image-rendering:crisp-edges;
+}
+
+/* ── STATUS: tiny, bottom right, barely visible ── */
+.hint {
+  position:fixed; bottom:16px; right:20px;
+  font-size:min(1.2vw, 10px);
+  color:#222;
+  letter-spacing:1px;
+  transition:color 0.3s;
+  pointer-events:none;
+  text-transform:uppercase;
+}
+.hint.visible { color:#444; }
+
+/* ── SETUP OVERLAY ── */
+.setup {
+  position:fixed; inset:0;
+  background:#000;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:16px; z-index:9999; padding:24px;
+  overflow-y:auto;
+}
+.setup.hidden { display:none !important; }
+.setup-title { font-size:clamp(0.5rem,2vw,0.8rem); color:#00d4ff; text-shadow:0 0 12px #00d4ff; text-align:center; }
+.setup-box {
+  width:100%; max-width:360px;
+  background:#0a0a14; border:2px solid #00d4ff;
+  padding:16px 20px;
+  font-size:clamp(0.35rem,1.5vw,0.5rem); line-height:2.3; color:#ff6b9d;
+}
+.setup-box a { color:#ffd700; }
+.setup-box b { color:#ffd700; }
+.key-inp {
+  width:100%; max-width:360px;
+  padding:12px 14px;
+  background:#0a0a14; border:2px solid #333;
+  color:#fff; font-family:'Press Start 2P'; font-size:clamp(0.4rem,1.5vw,0.55rem);
+  outline:none;
+}
+.key-inp:focus { border-color:#00d4ff; }
+.go-btn {
+  width:100%; max-width:360px; padding:14px;
+  background:#00d4ff; color:#000; border:none;
+  font-family:'Press Start 2P'; font-size:clamp(0.4rem,1.5vw,0.6rem);
+  cursor:pointer; letter-spacing:2px;
+}
+.err { font-size:clamp(0.3rem,1.2vw,0.4rem); color:#ff6b9d; text-align:center; min-height:14px; }
+
+/* Level pills — hidden until hover near bottom */
+.level-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  display:flex; justify-content:center; gap:6px; padding:8px;
+  background:rgba(0,0,0,0);
+  transition:background 0.3s;
+  z-index:50;
+}
+.level-bar:hover { background:rgba(0,0,0,0.8); }
+.pill {
+  font-family:'Press Start 2P'; font-size:clamp(0.25rem,1vw,0.38rem);
+  padding:5px 8px; border:1px solid #222;
+  background:transparent; color:#333; cursor:pointer; text-transform:uppercase;
+  transition:all 0.2s;
+}
+.pill:hover { border-color:#555; color:#555; }
+.pill.active { border-color:#00d4ff; color:#000; background:#00d4ff; }
+
+/* key change button */
+.key-btn {
+  position:fixed; top:10px; right:14px;
+  font-family:'Press Start 2P'; font-size:clamp(0.25rem,0.8vw,0.32rem);
+  color:#111; background:none; border:none; cursor:pointer;
+  transition:color 0.2s; z-index:50;
+}
+.key-btn:hover { color:#444; }
+
+/* Speech bubble - top center, brief */
+.bubble {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  max-width:85vw; padding:10px 18px;
+  background:rgba(0,0,0,0.85); border:1px solid #1a1a30;
+  font-size:clamp(0.4rem,1.8vw,0.65rem); line-height:1.9;
+  color:#00d4ff; text-align:center;
+  opacity:0; transition:opacity 0.3s;
+  pointer-events:none; z-index:60;
+  border-radius:4px;
+}
+.bubble.show { opacity:1; }
+.bubble.user { color:#aaa; border-color:#111; font-size:clamp(0.35rem,1.5vw,0.55rem); }
+
+#mv,#mc { display:none; }
+</style>
+</head>
+<body>
+
+<video id="mv" autoplay playsinline muted></video>
+<canvas id="mc"></canvas>
+
+<!-- SETUP -->
+<div class="setup" id="setup">
+  <div class="setup-title">[ BUDDY SETUP ]</div>
+  <div class="setup-box">
+    <b>GET FREE KEY (Google):</b><br>
+    1. Open <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a><br>
+    2. Sign in with Google account<br>
+    3. Tap <b>Create API Key</b><br>
+    4. Copy the key &amp; paste below<br><br>
+    ✓ 100% FREE &nbsp;·&nbsp; ✓ Saved on this device<br>
+    ✓ Never share key in chat
+  </div>
+  <input class="key-inp" id="ki" type="password" placeholder="AIza..." autocomplete="off" spellcheck="false"/>
+  <div class="err" id="ke"></div>
+  <button class="go-btn" onclick="saveKey()">▶ START BUDDY</button>
+</div>
+
+<!-- FULL SCREEN PIXEL FACE — no robot, no borders, just black + face -->
+<svg class="pixel-face" id="face"
+  viewBox="0 0 16 12"
+  xmlns="http://www.w3.org/2000/svg"
+  preserveAspectRatio="xMidYMid meet"
+  shape-rendering="crispEdges">
+</svg>
+
+<!-- Bottom level pills (barely visible) -->
+<div class="level-bar">
+  <button class="pill" data-l="starter"      onclick="setLvl(this)">STARTER</button>
+  <button class="pill active" data-l="intermediate" onclick="setLvl(this)">INTER</button>
+  <button class="pill" data-l="past"         onclick="setLvl(this)">PAST</button>
+  <button class="pill" data-l="irregular"    onclick="setLvl(this)">IRREG</button>
+  <button class="pill" data-l="advanced"     onclick="setLvl(this)">ADV</button>
+</div>
+
+<!-- Key change -->
+<button class="key-btn" onclick="showSetup()">key</button>
+
+<!-- Status hint -->
+<div class="hint" id="hint"></div>
+
+<!-- Bubble -->
+<div class="bubble" id="bubble"></div>
+
+<script>
+// ────────────────────────────────────────────
+// STATE
+// ────────────────────────────────────────────
+let apiKey  = localStorage.getItem('buddy_key') || '';
+let level   = 'intermediate';
+let hist    = [];
+let spk     = false;
+let mouthTmr= null;
+let lastFrame = null;
+let bubbleTmr = null;
+let blinkInt  = null;
+let isSetup   = !apiKey;
+
+// SpeechRecognition — continuous, always on
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recog = null;
+let listeningActive = false;
+
+// ────────────────────────────────────────────
+// PROMPTS
+// ────────────────────────────────────────────
+const PROMPTS = {
+  starter:`You are BUDDY, a cheerful pixel robot helping kid Gael learn English. Present simple only. Max 8 words per sentence. Simple vocabulary. Recast errors naturally. Ask yes/no questions. Warm and fun. Max 2 sentences.`,
+  intermediate:`You are BUDDY, a cool robot friend helping teenager Gael practice English. Target grammar: present simple, present continuous, past simple, past continuous, "used to", frequency adverbs (always/usually/sometimes/never), irregular verbs, adjectives, adverbs. Use these naturally. Recast grammar errors smoothly in your reply. Ask follow-up questions requiring target grammar. Enthusiastic and fun. Max 3 sentences. Never explain grammar rules directly.`,
+  past:`You are BUDDY, a robot friend helping Gael practice past tenses. Focus: past simple, past continuous, "used to". Ask about memories, weekends, childhood. Recast errors naturally. Max 3 sentences.`,
+  irregular:`You are BUDDY helping Gael master English irregular verbs: go/went, see/saw, eat/ate, buy/bought, take/took, give/gave, make/made, come/came, get/got, have/had. Converse naturally using these verbs. When Gael uses wrong form, enthusiastically echo the correct one in reply. Max 3 sentences.`,
+  advanced:`You are BUDDY, Gael's advanced English conversation partner. Use present perfect, conditionals, passive voice. Discuss opinions, hypotheticals, future plans. Push complex expression. Gently recast errors. Max 4 sentences.`
+};
+
+// ────────────────────────────────────────────
+// PIXEL ART — 16×12 grid
+// ────────────────────────────────────────────
+function r(x,y,w,h,fill) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg','rect');
+  el.setAttribute('x',x); el.setAttribute('y',y);
+  el.setAttribute('width',w); el.setAttribute('height',h);
+  el.setAttribute('fill',fill);
+  return el;
+}
+
+const C='#00d4ff', P='#ff6b9d', Y='#ffd700', G='#1a1a1a', D='#000';
+
+const EXPRS = {
+  happy: ()=>[
+    r(3,2,1,1,C), r(4,3,2,1,C), r(6,2,1,1,C),   // left eye arch
+    r(9,2,1,1,C), r(10,3,2,1,C), r(12,2,1,1,C),  // right eye arch
+    r(5,8,1,1,C), r(6,9,1,1,C), r(7,9,1,1,C), r(8,9,1,1,C), r(9,8,1,1,C), // smile
+  ],
+  love: ()=>[
+    r(2,2,1,1,P),r(4,2,1,1,P), r(1,3,4,1,P), r(2,4,3,1,P), r(3,5,1,1,P),  // left heart
+    r(9,2,1,1,P),r(11,2,1,1,P), r(8,3,4,1,P), r(9,4,3,1,P), r(10,5,1,1,P), // right heart
+    r(5,8,1,1,P), r(6,9,1,1,P), r(7,9,1,1,P), r(8,9,1,1,P), r(9,8,1,1,P),
+  ],
+  thinking: ()=>[
+    r(3,3,4,2,Y),                                  // left squint
+    r(9,2,1,1,Y), r(10,3,2,1,Y), r(12,2,1,1,Y),  // right arch
+    r(4,9,8,1,Y),                                  // flat mouth
+    r(1,5,1,2,Y), r(2,7,1,1,Y),                   // sweat
+  ],
+  listening: ()=>[
+    r(2,2,4,1,P), r(2,3,1,3,P), r(5,3,1,3,P), r(2,5,4,1,P),  // left big O
+    r(9,2,4,1,P), r(9,3,1,3,P), r(12,3,1,3,P), r(9,5,4,1,P), // right big O
+    r(5,7,5,1,P), r(5,8,1,3,P), r(9,8,1,3,P), r(5,10,5,1,P), // open mouth O
+  ],
+  speak_open: ()=>[
+    r(3,2,1,1,C), r(4,3,2,1,C), r(6,2,1,1,C),
+    r(9,2,1,1,C), r(10,3,2,1,C), r(12,2,1,1,C),
+    r(4,7,7,1,C), r(4,8,1,3,C), r(10,8,1,3,C), r(4,10,7,1,C),
+  ],
+  speak_closed: ()=>[
+    r(3,2,1,1,C), r(4,3,2,1,C), r(6,2,1,1,C),
+    r(9,2,1,1,C), r(10,3,2,1,C), r(12,2,1,1,C),
+    r(4,8,7,2,C),
+  ],
+  sleeping: ()=>[
+    r(2,3,5,2,G), r(9,3,5,2,G),  // dash eyes
+    r(5,9,6,1,G),                  // flat mouth
+    r(13,1,2,1,G), r(14,2,1,1,G), r(13,3,2,1,G), // Z
+  ],
+};
+
+let curExpr = 'sleeping';
+function setExpr(name) {
+  curExpr = name;
+  const svg = document.getElementById('face');
+  svg.innerHTML = '';
+  (EXPRS[name] || EXPRS.happy)().forEach(p => svg.appendChild(p));
+}
+
+// ── BLINK ──
+function startBlink() {
+  if (blinkInt) clearInterval(blinkInt);
+  blinkInt = setInterval(() => {
+    if (spk || curExpr === 'sleeping' || curExpr === 'listening') return;
+    const prev = curExpr;
+    const svg = document.getElementById('face');
+    svg.innerHTML = '';
+    (EXPRS.sleeping)().forEach(p => svg.appendChild(p));
+    setTimeout(() => { if (!spk) setExpr(prev); }, 120);
+  }, 3000 + Math.random() * 2500);
+}
+
+// ── MOUTH ANIMATION ──
+let mOpen = false;
+function startMouth() {
+  if (mouthTmr) clearInterval(mouthTmr);
+  mOpen = false;
+  mouthTmr = setInterval(() => {
+    mOpen = !mOpen;
+    const svg = document.getElementById('face');
+    svg.innerHTML = '';
+    (mOpen ? EXPRS.speak_open : EXPRS.speak_closed)().forEach(p => svg.appendChild(p));
+  }, 220);
+}
+function stopMouth() {
+  if (mouthTmr) clearInterval(mouthTmr);
+  mouthTmr = null;
+}
+
+// ── BUBBLE ──
+function showBubble(txt, isUser=false) {
+  const b = document.getElementById('bubble');
+  b.textContent = txt;
+  b.className = 'bubble show' + (isUser ? ' user' : '');
+  if (bubbleTmr) clearTimeout(bubbleTmr);
+  bubbleTmr = setTimeout(() => b.classList.remove('show'), isUser ? 3000 : 5000);
+}
+
+// ── HINT ──
+function setHint(txt) {
+  const h = document.getElementById('hint');
+  h.textContent = txt;
+  h.classList.toggle('visible', !!txt);
+}
+
+// ────────────────────────────────────────────
+// CONTINUOUS SPEECH RECOGNITION
+// ────────────────────────────────────────────
+function startListening() {
+  if (!SR || listeningActive || spk || isSetup) return;
+
+  recog = new SR();
+  recog.lang = 'en-US';
+  recog.continuous = false;
+  recog.interimResults = false;
+
+  recog.onstart = () => {
+    listeningActive = true;
+    setExpr('listening');
+    setHint('listening...');
+  };
+
+  recog.onresult = (e) => {
+    const txt = e.results[0][0].transcript.trim();
+    if (txt.length > 1) {
+      showBubble(txt, true);
+      setExpr('thinking');
+      setHint('thinking...');
+      handleIn(txt);
+    }
+  };
+
+  recog.onend = () => {
+    listeningActive = false;
+    if (!spk && !isSetup) {
+      setTimeout(startListening, 800);
+    }
+  };
+
+  recog.onerror = (e) => {
+    listeningActive = false;
+    if (e.error === 'not-allowed') {
+      setHint('mic blocked — allow mic in browser');
+      return;
+    }
+    if (!spk && !isSetup) setTimeout(startListening, 1500);
+  };
+
+  try { recog.start(); } catch(e) { listeningActive = false; }
+}
+
+function stopListening() {
+  listeningActive = false;
+  if (recog) { try { recog.stop(); } catch(e){} }
+}
+
+// ────────────────────────────────────────────
+// GEMINI
+// ────────────────────────────────────────────
+async function askGemini(txt) {
+  hist.push({ role:'user', parts:[{text:txt}] });
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system_instruction: { parts:[{text: PROMPTS[level]}] },
+        contents: hist,
+        generationConfig: { maxOutputTokens:120, temperature:0.9 }
+      })
+    }
+  );
+  const data = await res.json();
+  if (data.error) throw new Error(data.error.message + ' | code:' + data.error.code);
+  const reply = data.candidates[0].content.parts[0].text.trim();
+  hist.push({ role:'model', parts:[{text:reply}] });
+  return reply;
+}
+
+async function handleIn(txt) {
+  stopListening();
+  try {
+    const reply = await askGemini(txt);
+    say(reply);
+  } catch(e) {
+    let msg = 'Hmm, connection error. Try again!';
+    if (e.message.includes('429')) msg = 'Too many messages! Wait a moment...';
+    if (e.message.includes('400') || e.message.includes('403')) msg = 'API key problem. Tap KEY to update.';
+    showBubble(msg);
+    hist.pop();
+    setExpr('happy'); setHint('');
+    setTimeout(startListening, 2000);
+  }
+}
+
+// ────────────────────────────────────────────
+// TEXT TO SPEECH
+// ────────────────────────────────────────────
+function say(txt) {
+  if (!window.speechSynthesis) { setExpr('happy'); startListening(); return; }
+  if (speechSynthesis.speaking) speechSynthesis.cancel();
+
+  showBubble(txt);
+
+  const u = new SpeechSynthesisUtterance(txt);
+  u.lang  = 'en-US';
+  u.rate  = level === 'starter' ? 0.82 : 0.9;
+  u.pitch = 1.1;
+
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find(v => v.lang.startsWith('en') && v.localService)
+         || voices.find(v => v.lang.startsWith('en'));
+  if (v) u.voice = v;
+
+  u.onstart = () => {
+    spk = true;
+    setHint('speaking...');
+    startMouth();
+  };
+
+  u.onend = () => {
+    spk = false;
+    stopMouth();
+    setExpr('happy');
+    setHint('');
+    setTimeout(startListening, 600);
+  };
+
+  u.onerror = () => {
+    spk = false;
+    stopMouth();
+    setExpr('happy');
+    setTimeout(startListening, 600);
+  };
+
+  spk = true;
+  speechSynthesis.speak(u);
+}
+
+// ────────────────────────────────────────────
+// SETUP
+// ────────────────────────────────────────────
+function showSetup() {
+  isSetup = true;
+  stopListening();
+  document.getElementById('setup').classList.remove('hidden');
+}
+
+function saveKey() {
+  const v = document.getElementById('ki').value.trim();
+  if (v.length < 15) { document.getElementById('ke').textContent = 'Key too short — check it'; return; }
+  apiKey = v;
+  localStorage.setItem('buddy_key', v);
+  isSetup = false;
+  document.getElementById('setup').classList.add('hidden');
+  init();
+}
+
+function init() {
+  setExpr('happy');
+  startBlink();
+  speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+  setTimeout(() => {
+    say("Hey Gael! I'm Buddy. Let's practice English. Just talk to me!");
+  }, 500);
+  initMotion();
+  setInterval(() => {
+    if (spk || listeningActive || curExpr !== 'happy') return;
+    if (Math.random() < 0.15) {
+      setExpr('love');
+      setTimeout(() => { if (!spk && !listeningActive) setExpr('happy'); }, 2500);
+    }
+  }, 9000);
+}
+
+// ────────────────────────────────────────────
+// MOTION DETECTION (wake screen)
+// ────────────────────────────────────────────
+async function initMotion() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:80,height:60}});
+    const vid = document.getElementById('mv');
+    vid.srcObject = stream; vid.play();
+    const canvas = document.getElementById('mc');
+    canvas.width = 80; canvas.height = 60;
+    const ctx = canvas.getContext('2d', {willReadFrequently: true});
+    setInterval(() => {
+      ctx.drawImage(vid, 0, 0, 80, 60);
+      const frame = ctx.getImageData(0, 0, 80, 60);
+      lastFrame = frame;
+    }, 800);
+  } catch(e) { /* no camera = no problem */ }
+}
+
+// ────────────────────────────────────────────
+// LEVEL
+// ────────────────────────────────────────────
+function setLvl(btn) {
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  level = btn.dataset.l;
+}
+
+// ────────────────────────────────────────────
+// START
+// ────────────────────────────────────────────
+setExpr('sleeping');
+
+if (apiKey) {
+  isSetup = false;
+  document.getElementById('setup').classList.add('hidden');
+  init();
+}
+// Si no hay key, el setup ya está visible por defecto (sin clase hidden)
+</script>
+</body>
+</html>
