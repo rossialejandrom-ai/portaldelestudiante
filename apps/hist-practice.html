@@ -1,0 +1,626 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Historia I — Práctica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--sur:#161b22;--sur2:#1c2330;--brd:#2d333b;
+  --am:#e3b341;--bl:#58a6ff;--gr:#3fb950;--rd:#f85149;--or:#f0883e;--pu:#a371f7;
+  --tx:#e6edf3;--mu:#8b949e;--R:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;max-width:620px;margin:0 auto;min-height:100vh;padding-bottom:60px}
+
+/* HEADER */
+.hdr{background:linear-gradient(155deg,#2a1f0a 0%,#0d1117 55%);border-bottom:1px solid var(--brd);padding:20px 20px 14px;text-align:center}
+.pill{display:inline-block;background:rgba(227,179,65,.12);border:1px solid rgba(227,179,65,.3);color:var(--am);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:99px;margin-bottom:8px}
+.hdr h1{font-family:'Syne',sans-serif;font-size:clamp(18px,5vw,24px);font-weight:800;line-height:1.2}
+.hdr h1 em{color:var(--am);font-style:normal}
+.hdr .sub{color:var(--mu);font-size:12px;margin-top:4px}
+.exam-badge{display:inline-block;margin-top:8px;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:#ff7b72;font-size:11px;font-weight:600;padding:3px 12px;border-radius:99px}
+
+/* SCORES */
+.scores{display:flex;gap:1px;background:var(--brd);border-bottom:1px solid var(--brd)}
+.sc{flex:1;background:var(--sur);padding:11px 8px;text-align:center}
+.sc .n{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;line-height:1}
+.sc .l{font-size:10px;color:var(--mu);margin-top:2px}
+.sc.g .n{color:var(--gr)}.sc.r .n{color:var(--rd)}.sc.b .n{color:var(--bl)}
+
+.body{padding:16px}
+
+/* MODE TABS */
+.modes{display:flex;background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:4px;gap:4px;margin-bottom:12px}
+.mt{flex:1;padding:8px 4px;border-radius:8px;border:none;background:transparent;color:var(--mu);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;text-align:center}
+.mt.on{background:var(--am);color:#0d1117}
+
+/* TOPIC FILTERS */
+.trow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tp{padding:5px 12px;border-radius:99px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.tp.on{border-color:var(--am);color:var(--am);background:rgba(227,179,65,.07)}
+
+/* PROGRESS */
+.pb{height:4px;background:var(--sur);border-radius:99px;overflow:hidden;margin-bottom:5px}
+.pf{height:100%;background:linear-gradient(90deg,var(--am),var(--or));border-radius:99px;transition:width .4s ease}
+.pl{font-size:11px;color:var(--mu);text-align:right;margin-bottom:12px}
+
+/* CARD */
+.card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:18px;margin-bottom:12px}
+.qmeta{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--am);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.qref{font-size:10px;color:var(--mu);background:var(--sur2);padding:2px 8px;border-radius:99px}
+.qt{font-size:15px;font-weight:500;line-height:1.6;margin-bottom:14px}
+
+/* FLASHCARD */
+.fcw{perspective:900px;min-height:160px;margin-bottom:8px;cursor:pointer}
+.fc{width:100%;min-height:160px;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.fc.flip{transform:rotateY(180deg)}
+.ff,.fb2{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--R);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;text-align:center;min-height:160px}
+.ff{background:linear-gradient(135deg,#2a1f0a,#1c2330);border:1.5px solid rgba(227,179,65,.25)}
+.fb2{background:linear-gradient(135deg,#0c2418,#1c2330);border:1.5px solid rgba(63,185,80,.25);transform:rotateY(180deg);overflow-y:auto}
+.fc-top{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.fc-term{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--am);line-height:1.2}
+.fc-def{font-size:13px;line-height:1.75;color:#cdd9e5}
+.fc-def b{color:var(--am)}
+.fc-ref{font-size:10px;color:var(--mu);margin-top:8px;background:rgba(227,179,65,.07);padding:3px 10px;border-radius:99px;border:1px solid rgba(227,179,65,.15)}
+.hint{text-align:center;font-size:11px;color:var(--mu);margin-bottom:12px}
+.seval{display:none;gap:9px;margin-top:6px}
+.seval.on{display:flex}
+.bk{flex:1;background:rgba(63,185,80,.12);color:var(--gr);border:1px solid rgba(63,185,80,.28);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:11px;border-radius:9px;cursor:pointer}
+.bk:hover{background:rgba(63,185,80,.22)}
+.bn{flex:1;background:rgba(248,81,73,.1);color:#ff7b72;border:1px solid rgba(248,81,73,.25);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:11px;border-radius:9px;cursor:pointer}
+.bn:hover{background:rgba(248,81,73,.18)}
+
+/* MULTIPLE CHOICE */
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.ch{width:100%;text-align:left;background:var(--sur2);border:1.5px solid var(--brd);border-radius:9px;padding:12px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13.5px;line-height:1.5;cursor:pointer;transition:all .18s}
+.ch:hover:not(:disabled){border-color:var(--am)}
+.ch.ok{border-color:var(--gr);background:rgba(63,185,80,.08);color:var(--gr)}
+.ch.no{border-color:var(--rd);background:rgba(248,81,73,.08);color:var(--rd)}
+.ch:disabled{cursor:default}
+
+/* WRITE MODE */
+textarea{width:100%;background:var(--sur2);border:1.5px solid var(--brd);border-radius:9px;padding:12px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.6;resize:none;min-height:110px;outline:none;transition:border-color .2s}
+textarea:focus{border-color:var(--am)}
+textarea::placeholder{color:var(--mu)}
+
+/* REF BOX */
+.refbox{background:rgba(227,179,65,.05);border-left:3px solid var(--am);border-radius:6px;padding:12px 14px;font-size:13px;line-height:1.7;color:#cdd9e5;margin-bottom:12px;display:none}
+.refbox.on{display:block}
+.refbox b{color:var(--am)}
+.refbox .src{font-size:11px;color:var(--mu);margin-top:6px;font-style:italic}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 20px;border-radius:9px;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;width:100%;margin-top:8px}
+.bg{background:var(--am);color:#0d1117}
+.bg:hover{filter:brightness(1.1)}
+.bg:disabled{opacity:.35;cursor:not-allowed}
+.bgh{background:var(--sur2);color:var(--tx);border:1px solid var(--brd)}
+.bgh:hover{border-color:var(--am);color:var(--am)}
+
+/* FEEDBACK */
+.fbk{border-radius:var(--R);padding:14px;margin-top:10px;display:none;animation:fu .3s ease}
+.fbk.on{display:block}
+.fbk.ex{background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.28)}
+.fbk.pa{background:rgba(227,179,65,.07);border:1px solid rgba(227,179,65,.22)}
+.fbk.ic{background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.22)}
+.fbh{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.fbe{font-size:19px}.fbt{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.fbb{font-size:13px;line-height:1.7;color:#cdd9e5}
+.fbb b{color:var(--am)}
+.tg{display:inline-block;background:rgba(63,185,80,.13);color:var(--gr);border-radius:4px;padding:1px 7px;font-size:12px;font-weight:500}
+.tb{display:inline-block;background:rgba(248,81,73,.12);color:#ff7b72;border-radius:4px;padding:1px 7px;font-size:12px;font-weight:500}
+/* Reference tip inside feedback */
+.fref{margin-top:10px;background:rgba(227,179,65,.07);border:1px solid rgba(227,179,65,.18);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--mu);line-height:1.55}
+.fref b{color:var(--am)}
+
+/* DOTS LOADER */
+.dots{display:inline-flex;gap:5px;align-items:center;padding:4px 0}
+.dots span{width:7px;height:7px;background:var(--am);border-radius:50%;animation:bo 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+
+/* COMPLETION */
+.comp{display:none;text-align:center;padding:48px 20px;animation:fu .4s ease}
+.comp.on{display:block}
+.comp .big{font-size:54px;margin-bottom:14px}
+.comp h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:7px}
+.comp p{color:var(--mu);font-size:13.5px;margin-bottom:24px;line-height:1.6}
+
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bo{0%,80%,100%{transform:scaleY(1)}40%{transform:scaleY(1.6)}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="pill">🏛 Historia I</div>
+  <h1>Práctica<br><em>Interactiva</em></h1>
+  <div class="sub">Introducción a la Historia · Todo el material</div>
+  <div class="exam-badge">📅 Examen: Lunes 28/04</div>
+</div>
+
+<div class="scores">
+  <div class="sc g"><div class="n" id="sc">0</div><div class="l">✓ Correctas</div></div>
+  <div class="sc r"><div class="n" id="sw">0</div><div class="l">✗ Errores</div></div>
+  <div class="sc b"><div class="n" id="st">0</div><div class="l">Intentos</div></div>
+</div>
+
+<div class="body">
+  <div class="modes">
+    <button class="mt on" id="mf" onclick="setMode('flash')">⚡ Tarjetas</button>
+    <button class="mt" id="mm" onclick="setMode('multi')">🎯 Múltiple</button>
+    <button class="mt" id="mw" onclick="setMode('write')">✍️ Escribir</button>
+  </div>
+  <div class="trow" id="trow"></div>
+  <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
+  <div class="pl" id="pl">0 / 0</div>
+  <div id="garea">
+    <div class="card" id="mc"><div id="qa"></div></div>
+  </div>
+  <div class="comp" id="comp">
+    <div class="big" id="ce">🏆</div>
+    <h2 id="ct">¡Muy bien!</h2>
+    <p id="cp"></p>
+    <button class="btn bg" style="max-width:260px;margin:0 auto 10px" onclick="reErr()">🔄 Repasar errores</button><br>
+    <button class="btn bgh" style="max-width:260px;margin:0 auto" onclick="reAll()">↺ Empezar de nuevo</button>
+  </div>
+</div>
+
+<script>
+const Q = [
+
+/* ══════════════════════════════════
+   1. QUÉ ES LA HISTORIA
+══════════════════════════════════ */
+{id:1, topic:"¿Qué es la Historia?",
+term:"Definición de Historia",
+def:"La <b>Historia</b> es la ciencia social que estudia el pasado de la humanidad a través del tiempo, para conocer y comprender el presente.<br><br>Tiene <b>dos sentidos</b>:<br>• El <b>pasado mismo</b> (todo lo que ocurrió)<br>• La <b>disciplina científica</b> que estudia ese pasado",
+ref:"Carpeta p.1 · Libro p.15",
+src:"Carpeta p.1 — 'Historia: un esfuerzo por conocer y comprender' · Libro p.15 — '1. La Historia, un viaje a través del tiempo'",
+keys:["pasado","ciencia social","disciplina","humanidad","tiempo","comprender"],
+mc:["La ciencia que solo estudia guerras y batallas","La ciencia social que estudia el pasado de la humanidad para comprender el presente","Una técnica para memorizar fechas importantes","La disciplina que estudia el futuro de las sociedades"],cor:1},
+
+{id:2, topic:"¿Qué es la Historia?",
+term:"Para qué sirve la Historia",
+def:"La Historia sirve para:<br>• <b>Conocer y comprender el pasado</b> de la humanidad<br>• <b>Explicar el presente</b> (el presente es resultado del pasado)<br>• <b>Adquirir herramientas</b> para pensar críticamente<br>• <b>Hacer preguntas</b>: ¿cómo? ¿por qué? ¿para qué?<br><br>Como dijo Marx: 'La humanidad siempre se plantea los problemas que puede resolver'",
+ref:"Carpeta p.1-2 · Libro p.15",
+src:"Carpeta: 'Para qué estudiar Historia: conocer, comprender, explicar el presente' · Libro p.15",
+keys:["comprender","explicar","presente","pasado","herramientas","preguntas","crítico"],
+mc:["Solo para aprobar exámenes y saber fechas","Para conocer el pasado, explicar el presente y desarrollar pensamiento crítico","Únicamente para conocer la vida de los reyes","Para predecir el futuro con exactitud"],cor:1},
+
+{id:3, topic:"¿Qué es la Historia?",
+term:"La Historia como ciencia social",
+def:"La Historia es una <b>ciencia social</b> porque:<br>• Estudia la <b>vida de los hombres en el tiempo</b><br>• Usa un <b>método científico de investigación</b><br>• Busca explicaciones con <b>rigor y evidencia</b><br><br>A diferencia de otras ciencias, estudia hechos <b>irrepetibles</b> y busca <b>múltiples causas</b> para cada fenómeno.",
+ref:"Libro p.15-16",
+src:"Libro p.15 — 'Historia: una palabra, dos sentidos' · Libro p.16 — 'La vitalidad de la historia'",
+keys:["ciencia social","hombres en el tiempo","método científico","irrepetible","múltiples causas"],
+mc:["Una ciencia exacta como la Matemática","Una disciplina que estudia solo monumentos y obras de arte","Una ciencia social que estudia la vida humana en el tiempo con método científico","Una ciencia natural como la Biología"],cor:2},
+
+/* ══════════════════════════════════
+   2. CAMBIOS Y CONTINUIDADES
+══════════════════════════════════ */
+{id:4, topic:"Cambios y continuidades",
+term:"Cambio histórico",
+def:"El <b>cambio</b> es cuando algo se transforma a lo largo del tiempo: una institución, una costumbre, una forma de pensar o de organizar la sociedad.<br><br>Los cambios pueden ser:<br>• <b>Lentos</b> (siglos) o <b>rápidos</b> (revoluciones)<br>• <b>Parciales</b> (solo un aspecto) o <b>totales</b> (toda la sociedad)",
+ref:"Libro p.14 · Carpeta",
+src:"Libro p.14 — 'Cambios y continuidades' · Carpeta: concepto de cambio",
+keys:["transforma","tiempo","institución","costumbre","lentos","rápidos","parciales","totales"],
+mc:["Cuando todo permanece igual en la sociedad","La transformación de algo a lo largo del tiempo (institución, costumbre, pensamiento)","Solo las guerras que cambian fronteras","Únicamente los cambios de gobierno"],cor:1},
+
+{id:5, topic:"Cambios y continuidades",
+term:"Continuidad histórica",
+def:"La <b>continuidad</b> es cuando algo permanece a lo largo del tiempo sin transformarse radicalmente.<br><br>Ejemplos de continuidades:<br>• El <b>Cristianismo</b> y el <b>Islam</b> se mantienen como religiones<br>• La <b>agricultura</b> como actividad<br>• Algunas <b>instituciones</b> (como la Iglesia) a lo largo de los siglos<br><br>Cambio y continuidad coexisten siempre en la Historia.",
+ref:"Libro p.14",
+src:"Libro p.14 — 'Cambios y continuidades'",
+keys:["permanece","tiempo","Cristianismo","Islam","agricultura","institución","coexisten"],
+mc:["Cuando todo cambia radicalmente en la sociedad","Cuando algo permanece sin transformarse radicalmente a lo largo del tiempo","Solo la permanencia de las fronteras de los países","La repetición exacta de los mismos hechos"],cor:1},
+
+/* ══════════════════════════════════
+   3. EL TIEMPO HISTÓRICO
+══════════════════════════════════ */
+{id:6, topic:"El tiempo histórico",
+term:"Tiempo lineal",
+def:"El <b>tiempo lineal</b> es una forma de concebir el tiempo como una línea recta, con un <b>inicio</b>, un <b>desarrollo</b> y un <b>fin</b>.<br><br>• Va del <b>pasado hacia el futuro</b><br>• Los hechos <b>no se repiten</b><br>• Es la base del pensamiento histórico occidental<br>• Está vinculado al <b>Judaísmo y el Cristianismo</b> (nació con el nacimiento de Cristo como punto de partida)",
+ref:"Carpeta p.4 · Libro p.22",
+src:"Carpeta: 'Tiempo lineal — Sucesión. No es un círculo' · Libro p.22 — 'La cronología y las líneas de tiempo'",
+keys:["línea recta","inicio","fin","no se repiten","pasado","futuro","Judaísmo","Cristianismo"],
+mc:["Un tiempo que se repite cíclicamente como las estaciones","Un tiempo que avanza en línea recta del pasado al futuro, sin repetición","Solo el tiempo que dura un año","El tiempo medido por el movimiento de los planetas"],cor:1},
+
+{id:7, topic:"El tiempo histórico",
+term:"Tiempo cíclico",
+def:"El <b>tiempo cíclico</b> es la concepción del tiempo como un <b>círculo que se repite</b>.<br><br>• Los mismos fenómenos vuelven a ocurrir<br>• Ejemplos: <b>estaciones del año</b>, ciclo lunar, día y noche<br>• Era la concepción de muchas culturas de la Antigüedad<br>• No tiene inicio ni fin absolutos",
+ref:"Carpeta p.4",
+src:"Carpeta: 'Cíclico = No tiene principio ni fin. Moda, ver primera vez. Se puede repetir'",
+keys:["círculo","repite","estaciones","ciclo lunar","antigüedad","sin inicio ni fin"],
+mc:["El tiempo que avanza siempre hacia adelante sin repetirse","El tiempo concebido como un círculo que se repite (estaciones, ciclos naturales)","El tiempo que solo miden los científicos","El tiempo que transcurre en un año histórico"],cor:1},
+
+{id:8, topic:"El tiempo histórico",
+term:"Cronología",
+def:"La <b>cronología</b> (del griego Cronos = tiempo, Logía = estudio) es la <b>ciencia que mide y ordena el tiempo</b>.<br><br>• Ubica los hechos en el tiempo de forma precisa<br>• Permite comparar y relacionar eventos<br>• Herramienta fundamental del historiador<br><br>Los <b>calendarios</b> son convenciones para organizar el tiempo. No todos los pueblos usan el mismo punto de partida.",
+ref:"Carpeta p.4 · Libro p.22",
+src:"Libro p.22 — 'La cronología y las líneas de tiempo' · Carpeta: 'Cronología del griego Cronos = tiempo'",
+keys:["mide","ordena","tiempo","Cronos","Logía","calendarios","convención","historiador"],
+mc:["La ciencia que estudia los cromosomas","La ciencia que mide y ordena el tiempo para ubicar hechos históricos","Solo el estudio de los relojes antiguos","La rama de la Biología que estudia el tiempo de vida de los seres vivos"],cor:1},
+
+{id:9, topic:"El tiempo histórico",
+term:"Sucesiones y simultaneidades",
+def:"<b>Sucesiones</b>: hechos que ocurren uno <b>después</b> del otro, de forma consecutiva.<br><br><b>Simultaneidades</b>: hechos que ocurren <b>al mismo tiempo</b>, en distintos lugares.<br><br>Ejemplo: mientras en Europa ocurría la Revolución Francesa (1789), en América se desarrollaban movimientos de independencia — esto es una <b>simultaneidad</b>.",
+ref:"Libro p.22",
+src:"Libro p.22 — 'Sucesiones y simultaneidades'",
+keys:["sucesiones","después","consecutivo","simultaneidades","al mismo tiempo","distintos lugares"],
+mc:["Sucesión = al mismo tiempo; Simultaneidad = uno después del otro","Sucesión = hechos consecutivos; Simultaneidad = hechos al mismo tiempo en distintos lugares","Son sinónimos, significan lo mismo","Solo se aplican a guerras históricas"],cor:1},
+
+/* ══════════════════════════════════
+   4. PERIODIZACIÓN
+══════════════════════════════════ */
+{id:10, topic:"Periodización",
+term:"¿Qué es la periodización?",
+def:"La <b>periodización</b> es la división del tiempo histórico en <b>períodos o etapas</b> para facilitar su estudio.<br><br>• Es una <b>convención arbitraria</b> — los historiadores acuerdan puntos de corte<br>• Permite <b>organizar y comparar</b> hechos<br>• La más difundida divide la Historia en <b>5 edades</b>",
+ref:"Carpeta p.3 · Libro p.23-24",
+src:"Carpeta: 'Convención — Arbitrario — Organización — Orden' · Libro p.23-24",
+keys:["división","períodos","etapas","convención","arbitraria","organizar","5 edades"],
+mc:["La lista de todos los presidentes de un país","La división del tiempo histórico en períodos para facilitar el estudio","Solo la división entre pasado y presente","El estudio de los períodos glaciares"],cor:1},
+
+{id:11, topic:"Periodización",
+term:"Las 5 edades de la Historia",
+def:"<b>Prehistoria</b>: desde los primeros humanos hasta la escritura (~3000 a.C.)<br><b>Edad Antigua</b>: desde la escritura hasta la caída de Roma Occidental (476 d.C.)<br><b>Edad Media</b>: 476 d.C. hasta la caída de Constantinopla (1453)<br><b>Edad Moderna</b>: 1453 hasta la Revolución Francesa (1789)<br><b>Edad Contemporánea</b>: desde 1789 hasta hoy",
+ref:"Carpeta p.3 · Libro p.23",
+src:"Carpeta: tabla de edades con fechas · Libro p.23 — 'La periodización más difundida'",
+keys:["Prehistoria","escritura","Antigua","476","Media","1453","Moderna","1789","Contemporánea"],
+mc:["Prehistoria, Antigüedad, Oscurantismo, Renacimiento, Modernidad","Prehistoria (hasta escritura), Antigua (476), Media (1453), Moderna (1789), Contemporánea","Solo hay 3 edades: Antigua, Media y Moderna","Prehistoria, Antigüedad, Feudalismo, Colonialismo, Actual"],cor:1},
+
+/* ══════════════════════════════════
+   5. TESTIMONIOS Y FUENTES
+══════════════════════════════════ */
+{id:12, topic:"Fuentes históricas",
+term:"¿Qué son los testimonios?",
+def:"Los <b>testimonios</b> son todos los <b>vestigios o rastros del pasado</b> que llegan hasta nosotros.<br><br>• Permiten al historiador <b>conocer y reconstruir</b> el pasado<br>• Pueden ser <b>materiales</b> (objetos, monumentos) o <b>escritos</b> (documentos, cartas)<br>• También <b>tradiciones orales</b> y manifestaciones culturales",
+ref:"Carpeta p.2 · Libro p.16-17",
+src:"Libro p.16 — 'Testimonios y fuentes' · Carpeta: 'Testimonios = vestigios que llegan hasta nosotros'",
+keys:["vestigios","rastros","pasado","reconstruir","materiales","escritos","tradiciones orales"],
+mc:["Solo los testimonios escritos valen para la Historia","Los vestigios o rastros del pasado que permiten al historiador conocer y reconstruir lo ocurrido","Solo las declaraciones de testigos vivos","Los documentos guardados en archivos secretos"],cor:1},
+
+{id:13, topic:"Fuentes históricas",
+term:"Fuentes primarias vs secundarias",
+def:"<b>Fuentes primarias</b>: testimonios <b>directos de la época estudiada</b>. Son documentos, objetos o registros hechos durante el período que se analiza.<br>Ej: carta de un soldado de la Primera Guerra, un jarrón romano, un manuscrito medieval.<br><br><b>Fuentes secundarias</b>: tienen información <b>de la época pero no fueron escritas en ella</b>. Son análisis, libros o trabajos elaborados con posterioridad.<br>Ej: un libro de Historia escrito hoy sobre la Revolución Francesa.",
+ref:"Carpeta p.2 · Libro p.16",
+src:"Carpeta: 'Fuentes Primarias: todos los testimonios, objetos y documentos de la época estudiada · Fuentes Secundarias: tienen información de la época pero no fue escrito en la época'",
+keys:["primarias","directas","época","secundarias","posteriores","análisis","manuscrito"],
+mc:["Primarias = libros actuales; Secundarias = documentos antiguos","Primarias = testimonios directos de la época; Secundarias = análisis elaborados después","Son lo mismo, solo difieren en el nombre","Primarias = solo fuentes escritas; Secundarias = solo fuentes materiales"],cor:1},
+
+{id:14, topic:"Fuentes históricas",
+term:"Tipos de testimonios materiales",
+def:"Los testimonios materiales incluyen:<br><br><b>Biológicos</b>: restos óseos, fósiles<br><b>Culturales — Arquitectónicos</b>: monumentos, ciudades, palacios, construcciones religiosas<br><b>Culturales — Industriales</b>: herramientas, manufactura, objetos de consumo<br><b>Culturales — Artísticos</b>: esculturas, pinturas, mosaicos<br><b>Escritos y visuales</b>: documentos, libros, periódicos, monedas, sellos, joyas",
+ref:"Libro p.17",
+src:"Libro p.17 — tabla de testimonios: Biológicos · Arquitectónicos · Industriales · Artísticos · Escritos",
+keys:["biológicos","arquitectónicos","industriales","artísticos","escritos","monumentos","herramientas","documentos"],
+mc:["Solo los documentos escritos son testimonios válidos","Solo monumentos y esculturas son fuentes históricas","Biológicos (fósiles), arquitectónicos (monumentos), industriales (herramientas), artísticos y escritos","Solo los testimonios grabados en audio o video"],cor:2},
+
+/* ══════════════════════════════════
+   6. INVESTIGACIÓN HISTÓRICA
+══════════════════════════════════ */
+{id:15, topic:"Investigación histórica",
+term:"Etapas de la investigación histórica",
+def:"El historiador trabaja en etapas:<br><br><b>1. Formulación de preguntas</b>: ¿qué quiero investigar? ¿por qué?<br><b>2. Búsqueda y selección de fuentes</b>: primarias y secundarias<br><b>3. Análisis y crítica de las fuentes</b>: verificar autenticidad y validez<br><b>4. Síntesis</b>: elaborar explicaciones y conclusiones<br><b>5. Presentación</b>: comunicar los resultados (libro, artículo, conferencia)",
+ref:"Libro p.18-19",
+src:"Libro p.18-19 — 'Etapas de la investigación histórica'",
+keys:["preguntas","búsqueda","fuentes","análisis","crítica","síntesis","presentación","5 etapas"],
+mc:["Solo buscar libros en una biblioteca","Formular preguntas → buscar fuentes → analizarlas → síntesis → presentación","Leer el libro de texto y resumirlo","Copiar información de internet y pegarla"],cor:1},
+
+{id:16, topic:"Investigación histórica",
+term:"La hipótesis en la investigación",
+def:"La <b>hipótesis</b> es una <b>respuesta provisoria</b> a la pregunta de investigación.<br><br>• Se plantea <b>antes de tener todos los datos</b><br>• Guía la búsqueda de fuentes<br>• Puede confirmarse o rechazarse según la evidencia<br>• Es fundamental en el método científico histórico",
+ref:"Libro p.18",
+src:"Libro p.18 — 'La formulación de preguntas y el planteo del tema a estudiar'",
+keys:["provisoria","respuesta","antes","datos","guía","confirmar","rechazar","evidencia"],
+mc:["La conclusión final de la investigación","Una respuesta definitiva e inmutable","Una respuesta provisoria que guía la investigación y puede confirmarse o rechazarse","Solo se usa en ciencias naturales, no en Historia"],cor:2},
+
+/* ══════════════════════════════════
+   7. EL TIEMPO — CALENDARIOS
+══════════════════════════════════ */
+{id:17, topic:"Calendarios y cronología",
+term:"¿Por qué hay distintos calendarios?",
+def:"Los <b>calendarios</b> son convenciones para organizar el tiempo. Cada cultura/religión eligió un <b>punto de partida</b> diferente:<br><br>• <b>Calendario cristiano</b>: punto de partida = nacimiento de Jesucristo (a.C. / d.C.)<br>• <b>Calendario judío</b>: punto de partida = creación del mundo según la Torá<br>• <b>Calendario musulmán</b>: punto de partida = la Hégira (emigración de Mahoma a Medina, 622 d.C.)<br><br>Los tres son igualmente válidos, pero no todos tienen el mismo punto de partida.",
+ref:"Libro p.22",
+src:"Libro p.22 — 'Los calendarios'",
+keys:["convención","punto de partida","cristiano","Jesucristo","judío","Torá","musulmán","Hégira","622"],
+mc:["Todos los pueblos siempre usaron el mismo calendario","Solo hay un calendario válido, el cristiano","Cada cultura eligió un punto de partida distinto para medir el tiempo (Jesucristo, la Torá, la Hégira)","Los calendarios solo sirven para agricultores"],cor:2},
+
+{id:18, topic:"Calendarios y cronología",
+term:"Milenios, siglos, décadas, años",
+def:"Unidades para medir el tiempo histórico:<br><br>• <b>Milenio</b> = 1.000 años<br>• <b>Siglo</b> = 100 años<br>• <b>Década</b> = 10 años<br>• <b>Año</b><br><br>Los siglos se escriben en <b>números romanos</b>. El siglo I comienza en el año 1 d.C. El siglo XXI comenzó en el año 2001.",
+ref:"Libro p.22",
+src:"Libro p.22 — 'La cronología y las líneas de tiempo'",
+keys:["milenio","siglo","década","año","romanos","1000","100","10"],
+mc:["Milenio=100 años; Siglo=10 años","Milenio=1000 años; Siglo=100 años; Década=10 años","Todos duran 50 años","Milenio=500 años; Siglo=50 años"],cor:1},
+
+/* ══════════════════════════════════
+   8. LA HISTORIA COMO DISCIPLINA
+══════════════════════════════════ */
+{id:19, topic:"Historia como disciplina",
+term:"Cambios en la Historia como disciplina (siglo XX)",
+def:"En el siglo XX, la Historia se transformó:<br><br>• Antes: solo estudiaba <b>batallas, reyes y gobernantes</b><br>• Desde el siglo XX: también estudia <b>economía, sociedad, cultura, vida cotidiana</b>, minorías, mujeres, niños, etc.<br>• La revista <b>Annales</b> (Francia, 1929) inauguró este cambio<br>• Los historiadores se relacionan con otras ciencias: <b>Sociología, Antropología, Lingüística</b>",
+ref:"Libro p.20-21",
+src:"Libro p.20 — 'Transformaciones de la ciencia histórica en el siglo XX'",
+keys:["siglo XX","Annales","sociedad","economía","vida cotidiana","minorías","Sociología","Antropología"],
+mc:["La Historia siempre estudió lo mismo sin cambios","En el siglo XX la Historia se amplió para estudiar sociedad, economía, cultura y vida cotidiana, no solo reyes y guerras","La Historia solo empezó a estudiarse en el siglo XXI","La Historia se volvió más limitada en el siglo XX"],cor:1},
+
+{id:20, topic:"Historia como disciplina",
+term:"El sesgo en la Historia",
+def:"El <b>sesgo</b> es la inclinación o punto de vista parcial que puede tener una fuente o un historiador.<br><br>• Las fuentes no son completamente <b>objetivas</b>: reflejan el contexto de quien las creó<br>• El historiador debe <b>analizar críticamente</b> cada fuente<br>• Las <b>redes sociales</b> pueden confirmar lo que ya pensamos (sesgo de confirmación)<br>• Es importante usar <b>múltiples fuentes</b> y compararlas",
+ref:"Carpeta p.4 · Libro p.18",
+src:"Carpeta: 'Sesgo de Confirmación: Lo que pasa en verdad y éste se lo va confirmando' · Libro p.18 — análisis y crítica de las fuentes",
+keys:["sesgo","parcial","objetivas","contexto","críticamente","múltiples fuentes","comparar","confirmación"],
+mc:["Las fuentes siempre son 100% objetivas y confiables","El sesgo no existe en la Historia","La inclinación parcial de una fuente, que debe ser analizada críticamente comparando múltiples fuentes","Solo afecta a las fuentes medievales"],cor:2},
+
+];
+
+/* ══════════════ ENGINE ══════════════ */
+let mode = 'flash';
+let atop = new Set();
+let queue = [], idx = 0, errs = [], cor = 0, wr = 0, tot = 0;
+let flipped = false, answered = false;
+
+const topics = [...new Set(Q.map(q => q.topic))];
+
+function init() {
+  const tr = document.getElementById('trow');
+  tr.innerHTML = '';
+  topics.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'tp' + (atop.has(t) ? ' on' : '');
+    b.textContent = t;
+    b.onclick = () => togT(t, b);
+    tr.appendChild(b);
+  });
+  buildQ(); render();
+}
+
+function togT(t, b) {
+  atop.has(t) ? atop.delete(t) : atop.add(t);
+  b.classList.toggle('on');
+  reset(); buildQ(); render();
+}
+
+function reset() { idx = 0; errs = []; cor = 0; wr = 0; tot = 0; updS(); }
+
+function buildQ() {
+  const pool = atop.size === 0 ? [...Q] : Q.filter(q => atop.has(q.topic));
+  queue = shuf([...pool]); idx = 0;
+}
+
+function shuf(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = 0 | Math.random() * (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function setMode(m) {
+  mode = m;
+  ['flash', 'multi', 'write'].forEach(x => document.getElementById('m' + x[0]).classList.toggle('on', x === m));
+  reset(); buildQ(); render();
+}
+
+function updS() {
+  document.getElementById('sc').textContent = cor;
+  document.getElementById('sw').textContent = wr;
+  document.getElementById('st').textContent = tot;
+}
+
+function updP() {
+  const t = queue.length, d = Math.min(idx, t), p = t ? (d / t * 100) : 0;
+  document.getElementById('pf').style.width = p + '%';
+  document.getElementById('pl').textContent = d + ' / ' + t;
+}
+
+function render() {
+  document.getElementById('comp').classList.remove('on');
+  document.getElementById('mc').style.display = '';
+  updP();
+  if (!queue.length) {
+    document.getElementById('qa').innerHTML = '<p style="color:var(--mu);font-size:14px;padding:8px 0">Seleccioná un tema para empezar.</p>';
+    return;
+  }
+  if (idx >= queue.length) { showComp(); return; }
+  answered = false; flipped = false;
+  const q = queue[idx];
+  if (mode === 'flash') rFlash(q);
+  else if (mode === 'multi') rMulti(q);
+  else rWrite(q);
+}
+
+/* ── FLASH ── */
+function rFlash(q) {
+  document.getElementById('qa').innerHTML = `
+    <div class="qmeta">${q.topic} <span class="qref">📖 ${q.ref}</span></div>
+    <div class="fcw" onclick="doFlip()">
+      <div class="fc" id="fc">
+        <div class="ff"><div class="fc-top">${q.topic}</div><div class="fc-term">${q.term}</div></div>
+        <div class="fb2">
+          <div class="fc-def">${q.def}</div>
+          <div class="fc-ref">📖 ${q.ref}</div>
+        </div>
+      </div>
+    </div>
+    <div class="hint" id="hint">Tocá la tarjeta para ver la definición</div>
+    <div class="seval" id="se">
+      <button class="bk" onclick="fcR(true)">✓ Lo sabía</button>
+      <button class="bn" onclick="fcR(false)">✗ No lo sabía</button>
+    </div>`;
+}
+function doFlip() {
+  if (answered) return;
+  flipped = !flipped;
+  document.getElementById('fc').classList.toggle('flip', flipped);
+  if (flipped) {
+    document.getElementById('hint').textContent = '¿Lo sabías?';
+    document.getElementById('se').classList.add('on');
+  }
+}
+function fcR(k) {
+  answered = true; tot++;
+  k ? cor++ : (wr++, errs.push(queue[idx]));
+  updS(); idx++; setTimeout(render, 280);
+}
+
+/* ── MULTI ── */
+function rMulti(q) {
+  const opts = shuf(q.mc.map((t, i) => ({ t, i }))), ct = q.mc[q.cor];
+  let h = `<div class="qmeta">${q.topic} <span class="qref">📖 ${q.ref}</span></div>
+    <div class="qt">¿Cómo se define correctamente: <strong>${q.term}</strong>?</div>
+    <div class="choices" id="chs">`;
+  opts.forEach(o => { h += `<button class="ch" onclick="chkM(this,'${o.t === ct ? 'ok' : 'no'}')">${o.t}</button>`; });
+  h += `</div><div class="fbk" id="fbk"></div>`;
+  document.getElementById('qa').innerHTML = h;
+}
+function chkM(btn, res) {
+  if (answered) return;
+  answered = true; tot++;
+  const q = queue[idx], ct = q.mc[q.cor];
+  document.querySelectorAll('.ch').forEach(b => {
+    b.disabled = true;
+    if (b.textContent === ct) b.classList.add('ok');
+    else if (b === btn && res === 'no') b.classList.add('no');
+  });
+  const fb = document.getElementById('fbk');
+  if (res === 'ok') {
+    cor++;
+    fb.className = 'fbk ex on';
+    fb.innerHTML = `<div class="fbh"><span class="fbe">🎯</span><span class="fbt">¡Correcto!</span></div>
+      <div class="fbb">${q.def}</div>
+      <div class="fref"><b>📖 Dónde encontrarlo:</b> ${q.src}</div>`;
+  } else {
+    wr++; errs.push(q);
+    fb.className = 'fbk ic on';
+    fb.innerHTML = `<div class="fbh"><span class="fbe">📖</span><span class="fbt">Repasemos</span></div>
+      <div class="fbb">Correcta: <b>${ct}</b><br><br>${q.def}</div>
+      <div class="fref"><b>📖 Para repasar:</b> ${q.src}</div>`;
+  }
+  const nx = document.createElement('button');
+  nx.className = 'btn bg'; nx.style.marginTop = '12px';
+  nx.textContent = idx < queue.length - 1 ? '→ Siguiente' : '✓ Finalizar';
+  nx.onclick = () => { idx++; render(); };
+  fb.after(nx);
+}
+
+/* ── WRITE ── */
+function rWrite(q) {
+  document.getElementById('qa').innerHTML = `
+    <div class="qmeta">${q.topic} <span class="qref">📖 ${q.ref}</span></div>
+    <div class="qt">Explicá con tus palabras: <strong>${q.term}</strong></div>
+    <div class="refbox" id="dbox"><b>📖 Definición de referencia:</b><br>${q.def}<div class="src">Fuente: ${q.src}</div></div>
+    <textarea id="ans" placeholder="Escribí tu respuesta acá..." rows="4"></textarea>
+    <button class="btn bg" id="evb" onclick="evalW()" disabled>Evaluar mi respuesta</button>
+    <div class="fbk" id="fbk2"></div>`;
+  document.getElementById('ans').addEventListener('input', () => {
+    document.getElementById('evb').disabled = document.getElementById('ans').value.trim().length < 8;
+  });
+}
+
+async function evalW() {
+  if (answered) return;
+  const q = queue[idx], ans = document.getElementById('ans').value.trim();
+  if (!ans) return;
+  answered = true; tot++; updS();
+  const evb = document.getElementById('evb');
+  evb.disabled = true;
+  evb.innerHTML = '<div class="dots"><span></span><span></span><span></span></div>';
+  document.getElementById('dbox').style.display = 'block';
+
+  const prompt = `Sos un profesor de Historia de 1er año de secundaria evaluando la respuesta de un alumno de 13-14 años.
+
+CONCEPTO EVALUADO: "${q.term}"
+TEMA: "${q.topic}"
+DEFINICIÓN CORRECTA DE REFERENCIA: "${q.def.replace(/<[^>]+>/g, '').replace(/\n/g, ' ')}"
+PALABRAS CLAVE ESPERADAS: ${q.keys.join(', ')}
+RESPUESTA DEL ALUMNO: "${ans}"
+
+Evaluá la respuesta de forma clara, concisa y motivadora. Respondé SOLO con JSON sin markdown:
+{"nivel":"excelente"|"parcial"|"incompleta","bien":["concepto1","concepto2"],"falto":["concepto3"],"comentario":"1-2 frases de feedback específico y alentador"}
+
+El feedback debe:
+- Ser específico (nombrar qué conceptos incluyó y cuáles faltaron)
+- Ser breve y directo
+- Usar lenguaje simple para un adolescente
+- Si está incompleta, indicar exactamente qué faltó mencionar`;
+
+  let nivel = 'parcial', bien = [], falto = [], comentario = '';
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 400,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const d = await r.json();
+    const raw = (d.content?.find(c => c.type === 'text')?.text || '{}')
+      .replace(/```[a-z]*/g, '').replace(/```/g, '').trim();
+    const p = JSON.parse(raw);
+    nivel = p.nivel || 'parcial';
+    bien = p.bien || [];
+    falto = p.falto || [];
+    comentario = p.comentario || '';
+  } catch {
+    const low = ans.toLowerCase();
+    const f = q.keys.filter(k => low.includes(k.toLowerCase()));
+    const ms = q.keys.filter(k => !low.includes(k.toLowerCase()));
+    const pct = f.length / q.keys.length;
+    nivel = pct >= .75 ? 'excelente' : pct >= .4 ? 'parcial' : 'incompleta';
+    bien = f; falto = ms;
+    comentario = pct >= .75
+      ? '¡Muy bien! Incluiste los conceptos principales.'
+      : 'Revisá los conceptos que te faltaron en la definición.';
+  }
+
+  nivel === 'excelente' ? cor++ : (wr++, errs.push(q));
+  updS();
+
+  const em = { excelente: '🌟', parcial: '💡', incompleta: '📖' };
+  const ti = { excelente: '¡Excelente!', parcial: 'Casi, seguí mejorando', incompleta: 'Hay que repasar esto' };
+  const cl = { excelente: 'ex', parcial: 'pa', incompleta: 'ic' };
+
+  const fb = document.getElementById('fbk2');
+  fb.className = `fbk ${cl[nivel]} on`;
+  fb.innerHTML = `<div class="fbh"><span class="fbe">${em[nivel]}</span><span class="fbt">${ti[nivel]}</span></div>
+    <div class="fbb">${comentario}
+    ${bien.length ? `<br><br><b>✓ Mencionaste:</b> ${bien.map(b => `<span class="tg">${b}</span>`).join(' ')}` : ''}
+    ${falto.length ? `<br><br><b>✗ Te faltó mencionar:</b> ${falto.map(b => `<span class="tb">${b}</span>`).join(' ')}` : ''}
+    </div>
+    ${nivel !== 'excelente' ? `<div class="fref"><b>📖 Para repasar:</b> ${q.src}</div>` : ''}`;
+
+  evb.innerHTML = idx < queue.length - 1 ? '→ Siguiente' : '✓ Finalizar';
+  evb.disabled = false;
+  evb.onclick = () => { idx++; render(); };
+}
+
+/* ── COMPLETION ── */
+function showComp() {
+  document.getElementById('mc').style.display = 'none';
+  document.getElementById('comp').classList.add('on');
+  const pct = tot ? Math.round(cor / tot * 100) : 0;
+  document.getElementById('ce').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '💪' : '📚';
+  document.getElementById('ct').textContent = pct >= 80 ? '¡Excelente!' : pct >= 50 ? '¡Bien, seguí!' : '¡Un poco más de repaso!';
+  document.getElementById('cp').textContent = `${cor} de ${tot} correctas (${pct}%).` + (errs.length ? ` Tenés ${errs.length} para repasar.` : ' ¡Todo perfecto!');
+}
+function reErr() {
+  if (!errs.length) { reAll(); return; }
+  queue = shuf([...errs]); errs = []; idx = 0; cor = 0; wr = 0; tot = 0; updS();
+  document.getElementById('comp').classList.remove('on');
+  document.getElementById('mc').style.display = ''; render();
+}
+function reAll() {
+  reset(); buildQ();
+  document.getElementById('comp').classList.remove('on');
+  document.getElementById('mc').style.display = ''; render();
+}
+
+init();
+</script>
+</body>
+</html>

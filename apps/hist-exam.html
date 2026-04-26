@@ -1,0 +1,599 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen Simulacro — Historia</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--sur:#161b22;--sur2:#1c2330;--brd:#2d333b;
+  --gr:#3fb950;--bl:#58a6ff;--or:#f0883e;--yw:#e3b341;--rd:#f85149;--pu:#a371f7;
+  --tx:#e6edf3;--mu:#8b949e;--R:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;max-width:620px;margin:0 auto;min-height:100vh;padding-bottom:40px}
+
+.hdr{background:linear-gradient(155deg,#3d1d0a 0%,#0d1117 55%);border-bottom:1px solid var(--brd);padding:22px 20px 16px;text-align:center;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(240,136,62,.1),transparent 70%);pointer-events:none}
+.pill{display:inline-block;background:rgba(240,136,62,.12);border:1px solid rgba(240,136,62,.3);color:var(--or);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:99px;margin-bottom:8px;position:relative}
+.hdr h1{font-family:'Syne',sans-serif;font-size:clamp(20px,5.5vw,28px);font-weight:900;line-height:1.15;position:relative}
+.hdr h1 em{color:var(--or);font-style:normal}
+.hdr .sub{color:var(--mu);font-size:12px;margin-top:4px;position:relative}
+.warn{display:inline-block;margin-top:10px;background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.25);color:var(--yw);font-size:10.5px;font-weight:600;padding:4px 12px;border-radius:99px}
+
+.topbar{display:flex;gap:1px;background:var(--brd);border-bottom:1px solid var(--brd)}
+.tb{flex:1;background:var(--sur);padding:11px 8px;text-align:center}
+.tb .n{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1}
+.tb .l{font-size:10px;color:var(--mu);margin-top:2px;letter-spacing:.5px}
+.tb.time .n{color:var(--yw)}
+.tb.prog .n{color:var(--bl)}
+.tb.score .n{color:var(--gr)}
+
+.body{padding:18px 16px}
+
+.start{text-align:center;padding:30px 10px}
+.start h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:14px}
+.start p{color:var(--mu);font-size:13.5px;line-height:1.7;margin-bottom:14px}
+.start .rules{background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:16px;text-align:left;margin:18px 0}
+.start .rules h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yw);margin-bottom:10px}
+.start .rules ul{list-style:none;padding:0}
+.start .rules li{font-size:13px;color:#cdd9e5;line-height:1.7;padding-left:20px;position:relative;margin-bottom:4px}
+.start .rules li::before{content:'▸';position:absolute;left:6px;color:var(--yw)}
+.btn-start{background:linear-gradient(135deg,#f0883e,#a371f7);color:white;border:none;padding:14px 32px;border-radius:10px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.5px}
+
+.qwrap{display:none}
+.qwrap.on{display:block}
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:11px}
+.qnum{font-family:'Syne',sans-serif;font-weight:800;color:var(--mu);letter-spacing:1px}
+.qtopic{background:var(--sur2);color:var(--or);padding:3px 10px;border-radius:99px;font-size:10.5px;font-weight:600}
+
+.qcard{background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:18px;margin-bottom:14px}
+.qtxt{font-size:15px;line-height:1.6;margin-bottom:6px;font-weight:500}
+.qtxt b{color:var(--yw)}
+.qtxt em{color:#ff7b72;font-style:normal;font-weight:600;text-transform:uppercase;font-size:13px}
+
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.opt{width:100%;text-align:left;background:var(--sur2);border:1.5px solid var(--brd);border-radius:9px;padding:12px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13.5px;line-height:1.55;cursor:pointer;transition:all .15s;display:flex;gap:11px;align-items:flex-start}
+.opt:hover:not(:disabled){border-color:var(--or);background:rgba(240,136,62,.04)}
+.opt .letter{font-family:'Syne',sans-serif;font-weight:800;color:var(--mu);min-width:18px;font-size:12px;flex-shrink:0;padding-top:1px}
+.opt.sel{border-color:var(--or);background:rgba(240,136,62,.08)}
+.opt.sel .letter{color:var(--or)}
+.opt.ok{border-color:var(--gr);background:rgba(63,185,80,.1);color:var(--gr)}
+.opt.ok .letter{color:var(--gr)}
+.opt.no{border-color:var(--rd);background:rgba(248,81,73,.08);color:#ff7b72}
+.opt.no .letter{color:#ff7b72}
+.opt:disabled{cursor:default}
+
+.submit-row{display:flex;gap:9px}
+.btn-submit{flex:1;background:var(--or);color:#0d1117;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;padding:12px;border-radius:9px;cursor:pointer}
+.btn-submit:disabled{background:var(--sur2);color:var(--mu);cursor:not-allowed}
+.btn-next{flex:1;background:var(--gr);color:#0d1117;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;padding:12px;border-radius:9px;cursor:pointer;display:none}
+.btn-next.on{display:block}
+
+.fbk{display:none;border-radius:var(--R);padding:15px;margin-top:12px;animation:fu .3s ease}
+.fbk.on{display:block}
+.fbk.correct{background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.28)}
+.fbk.wrong{background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.28)}
+.fbk-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.fbk-emoji{font-size:20px}
+.fbk-title{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:800}
+.fbk.correct .fbk-title{color:var(--gr)}
+.fbk.wrong .fbk-title{color:#ff7b72}
+.fbk-body{font-size:13px;line-height:1.7;color:#cdd9e5}
+.fbk-body b{color:var(--yw)}
+.fbk-trap{background:rgba(227,179,65,.08);border-left:3px solid var(--yw);padding:8px 11px;border-radius:4px;margin-top:10px;font-size:12px;line-height:1.55;color:#cdd9e5}
+.fbk-trap b{color:var(--yw)}
+
+.result{display:none;text-align:center;padding:24px 10px;animation:fu .4s ease}
+.result.on{display:block}
+.result-emoji{font-size:64px;margin-bottom:10px}
+.result h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:900;margin-bottom:8px}
+.result .grade{font-family:'Syne',sans-serif;font-size:42px;font-weight:900;margin:8px 0;display:inline-block;padding:10px 28px;border-radius:16px}
+.result .grade.excellent{background:rgba(63,185,80,.12);color:var(--gr)}
+.result .grade.good{background:rgba(88,166,255,.12);color:var(--bl)}
+.result .grade.ok{background:rgba(227,179,65,.12);color:var(--yw)}
+.result .grade.bad{background:rgba(248,81,73,.12);color:#ff7b72}
+.result p{color:var(--mu);font-size:13.5px;margin-bottom:16px;line-height:1.6}
+.result-stats{display:flex;gap:8px;margin:20px 0}
+.rs{flex:1;background:var(--sur);border:1px solid var(--brd);border-radius:10px;padding:12px 8px;text-align:center}
+.rs .n{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1}
+.rs .l{font-size:10px;color:var(--mu);margin-top:3px;letter-spacing:.5px}
+.btn-restart{background:var(--sur2);color:var(--tx);border:1px solid var(--brd);padding:12px 28px;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;margin-top:10px}
+.btn-home{background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.3);color:#67e8f9;padding:12px 24px;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;margin-top:10px;margin-right:8px}
+
+.review{text-align:left;margin-top:24px}
+.review h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--yw);margin-bottom:10px}
+.revq{background:var(--sur);border:1px solid var(--brd);border-radius:9px;padding:12px 14px;margin-bottom:8px;font-size:12.5px;line-height:1.55}
+.revq.wrong{border-left:3px solid var(--rd)}
+.revq.right{border-left:3px solid var(--gr)}
+.revq .rev-num{font-family:'Syne',sans-serif;font-size:10.5px;color:var(--mu);margin-bottom:4px;font-weight:700;letter-spacing:1px}
+.revq .rev-q{color:var(--tx);margin-bottom:5px}
+.revq .rev-a{font-size:11.5px}
+.revq .rev-a .good{color:var(--gr)}
+.revq .rev-a .bad{color:#ff7b72;text-decoration:line-through;opacity:.7}
+
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.pbar{height:3px;background:var(--sur2);position:relative;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,#f0883e,#a371f7);transition:width .4s ease;width:0%}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="pill">⚠️ Simulacro · Dificultad Alta</div>
+  <h1>Examen de<br><em>Historia</em></h1>
+  <div class="sub">Introducción a la Historia</div>
+  <div class="warn">⏱ 20 preguntas · 20 minutos · leé con atención</div>
+</div>
+
+<div class="topbar">
+  <div class="tb time"><div class="n" id="tTime">20:00</div><div class="l">Tiempo</div></div>
+  <div class="tb prog"><div class="n"><span id="tCur">0</span>/<span id="tTot">20</span></div><div class="l">Pregunta</div></div>
+  <div class="tb score"><div class="n" id="tScore">0</div><div class="l">Correctas</div></div>
+</div>
+
+<div class="pbar"><div class="pfill" id="pfill"></div></div>
+
+<div class="body">
+
+  <div class="start" id="start">
+    <div style="font-size:56px;margin-bottom:8px">📜</div>
+    <h2>Simulacro de Examen</h2>
+    <p>Preguntas con el nivel de dificultad de un examen escrito real sobre Introducción a la Historia.</p>
+    <div class="rules">
+      <h3>⚠️ Antes de empezar</h3>
+      <ul>
+        <li>Preguntas con <b>trampas</b>, negaciones y opciones parecidas — leé despacio</li>
+        <li>A veces la respuesta correcta es <b>"Ninguna"</b> o <b>"Todas"</b></li>
+        <li>Una vez que respondés no podés cambiar</li>
+        <li>Tenés 20 minutos</li>
+        <li>Al final vas a ver el repaso con explicaciones</li>
+      </ul>
+    </div>
+    <button class="btn-start" onclick="startExam()">▶ Empezar examen</button>
+  </div>
+
+  <div class="qwrap" id="qwrap">
+    <div class="qmeta">
+      <div class="qnum">Pregunta <span id="qNum">1</span></div>
+      <div class="qtopic" id="qTopic"></div>
+    </div>
+    <div class="qcard">
+      <div class="qtxt" id="qTxt"></div>
+    </div>
+    <div class="opts" id="opts"></div>
+    <div class="submit-row">
+      <button class="btn-submit" id="btnSubmit" disabled onclick="submitAnswer()">Confirmar respuesta</button>
+      <button class="btn-next" id="btnNext" onclick="nextQuestion()">Siguiente →</button>
+    </div>
+    <div class="fbk" id="fbk"></div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="result-emoji" id="rEmoji">🎓</div>
+    <h2 id="rTitle">Examen completado</h2>
+    <div class="grade" id="rGrade">0/20</div>
+    <p id="rMsg"></p>
+    <div class="result-stats">
+      <div class="rs"><div class="n" style="color:var(--gr)" id="rOk">0</div><div class="l">✓ CORRECTAS</div></div>
+      <div class="rs"><div class="n" style="color:var(--rd)" id="rBad">0</div><div class="l">✗ INCORRECTAS</div></div>
+      <div class="rs"><div class="n" style="color:var(--yw)" id="rPct">0%</div><div class="l">NOTA</div></div>
+    </div>
+    <button class="btn-home" onclick="goPortalH()">← Volver al Portal</button> <button class="btn-restart" onclick="restart()">↺ Rehacer examen</button>
+    <div class="review" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+const QUESTIONS = [
+
+{topic:"Historia",
+q:"La palabra 'historia' tiene <em>dos sentidos</em>. ¿Cuál de las siguientes afirmaciones los describe correctamente?",
+opts:[
+ "Los hechos del pasado y la ciencia que los estudia",
+ "Solo los hechos que sucedieron en el pasado",
+ "Solo la ciencia que estudia el pasado",
+ "La historia individual y la historia colectiva",
+ "Ninguna de las anteriores"
+],
+cor:0,
+trap:"Trampa: las opciones 2 y 3 son solo una mitad. La opción 4 suena lógica pero es inventada.",
+exp:"La palabra historia designa <b>los hechos que sucedieron</b> Y <b>la ciencia que los estudia</b>. Los dos sentidos van juntos."},
+
+{topic:"Tiempo",
+q:"Un monje medieval cristiano cree que el tiempo tiene un comienzo (creación) y un final (juicio final). ¿Qué tipo de concepción del tiempo tiene?",
+opts:[
+ "Tiempo cíclico",
+ "Tiempo lineal",
+ "Tiempo simultáneo",
+ "Tiempo relativo",
+ "No tiene concepción del tiempo porque la Edad Media no la estudiaba"
+],
+cor:1,
+trap:"Trampa con la opción 5: suena 'culta' porque menciona la Edad Media, pero es falsa.",
+exp:"<b>Tiempo lineal</b>: tiene inicio y fin. El cristianismo y el judaísmo comparten esta visión, donde cada hecho sucede una sola vez."},
+
+{topic:"Periodización",
+q:"Indicá cuál de las siguientes afirmaciones sobre la periodización es <em>FALSA</em>:",
+opts:[
+ "La Edad Antigua termina con la caída del Imperio Romano de Occidente en 476 d.C.",
+ "La Edad Media duró aproximadamente 1000 años",
+ "La Edad Moderna termina en 1789 con la Revolución Francesa",
+ "La Prehistoria termina con la invención de la escritura (≈3000 a.C.)",
+ "La Edad Contemporánea terminó en el año 2000"
+],
+cor:4,
+trap:"Trampa con el NO: si leés rápido, ves afirmaciones verdaderas y marcás una. La última suena razonable pero es falsa — la Edad Contemporánea sigue hasta hoy.",
+exp:"<b>FALSA</b>: La Edad Contemporánea NO terminó en 2000. Va desde 1789 hasta <b>la actualidad</b>. Las otras 4 son correctas."},
+
+{topic:"Fuentes",
+q:"Un historiador encuentra: (A) una <em>carta escrita por Napoleón en 1810</em> y (B) un <em>libro publicado en 2020 sobre Napoleón</em>. ¿Cómo se clasifican?",
+opts:[
+ "(A) y (B) son fuentes primarias",
+ "(A) primaria, (B) secundaria",
+ "(A) secundaria, (B) primaria",
+ "Ambas son secundarias",
+ "Depende del contenido, no del origen"
+],
+cor:1,
+trap:"Trampa: si confundís los dos tipos, marcás la opción invertida (C). La opción 5 parece una respuesta 'inteligente' pero es falsa.",
+exp:"<b>(A) es primaria</b> porque fue escrita en la época estudiada. <b>(B) es secundaria</b> porque fue escrita después. Lo que define primaria/secundaria es el <b>momento de producción</b>, no el contenido."},
+
+{topic:"Calendarios",
+q:"Según el calendario cristiano, este año es 2026. Según los calendarios de otras religiones, el año puede ser distinto. ¿Por qué?",
+opts:[
+ "Porque cada calendario toma un punto de partida diferente",
+ "Porque cada religión mide el tiempo con distinta precisión",
+ "Porque los otros calendarios están mal",
+ "Porque no todos los países aceptan el año 2026",
+ "Porque el calendario cristiano es el único oficial"
+],
+cor:0,
+trap:"Trampa con la opción 3 y 5: son juicios falsos que pueden sonar lógicos si no entendiste el concepto.",
+exp:"Cada calendario toma un <b>punto de partida distinto</b>. El cristiano arranca con el nacimiento de Cristo; el judío con la creación del mundo; el musulmán con la huida de Mahoma. Ninguno está 'mal', son diferentes formas de contabilizar."},
+
+{topic:"Hechos y procesos",
+q:"¿Cuál de los siguientes es un <em>proceso histórico</em> (no un acontecimiento)?",
+opts:[
+ "La caída de Constantinopla en 1453",
+ "El asesinato de Julio César en 44 a.C.",
+ "El Renacimiento artístico (siglos XV-XVI)",
+ "El descubrimiento de América el 12 de octubre de 1492",
+ "El atentado a las Torres Gemelas en 2001"
+],
+cor:2,
+trap:"Trampa: las 4 opciones descartadas son todas acontecimientos puntuales. El Renacimiento es el único que dura siglos = proceso.",
+exp:"El <b>Renacimiento</b> es un proceso (dura años/siglos y tiene muchos acontecimientos relacionados). Los otros cuatro son <b>acontecimientos</b> (momentos puntuales)."},
+
+{topic:"Causas",
+q:"El concepto de <em>multicausalidad</em> significa que:",
+opts:[
+ "Todos los hechos tienen una sola causa principal",
+ "Los hechos históricos tienen múltiples causas relacionadas entre sí",
+ "Un hecho puede tener muchas consecuencias",
+ "Los historiadores no se ponen de acuerdo sobre las causas",
+ "Las causas se dividen solo en políticas y económicas"
+],
+cor:1,
+trap:"Trampa: la opción 1 dice lo CONTRARIO (lo que suena como 'causa principal'). La 3 confunde causas con consecuencias.",
+exp:"<b>Multicausalidad</b>: un hecho histórico tiene <b>varias causas relacionadas entre sí</b> (políticas, económicas, sociales, culturales). Nunca es una sola causa."},
+
+{topic:"Investigación",
+q:"En la etapa de <em>análisis y crítica</em> de fuentes, ¿qué debe hacer el historiador?",
+opts:[
+ "Creer todo lo que dice la fuente porque es antigua",
+ "Verificar la veracidad de la fuente y su contexto",
+ "Descartar todas las fuentes que no le convengan",
+ "Usar solo una fuente por investigación",
+ "Traducir la fuente si está en otro idioma"
+],
+cor:1,
+trap:"Trampa con 3: suena parecido a 'criticar' pero significa manipular. El historiador debe ser objetivo, no 'descartar lo que no le conviene'.",
+exp:"El historiador debe <b>verificar la veracidad</b> de la fuente (su autenticidad, contexto, origen). No debe creerlo todo, pero tampoco manipular las fuentes."},
+
+{topic:"Tiempo",
+q:"Unidad de tiempo: 100 años corresponden a un <em>siglo</em>. ¿A qué unidad corresponden 1000 años?",
+opts:[
+ "Una era",
+ "Un milenio",
+ "Una época",
+ "Una edad",
+ "Una generación"
+],
+cor:1,
+trap:"Trampa con 'era' y 'época' (opciones 1 y 3): son palabras similares pero no técnicamente correctas. 'Edad' (opción 4) es un periodo histórico, no una unidad fija.",
+exp:"<b>1000 años = 1 milenio</b>. Era, época y edad son conceptos distintos (no son unidades de tiempo fijas)."},
+
+{topic:"Historia",
+q:"Elegí la afirmación correcta sobre <em>cambios y continuidades</em>:",
+opts:[
+ "En la historia todo cambia constantemente",
+ "La historia estudia solo lo que cambia",
+ "La historia estudia tanto lo que cambia como lo que permanece",
+ "Las continuidades son cosas que cambian pero lentamente",
+ "Todas son correctas"
+],
+cor:2,
+trap:"Trampa con la 4: parece razonable pero contradice la definición. Continuidad = lo que permanece, no lo que cambia lento.",
+exp:"La Historia estudia <b>tanto los cambios como las continuidades</b>. Por ejemplo, cambia la tecnología, pero pueden continuar el lenguaje, las religiones, las costumbres."},
+
+{topic:"Periodización",
+q:"¿En qué siglo se encuentra el año <em>1453</em> (caída de Constantinopla)?",
+opts:[
+ "Siglo XIV",
+ "Siglo XV",
+ "Siglo XVI",
+ "Siglo XIII",
+ "Siglo XII"
+],
+cor:1,
+trap:"Trampa clásica de siglo: el año 1453 NO es siglo XIV (que iría hasta 1400). Los siglos se cuentan así: 1401-1500 = siglo XV.",
+exp:"El año <b>1453 pertenece al siglo XV</b> (los años 1401 a 1500 forman el siglo XV). Regla: los años entre 1401-1500 son siglo XV."},
+
+{topic:"Fuentes",
+q:"¿Cuál de las siguientes <em>NO</em> es una fuente histórica?",
+opts:[
+ "Una moneda del año 100 a.C.",
+ "Un esqueleto humano encontrado en excavación",
+ "Una canción popular transmitida oralmente",
+ "Un libro de historia moderno sobre Roma",
+ "Todas son fuentes históricas"
+],
+cor:4,
+trap:"Trampa: el 'libro de historia moderno' es fuente secundaria. Las otras tres son primarias (biológica, cultural, tradición oral). Todas SÍ son fuentes.",
+exp:"<b>Todas son fuentes históricas</b>. Las monedas, esqueletos y tradiciones orales son primarias. Los libros de historia modernos son secundarias."},
+
+{topic:"Simultaneidad",
+q:"En 1453 cae Constantinopla y en Florencia florece el Renacimiento. ¿Cómo se llama esta relación temporal?",
+opts:[
+ "Sucesión histórica",
+ "Simultaneidad",
+ "Sincronización",
+ "Causa y consecuencia",
+ "Proceso histórico"
+],
+cor:1,
+trap:"Trampa: 'sucesión' (uno detrás del otro) vs 'simultaneidad' (al mismo tiempo). La 3 no existe como término histórico.",
+exp:"<b>Simultaneidad</b>: hechos que ocurren <b>al mismo tiempo en diferentes lugares</b>. Sucesión sería uno después del otro."},
+
+{topic:"Periodización",
+q:"Indicá el orden correcto de periodos históricos, de <em>más antiguo a más reciente</em>:",
+opts:[
+ "Antigua → Prehistoria → Media → Moderna → Contemporánea",
+ "Prehistoria → Antigua → Moderna → Media → Contemporánea",
+ "Prehistoria → Antigua → Media → Moderna → Contemporánea",
+ "Antigua → Media → Prehistoria → Moderna → Contemporánea",
+ "Contemporánea → Moderna → Media → Antigua → Prehistoria"
+],
+cor:2,
+trap:"Trampa con órdenes parecidos: la 2 intercambia Moderna y Media. La 5 es el orden al revés.",
+exp:"Orden correcto: <b>Prehistoria → Edad Antigua → Edad Media → Edad Moderna → Edad Contemporánea</b>."},
+
+{topic:"Historia",
+q:"¿Por qué estudiar Historia? Indicá la razón <em>INCORRECTA</em>:",
+opts:[
+ "Para conocer y comprender el pasado",
+ "Para explicar el presente",
+ "Para adquirir herramientas para pensar la época",
+ "Para predecir el futuro con certeza científica",
+ "Para entender cambios y continuidades"
+],
+cor:3,
+trap:"Trampa con el NO: 4 suena razonable — la historia nos sirve para algo futuro — pero la idea de 'predecir con certeza científica' es exagerada y falsa.",
+exp:"La Historia <b>no predice el futuro con certeza científica</b>. Sirve para comprender el pasado y el presente, pero no da certezas sobre lo que va a pasar."},
+
+{topic:"Fuentes",
+q:"Un arqueólogo encuentra un <em>jarrón cerámico</em> del año 500 a.C. ¿Qué tipo de testimonio es?",
+opts:[
+ "Biológico",
+ "Cultural (artístico)",
+ "Tradición oral",
+ "Fuente secundaria",
+ "No es una fuente válida"
+],
+cor:1,
+trap:"Trampa con la 4: al ser 'objeto antiguo' podrías pensar primaria/secundaria. Pero la pregunta es sobre el TIPO de testimonio. Cerámica = artístico/cultural.",
+exp:"La cerámica es un <b>testimonio cultural (artístico)</b>. Los biológicos son huesos y fósiles; las tradiciones orales son canciones y leyendas."},
+
+{topic:"Hechos y procesos",
+q:"Una <em>causa económica</em> de un hecho histórico podría ser:",
+opts:[
+ "Una guerra religiosa",
+ "Una crisis financiera y escasez de alimentos",
+ "El asesinato de un rey",
+ "Un cambio en el arte",
+ "Una revolución cultural"
+],
+cor:1,
+trap:"Trampa: 1 es religiosa, 3 es política, 4 y 5 son culturales. Solo 2 es económica.",
+exp:"Una <b>causa económica</b> se refiere a dinero, producción, comercio, alimentos. Las otras opciones son causas políticas, religiosas o culturales."},
+
+{topic:"Calendarios",
+q:"El año <em>44 a.C.</em> (muerte de Julio César) ocurrió <em>ANTES</em> del año 27 a.C. ¿Por qué?",
+opts:[
+ "Porque los números en a.C. se cuentan al revés (menos es más reciente)",
+ "Porque a.C. significa 'antes de calendario'",
+ "Porque los romanos contaban al revés",
+ "Es un error del libro",
+ "44 es mayor que 27, entonces es posterior"
+],
+cor:0,
+trap:"Trampa MUY común: si pensás como en matemáticas, 44 > 27 te parece 'después'. Pero en a.C. es al revés: cuanto MÁS GRANDE el número, MÁS ANTIGUO.",
+exp:"En <b>años a.C. los números van al revés</b>: 44 a.C. es ANTES que 27 a.C. (44 = más lejano del año 0). En d.C. es al revés: 44 d.C. es anterior a 27... no, perdón: 44 d.C. es posterior a 27 d.C."},
+
+{topic:"Investigación",
+q:"Cuál de los siguientes NO es una etapa de la investigación histórica:",
+opts:[
+ "Formulación de preguntas e hipótesis",
+ "Búsqueda y selección de fuentes",
+ "Análisis y crítica de las fuentes",
+ "Votación democrática sobre la conclusión",
+ "Presentación de los resultados"
+],
+cor:3,
+trap:"Trampa: la votación democrática suena absurda pero si no prestás atención podrías marcar la 5 o 3.",
+exp:"La <b>votación democrática no existe</b> en investigación histórica. Las etapas son: 1) preguntas, 2) búsqueda de fuentes, 3) análisis y crítica, 4) síntesis, 5) presentación."},
+
+{topic:"Integración",
+q:"Un alumno escribe: <em>'La Historia estudia solo a los reyes y gobernantes, y todos los calendarios del mundo son iguales.'</em> ¿Qué tiene de malo esa afirmación?",
+opts:[
+ "Nada, es correcta",
+ "Solo la primera parte está mal (la Historia estudia a toda la sociedad)",
+ "Solo la segunda parte está mal (hay varios calendarios diferentes)",
+ "Las dos partes están mal",
+ "Las dos partes están bien pero mal redactadas"
+],
+cor:3,
+trap:"Trampa integradora: si solo viste un error, te quedás con 2 o 3. Pero AMBAS partes están mal.",
+exp:"<b>Las dos partes están mal</b>: (1) La Historia moderna estudia a <b>toda la sociedad</b> (obreros, mujeres, niños), no solo reyes. (2) <b>Hay varios calendarios</b> (cristiano, judío, musulmán) con puntos de partida distintos."},
+
+];
+
+let curQ = 0, selected = -1, answered = false, correct = 0, wrong = 0;
+const answers = [];
+let timeLeft = 20 * 60, timerInterval;
+
+function startExam() {
+  document.getElementById('start').style.display = 'none';
+  document.getElementById('qwrap').classList.add('on');
+  document.getElementById('tTot').textContent = QUESTIONS.length;
+  startTimer();
+  renderQuestion();
+}
+
+function startTimer() {
+  updateTimer();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) { clearInterval(timerInterval); finishExam(); }
+  }, 1000);
+}
+
+function updateTimer() {
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  document.getElementById('tTime').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  if (timeLeft < 120) document.getElementById('tTime').style.color = 'var(--rd)';
+  else if (timeLeft < 300) document.getElementById('tTime').style.color = 'var(--or)';
+}
+
+function renderQuestion() {
+  selected = -1; answered = false;
+  const q = QUESTIONS[curQ];
+  document.getElementById('qNum').textContent = (curQ + 1);
+  document.getElementById('qTopic').textContent = q.topic;
+  document.getElementById('tCur').textContent = (curQ + 1);
+  document.getElementById('qTxt').innerHTML = q.q;
+  document.getElementById('fbk').classList.remove('on');
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').style.display = 'block';
+  document.getElementById('btnNext').classList.remove('on');
+
+  const opts = document.getElementById('opts');
+  opts.innerHTML = '';
+  const letters = ['A','B','C','D','E','F'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = '<span class="letter">' + letters[i] + '</span><span>' + opt + '</span>';
+    btn.onclick = () => selectOption(i, btn);
+    opts.appendChild(btn);
+  });
+
+  document.getElementById('pfill').style.width = ((curQ) / QUESTIONS.length * 100) + '%';
+}
+
+function selectOption(idx, btn) {
+  if (answered) return;
+  document.querySelectorAll('.opt').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selected = idx;
+  document.getElementById('btnSubmit').disabled = false;
+}
+
+function submitAnswer() {
+  if (selected === -1 || answered) return;
+  answered = true;
+  const q = QUESTIONS[curQ];
+  const isCorrect = (selected === q.cor);
+  answers.push({ selected: selected, correct: q.cor, isCorrect: isCorrect, q: q });
+
+  document.querySelectorAll('.opt').forEach((b, i) => {
+    b.disabled = true; b.classList.remove('sel');
+    if (i === q.cor) b.classList.add('ok');
+    else if (i === selected) b.classList.add('no');
+  });
+
+  if (isCorrect) correct++; else wrong++;
+  document.getElementById('tScore').textContent = correct;
+
+  const fbk = document.getElementById('fbk');
+  fbk.className = 'fbk on ' + (isCorrect ? 'correct' : 'wrong');
+  fbk.innerHTML = '<div class="fbk-head"><span class="fbk-emoji">' + (isCorrect ? '✓' : '✗') + '</span>'
+    + '<span class="fbk-title">' + (isCorrect ? '¡Correcto!' : 'Incorrecto') + '</span></div>'
+    + '<div class="fbk-body">' + q.exp + '</div>'
+    + (q.trap ? '<div class="fbk-trap"><b>⚠️ Trampa:</b> ' + q.trap + '</div>' : '');
+
+  document.getElementById('btnSubmit').style.display = 'none';
+  document.getElementById('btnNext').classList.add('on');
+  document.getElementById('btnNext').textContent = (curQ + 1 >= QUESTIONS.length) ? '✓ Finalizar examen' : 'Siguiente →';
+}
+
+function nextQuestion() {
+  curQ++;
+  if (curQ >= QUESTIONS.length) { finishExam(); return; }
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function finishExam() {
+  clearInterval(timerInterval);
+  document.getElementById('qwrap').classList.remove('on');
+  document.getElementById('result').classList.add('on');
+  document.getElementById('pfill').style.width = '100%';
+
+  const pct = Math.round(correct / QUESTIONS.length * 100);
+  document.getElementById('rOk').textContent = correct;
+  document.getElementById('rBad').textContent = wrong;
+  document.getElementById('rPct').textContent = pct + '%';
+  document.getElementById('rGrade').textContent = correct + '/' + QUESTIONS.length;
+
+  const g = document.getElementById('rGrade');
+  g.className = 'grade';
+  if (pct >= 90) { g.classList.add('excellent'); document.getElementById('rEmoji').textContent = '🏆'; document.getElementById('rTitle').textContent = '¡Excelente!'; document.getElementById('rMsg').textContent = 'Dominás los conceptos.'; }
+  else if (pct >= 70) { g.classList.add('good'); document.getElementById('rEmoji').textContent = '💪'; document.getElementById('rTitle').textContent = '¡Muy bien!'; document.getElementById('rMsg').textContent = 'Bien encaminado. Repasá las que fallaste.'; }
+  else if (pct >= 50) { g.classList.add('ok'); document.getElementById('rEmoji').textContent = '📚'; document.getElementById('rTitle').textContent = 'Podés mejorar'; document.getElementById('rMsg').textContent = 'Revisá las explicaciones.'; }
+  else { g.classList.add('bad'); document.getElementById('rEmoji').textContent = '⏰'; document.getElementById('rTitle').textContent = 'Hay que repasar'; document.getElementById('rMsg').textContent = 'Volvé a las tarjetas y vuelve a intentar.'; }
+
+  const rev = document.getElementById('review');
+  rev.innerHTML = '<h3>📋 Repaso de respuestas</h3>';
+  answers.forEach((a, i) => {
+    const div = document.createElement('div');
+    div.className = 'revq ' + (a.isCorrect ? 'right' : 'wrong');
+    div.innerHTML = '<div class="rev-num">Pregunta ' + (i + 1) + ' · ' + a.q.topic + '</div>'
+      + '<div class="rev-q">' + a.q.q.replace(/<em>/g,'').replace(/<\/em>/g,'') + '</div>'
+      + (a.isCorrect
+        ? '<div class="rev-a"><b>✓ Respondiste:</b> <span class="good">' + a.q.opts[a.selected] + '</span></div>'
+        : '<div class="rev-a"><b>Respondiste:</b> <span class="bad">' + a.q.opts[a.selected] + '</span><br><b>✓ Correcta:</b> <span class="good">' + a.q.opts[a.correct] + '</span></div>');
+    rev.appendChild(div);
+  });
+}
+
+function goPortalH(){try{window.parent.document.getElementById('backBtn').click();}catch(e){window.history.back();}} function restart() {
+  curQ = 0; selected = -1; answered = false; correct = 0; wrong = 0;
+  answers.length = 0;
+  timeLeft = 20 * 60;
+  document.getElementById('result').classList.remove('on');
+  document.getElementById('start').style.display = 'block';
+  document.getElementById('tScore').textContent = '0';
+  document.getElementById('tCur').textContent = '0';
+  document.getElementById('pfill').style.width = '0%';
+  document.getElementById('tTime').style.color = '';
+}
+</script>
+</body>
+</html>

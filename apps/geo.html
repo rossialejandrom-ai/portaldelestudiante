@@ -1,0 +1,340 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geography – </title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #1a1a2e;
+    --deep: #16213e;
+    --accent: #e94560;
+    --gold: #f5a623;
+    --green: #4ecdc4;
+    --text: #eaeaea;
+    --soft: #a8b2d8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--sky); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.5) 0%, transparent 100%);
+  }
+  .container { max-width: 700px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+  header { text-align: center; margin-bottom: 28px; animation: fadeDown 0.6s ease; }
+  header h1 { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--gold); }
+  header p { color: var(--soft); font-size: 0.95rem; margin-top: 6px; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+  .tab { padding: 8px 18px; border-radius: 20px; border: 2px solid transparent; background: var(--deep); color: var(--soft); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .tab:hover:not(.active) { border-color: var(--soft); color: white; }
+
+  .modes { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; }
+  .mode-btn { padding: 7px 16px; border-radius: 10px; border: 2px solid var(--green); background: transparent; color: var(--green); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+  .mode-btn.active { background: var(--green); color: var(--deep); }
+
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--gold)); border-radius: 10px; transition: width 0.4s ease; }
+
+  .flip-hint { text-align: center; color: var(--soft); font-size: 0.78rem; margin-bottom: 12px; opacity: 0.7; }
+
+  .card-area { perspective: 1200px; margin-bottom: 20px; }
+  .card { width: 100%; min-height: 270px; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; border-radius: 20px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 24px; text-align: center; }
+  .card-front { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); border: 2px solid rgba(78,205,196,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .card-back { background: linear-gradient(135deg, #1a0a2e 0%, #2d1b69 100%); border: 2px solid rgba(233,69,96,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: rotateY(180deg); }
+  .card-category-badge { position: absolute; top: 14px; right: 14px; font-size: 0.7rem; font-weight: 800; padding: 3px 10px; border-radius: 10px; background: rgba(255,255,255,0.1); color: var(--soft); text-transform: uppercase; letter-spacing: 1px; }
+  .card-emoji { font-size: 3rem; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+  .card-word { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--gold); margin-bottom: 4px; line-height: 1.1; }
+  .card-phonetic { font-size: 0.85rem; color: var(--green); font-weight: 700; background: rgba(78,205,196,0.12); padding: 3px 12px; border-radius: 20px; margin-bottom: 6px; }
+  .card-hint { font-size: 0.82rem; color: var(--soft); margin-top: 6px; }
+  .card-translation { font-family: 'Fredoka One', cursive; font-size: 1.7rem; color: var(--green); margin-bottom: 10px; }
+  .card-definition { font-size: 0.88rem; color: var(--soft); line-height: 1.5; max-width: 320px; }
+
+  .audio-btn { margin-top: 12px; background: var(--accent); border: none; border-radius: 50px; padding: 8px 20px; color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: transform 0.15s, background 0.2s; }
+  .audio-btn:hover { background: #c73652; transform: scale(1.05); }
+  .audio-btn.speaking { background: var(--gold); }
+
+  .nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+  .nav-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--soft); background: transparent; color: var(--soft); font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .counter { font-weight: 800; color: var(--soft); font-size: 0.95rem; min-width: 60px; text-align: center; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--deep); border: 2px solid var(--gold); border-radius: 20px; padding: 28px 24px; max-width: 380px; width: 100%; animation: fadeUp 0.3s ease; }
+  .modal h3 { font-family: 'Fredoka One', cursive; color: var(--gold); font-size: 1.3rem; margin-bottom: 12px; }
+  .modal p { color: var(--soft); font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5; }
+  .modal ol { padding-left: 20px; color: var(--soft); font-size: 0.9rem; line-height: 2.1; }
+  .modal ol li strong { color: var(--text); }
+  .modal-note { font-size: 0.76rem; color: var(--soft); margin-top: 14px; text-align: center; opacity: 0.75; font-style: italic; }
+  .modal-close { margin-top: 20px; width: 100%; background: var(--accent); border: none; border-radius: 50px; padding: 10px; color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: transform 0.15s; }
+  .modal-close:hover { transform: scale(1.03); }
+
+  /* Quiz */
+  .quiz-area { animation: fadeUp 0.4s ease; }
+  .score-bar { display: flex; justify-content: space-between; align-items: center; background: var(--deep); border-radius: 12px; padding: 10px 16px; margin-bottom: 16px; font-size: 0.85rem; }
+  .score-badge { font-weight: 800; color: var(--gold); font-size: 1rem; }
+  .quiz-question { background: var(--deep); border: 2px solid rgba(78,205,196,0.2); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 16px; }
+  .q-emoji { font-size: 2.5rem; margin-bottom: 10px; }
+  .q-word { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: var(--gold); margin-bottom: 4px; }
+  .q-phonetic { display: inline-block; font-size: 0.82rem; color: var(--green); font-weight: 700; background: rgba(78,205,196,0.12); padding: 2px 10px; border-radius: 20px; margin-bottom: 8px; }
+  .q-sub { color: var(--soft); font-size: 0.85rem; }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .option-btn { padding: 14px 10px; border-radius: 12px; border: 2px solid rgba(168,178,216,0.2); background: var(--deep); color: var(--text); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .option-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+  .option-btn.correct { background: #1a4a3a; border-color: var(--green); color: var(--green); }
+  .option-btn.wrong { background: #4a1a2a; border-color: var(--accent); color: var(--accent); }
+  .result-screen { text-align: center; padding: 40px 20px; animation: fadeUp 0.5s ease; }
+  .result-screen .big-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .result-screen h2 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--gold); margin-bottom: 8px; }
+  .result-screen p { color: var(--soft); margin-bottom: 24px; }
+  .restart-btn { background: var(--accent); border: none; border-radius: 50px; padding: 12px 32px; color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; cursor: pointer; }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(20px);  } to { opacity:1; transform:translateY(0); } }
+  @keyframes float    { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+</style>
+</head>
+<body>
+
+<!-- Modal: Android voice help -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>🔊 Activar voz en inglés</h3>
+    <p>El audio no funcionó. En Android hay que instalar la voz en inglés. Es fácil y gratis:</p>
+    <ol>
+      <li>Abrí <strong>Ajustes</strong> del celular</li>
+      <li>Tocá <strong>Accesibilidad</strong></li>
+      <li>Tocá <strong>Texto a voz</strong></li>
+      <li>Tocá el ⚙️ al lado de <strong>Google TTS</strong></li>
+      <li>Tocá <strong>Instalar datos de voz</strong></li>
+      <li>Elegí <strong>English (United States)</strong> y descargá</li>
+      <li>Volvé a la app y probá de nuevo 🎉</li>
+    </ol>
+    <p class="modal-note">Nota: el nombre exacto puede variar según la versión de Android.</p>
+    <button class="modal-close" onclick="closeModal()">Entendido ✓</button>
+  </div>
+</div>
+
+<div class="container">
+  <header>
+    <h1>🌍 Geography Flashcards</h1>
+    <p> · Tocá la tarjeta para ver la traducción</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setCategory('all',event)">All</button>
+    <button class="tab" onclick="setCategory('landforms',event)">🏔 Landforms</button>
+    <button class="tab" onclick="setCategory('volcanoes',event)">🌋 Volcanoes</button>
+  </div>
+
+  <div class="modes">
+    <button class="mode-btn active" id="btn-cards" onclick="setMode('cards')">📇 Tarjetas</button>
+    <button class="mode-btn" id="btn-quiz" onclick="setMode('quiz')">🎯 Quiz</button>
+  </div>
+
+  <div id="cards-mode">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <p class="flip-hint">👆 Tocá la tarjeta para girarla</p>
+    <div class="card-area">
+      <div class="card" id="card" onclick="flipCard()">
+        <div class="card-face card-front">
+          <span class="card-category-badge" id="front-badge"></span>
+          <div class="card-emoji" id="front-emoji"></div>
+          <div class="card-word" id="front-word"></div>
+          <div class="card-phonetic" id="front-phonetic"></div>
+          <p class="card-hint">📖 Tocá para ver en español</p>
+          <button class="audio-btn" id="audio-btn" onclick="speakWord(event)">🔊 Escuchar</button>
+        </div>
+        <div class="card-face card-back">
+          <span class="card-category-badge" id="back-badge"></span>
+          <div class="card-emoji" id="back-emoji"></div>
+          <div class="card-translation" id="back-translation"></div>
+          <div class="card-definition" id="back-definition"></div>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="prevCard()">◀</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button class="nav-btn" onclick="nextCard()">▶</button>
+    </div>
+  </div>
+
+  <div id="quiz-mode" style="display:none">
+    <div id="quiz-inner"></div>
+  </div>
+</div>
+
+<script>
+const allCards = [
+  {category:'landforms',emoji:'🏔',word:'Mountain',        translation:'Montaña',             definition:"A very high area of land with steep sides.",                                           pronunciation:'Mountain',         phonetic:'MAUN-ten'},
+  {category:'landforms',emoji:'🏞',word:'Valley',          translation:'Valle',                definition:"A low area of land between mountains or hills.",                                      pronunciation:'Valley',           phonetic:'VAL-ee'},
+  {category:'landforms',emoji:'🌾',word:'Plain',           translation:'Llanura',              definition:"A large flat area of land.",                                                          pronunciation:'Plain',            phonetic:'pleyn'},
+  {category:'landforms',emoji:'🗻',word:'Plateau',         translation:'Meseta',               definition:"A flat area of land that is high above sea level.",                                   pronunciation:'Plateau',          phonetic:'pla-TOH'},
+  {category:'landforms',emoji:'⛰',word:'Hill',            translation:'Colina',               definition:"An area of land higher than the land around it, but smaller than a mountain.",       pronunciation:'Hill',             phonetic:'hil'},
+  {category:'landforms',emoji:'🏜',word:'Canyon',          translation:'Cañón',                definition:"A deep narrow valley with steep sides, often with a river at the bottom.",           pronunciation:'Canyon',           phonetic:'KAN-yon'},
+  {category:'landforms',emoji:'🌑',word:'Cave',            translation:'Cueva',                definition:"A large hole underground or in the side of a cliff.",                                pronunciation:'Cave',             phonetic:'keyv'},
+  {category:'landforms',emoji:'🏝',word:'Island',          translation:'Isla',                 definition:"A piece of land completely surrounded by water.",                                    pronunciation:'Island',           phonetic:'AY-land'},
+  {category:'landforms',emoji:'🗺',word:'Peninsula',       translation:'Península',            definition:"A piece of land almost completely surrounded by water.",                             pronunciation:'Peninsula',        phonetic:'pe-NIN-su-la'},
+  {category:'landforms',emoji:'🌊',word:'Coast',           translation:'Costa',                definition:"The land along the edge of the sea.",                                                pronunciation:'Coast',            phonetic:'kohst'},
+  {category:'landforms',emoji:'🏖',word:'Bay',             translation:'Bahía',                definition:"A curved area of coast where the sea comes in.",                                     pronunciation:'Bay',              phonetic:'bey'},
+  {category:'landforms',emoji:'🌀',word:'Delta',           translation:'Delta',                definition:"A flat area where a river splits before entering the sea.",                          pronunciation:'Delta',            phonetic:'DEL-ta'},
+  {category:'landforms',emoji:'🧊',word:'Glacier',         translation:'Glaciar',              definition:"A large slow-moving mass of ice.",                                                   pronunciation:'Glacier',          phonetic:'GLEY-sher'},
+  {category:'landforms',emoji:'🌊',word:'River',           translation:'Río',                  definition:"A large natural stream of water flowing to the sea.",                               pronunciation:'River',            phonetic:'RIV-er'},
+  {category:'landforms',emoji:'💧',word:'Lake',            translation:'Lago',                 definition:"A large area of water surrounded by land.",                                          pronunciation:'Lake',             phonetic:'leyk'},
+  {category:'landforms',emoji:'🗾',word:'Landform',        translation:'Accidente geográfico', definition:"A natural feature of the Earth's surface.",                                         pronunciation:'Landform',         phonetic:'LAND-form'},
+  {category:'volcanoes',emoji:'🌋',word:'Volcano',         translation:'Volcán',               definition:"An opening in the Earth's surface that can erupt lava, ash and gas.",              pronunciation:'Volcano',          phonetic:'vol-KEY-noh'},
+  {category:'volcanoes',emoji:'💥',word:'Eruption',        translation:'Erupción',             definition:"When a volcano releases lava, ash and gas.",                                         pronunciation:'Eruption',         phonetic:'i-RUP-shon'},
+  {category:'volcanoes',emoji:'🔴',word:'Lava',            translation:'Lava',                 definition:"Magma that reaches the surface. It is extremely hot.",                              pronunciation:'Lava',             phonetic:'LA-va'},
+  {category:'volcanoes',emoji:'🔥',word:'Magma',           translation:'Magma',                definition:"Hot melted rock inside the Earth. When it reaches the surface it becomes lava.",   pronunciation:'Magma',            phonetic:'MAG-ma'},
+  {category:'volcanoes',emoji:'⭕',word:'Crater',          translation:'Cráter',               definition:"The opening at the top of a volcano.",                                              pronunciation:'Crater',           phonetic:'KREY-ter'},
+  {category:'volcanoes',emoji:'💨',word:'Ash',             translation:'Ceniza',               definition:"Fine powder released when a volcano erupts.",                                        pronunciation:'Ash',              phonetic:'ash'},
+  {category:'volcanoes',emoji:'🌬',word:'Vent',            translation:'Chimenea',             definition:"An opening through which gas and lava escape from a volcano.",                      pronunciation:'Vent',             phonetic:'vent'},
+  {category:'volcanoes',emoji:'🧩',word:'Tectonic plates', translation:'Placas tectónicas',    definition:"Large pieces of the Earth's crust that move slowly.",                              pronunciation:'Tectonic plates',  phonetic:'tek-TON-ik pleyts'},
+  {category:'volcanoes',emoji:'🌐',word:'Plate boundary',  translation:'Límite de placas',     definition:"The edge where two tectonic plates meet.",                                          pronunciation:'Plate boundary',   phonetic:'pleyt BOUN-da-ree'},
+  {category:'volcanoes',emoji:'🪨',word:'Crust',           translation:'Corteza terrestre',    definition:"The hard outer layer of the Earth.",                                                pronunciation:'Crust',            phonetic:'krust'},
+  {category:'volcanoes',emoji:'🌡',word:'Mantle',          translation:'Manto terrestre',      definition:"The layer of the Earth between the crust and the core.",                            pronunciation:'Mantle',           phonetic:'MAN-tel'},
+  {category:'volcanoes',emoji:'🏔',word:'Composite volcano',translation:'Volcán compuesto',    definition:"A tall, steep and explosive type of volcano.",                                      pronunciation:'Composite volcano',phonetic:'kom-POZ-it vol-KEY-noh'},
+  {category:'volcanoes',emoji:'🛡',word:'Shield volcano',  translation:'Volcán en escudo',     definition:"A wide and flat volcano with gentle slopes.",                                       pronunciation:'Shield volcano',   phonetic:'sheeld vol-KEY-noh'},
+];
+
+let currentCategory='all', currentMode='cards', currentIndex=0, isFlipped=false, filtered=[];
+let quizCards=[], quizIndex=0, score=0, answered=false;
+
+function getFiltered(){ return currentCategory==='all'?allCards:allCards.filter(c=>c.category===currentCategory); }
+
+function setCategory(cat,e){
+  currentCategory=cat;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  e.target.classList.add('active');
+  currentIndex=0; isFlipped=false; filtered=getFiltered();
+  currentMode==='cards'?renderCard():startQuiz();
+}
+
+function setMode(mode){
+  currentMode=mode;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+mode).classList.add('active');
+  filtered=getFiltered();
+  if(mode==='cards'){
+    document.getElementById('cards-mode').style.display='block';
+    document.getElementById('quiz-mode').style.display='none';
+    currentIndex=0; isFlipped=false; renderCard();
+  } else {
+    document.getElementById('cards-mode').style.display='none';
+    document.getElementById('quiz-mode').style.display='block';
+    startQuiz();
+  }
+}
+
+function renderCard(){
+  filtered=getFiltered();
+  const c=filtered[currentIndex]; if(!c)return;
+  document.getElementById('card').classList.remove('flipped'); isFlipped=false;
+  document.getElementById('front-badge').textContent=c.category==='landforms'?'🏔 Landforms':'🌋 Volcanoes';
+  document.getElementById('front-emoji').textContent=c.emoji;
+  document.getElementById('front-word').textContent=c.word;
+  document.getElementById('front-phonetic').textContent='🔤 '+c.phonetic;
+  document.getElementById('back-badge').textContent=c.category==='landforms'?'🏔 Landforms':'🌋 Volcanoes';
+  document.getElementById('back-emoji').textContent=c.emoji;
+  document.getElementById('back-translation').textContent=c.translation;
+  document.getElementById('back-definition').textContent=c.definition;
+  document.getElementById('counter').textContent=`${currentIndex+1} / ${filtered.length}`;
+  document.getElementById('progress').style.width=((currentIndex+1)/filtered.length*100)+'%';
+}
+
+function flipCard(){ isFlipped=!isFlipped; document.getElementById('card').classList.toggle('flipped',isFlipped); }
+function nextCard(){ filtered=getFiltered(); currentIndex=(currentIndex+1)%filtered.length; isFlipped=false; renderCard(); }
+function prevCard(){ filtered=getFiltered(); currentIndex=(currentIndex-1+filtered.length)%filtered.length; isFlipped=false; renderCard(); }
+
+function speak(text, btnEl){
+  if(!('speechSynthesis' in window)){ openModal(); return; }
+  window.speechSynthesis.cancel();
+  const utter=new SpeechSynthesisUtterance(text);
+  utter.lang='en-US'; utter.rate=0.85;
+  const voices=window.speechSynthesis.getVoices();
+  const enVoice=voices.find(v=>v.lang.startsWith('en'));
+  if(enVoice) utter.voice=enVoice;
+  if(btnEl){ btnEl.classList.add('speaking'); utter.onend=()=>btnEl.classList.remove('speaking'); }
+  utter.onerror=()=>{ if(btnEl)btnEl.classList.remove('speaking'); openModal(); };
+  window.speechSynthesis.speak(utter);
+  // fallback: if no sound after 1.5s show modal
+  setTimeout(()=>{ if(btnEl&&btnEl.classList.contains('speaking')&&!window.speechSynthesis.speaking){ btnEl.classList.remove('speaking'); openModal(); }},1500);
+}
+
+function speakWord(e){
+  e.stopPropagation();
+  filtered=getFiltered();
+  const c=filtered[currentIndex]; if(!c)return;
+  speak(c.pronunciation, document.getElementById('audio-btn'));
+}
+
+function speakQuiz(text){ speak(text, null); }
+function openModal(){ document.getElementById('modal').classList.add('open'); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
+function startQuiz(){
+  filtered=getFiltered(); quizCards=shuffle(filtered); quizIndex=0; score=0; answered=false;
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion(){
+  const container=document.getElementById('quiz-inner');
+  if(quizIndex>=quizCards.length){ showResult(container); return; }
+  answered=false;
+  const c=quizCards[quizIndex];
+  const others=filtered.filter(x=>x.word!==c.word);
+  const options=shuffle([c,...shuffle(others).slice(0,3)]);
+  const safeText=t=>t.replace(/'/g,"\\'");
+  container.innerHTML=`
+    <div class="score-bar">
+      <span>Pregunta ${quizIndex+1} / ${quizCards.length}</span>
+      <span class="score-badge">✅ ${score}</span>
+    </div>
+    <div class="quiz-area">
+      <div class="quiz-question">
+        <div class="q-emoji">${c.emoji}</div>
+        <div class="q-word">${c.word}</div>
+        <div class="q-phonetic">🔤 ${c.phonetic}</div>
+        <div class="q-sub">¿Cómo se dice en español?</div>
+        <button class="audio-btn" style="margin:12px auto 0;" onclick="speakQuiz('${safeText(c.pronunciation)}')">🔊 Escuchar</button>
+      </div>
+      <div class="quiz-options">
+        ${options.map(o=>`<button class="option-btn" onclick="checkAnswer(this,'${safeText(o.translation)}','${safeText(c.translation)}')">${o.translation}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function checkAnswer(btn,selected,correct){
+  if(answered)return; answered=true;
+  document.querySelectorAll('.option-btn').forEach(b=>{ b.disabled=true; if(b.textContent.trim()===correct)b.classList.add('correct'); });
+  if(selected===correct){ btn.classList.add('correct'); score++; } else btn.classList.add('wrong');
+  setTimeout(()=>{ quizIndex++; renderQuizQuestion(); },1200);
+}
+
+function showResult(container){
+  const pct=Math.round(score/quizCards.length*100);
+  const emoji=pct>=80?'🏆':pct>=50?'💪':'📚';
+  const msg=pct>=80?'¡Excelente!':pct>=50?'¡Bien! Seguí practicando.':'Repasá las tarjetas y volvé a intentar.';
+  container.innerHTML=`<div class="result-screen"><div class="big-emoji">${emoji}</div><h2>${score} / ${quizCards.length}</h2><p>${msg}<br><span style="color:var(--gold)">${pct}% correcto</span></p><button class="restart-btn" onclick="startQuiz()">🔄 Jugar de nuevo</button></div>`;
+}
+
+filtered=getFiltered(); renderCard();
+</script>
+</body>
+</html>

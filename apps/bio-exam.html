@@ -1,0 +1,645 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Examen Simulacro — Biología I</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--sur:#161b22;--sur2:#1c2330;--brd:#2d333b;
+  --gr:#3fb950;--bl:#58a6ff;--or:#f0883e;--yw:#e3b341;--rd:#f85149;--pu:#a371f7;
+  --tx:#e6edf3;--mu:#8b949e;--R:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;max-width:620px;margin:0 auto;min-height:100vh;padding-bottom:40px}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(155deg,#2e0b1c 0%,#0d1117 55%);border-bottom:1px solid var(--brd);padding:22px 20px 16px;text-align:center;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(248,81,73,.08),transparent 70%);pointer-events:none}
+.pill{display:inline-block;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:#ff7b72;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:99px;margin-bottom:8px;position:relative}
+.hdr h1{font-family:'Syne',sans-serif;font-size:clamp(20px,5.5vw,28px);font-weight:900;line-height:1.15;position:relative}
+.hdr h1 em{color:#ff7b72;font-style:normal}
+.hdr .sub{color:var(--mu);font-size:12px;margin-top:4px;position:relative}
+.warn{display:inline-block;margin-top:10px;background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.25);color:var(--yw);font-size:10.5px;font-weight:600;padding:4px 12px;border-radius:99px}
+
+/* ── TIMER + SCORE ── */
+.topbar{display:flex;gap:1px;background:var(--brd);border-bottom:1px solid var(--brd)}
+.tb{flex:1;background:var(--sur);padding:11px 8px;text-align:center}
+.tb .n{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;line-height:1}
+.tb .l{font-size:10px;color:var(--mu);margin-top:2px;letter-spacing:.5px}
+.tb.time .n{color:var(--yw)}
+.tb.prog .n{color:var(--bl)}
+.tb.score .n{color:var(--gr)}
+
+/* ── BODY ── */
+.body{padding:18px 16px}
+
+/* ── START SCREEN ── */
+.start{text-align:center;padding:30px 10px}
+.start h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:14px}
+.start p{color:var(--mu);font-size:13.5px;line-height:1.7;margin-bottom:14px}
+.start .rules{background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:16px;text-align:left;margin:18px 0}
+.start .rules h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--yw);margin-bottom:10px}
+.start .rules ul{list-style:none;padding:0}
+.start .rules li{font-size:13px;color:#cdd9e5;line-height:1.7;padding-left:20px;position:relative;margin-bottom:4px}
+.start .rules li::before{content:'▸';position:absolute;left:6px;color:var(--yw)}
+.btn-start{background:linear-gradient(135deg,#f85149,#a371f7);color:white;border:none;padding:14px 32px;border-radius:10px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:transform .15s,box-shadow .2s}
+.btn-start:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(248,81,73,.3)}
+
+/* ── QUESTION ── */
+.qwrap{display:none}
+.qwrap.on{display:block}
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-size:11px}
+.qnum{font-family:'Syne',sans-serif;font-weight:800;color:var(--mu);letter-spacing:1px}
+.qtopic{background:var(--sur2);color:var(--bl);padding:3px 10px;border-radius:99px;font-size:10.5px;font-weight:600}
+
+.qcard{background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:18px;margin-bottom:14px}
+.qtxt{font-size:15px;line-height:1.6;margin-bottom:6px;font-weight:500}
+.qtxt b{color:var(--yw)}
+.qtxt em{color:#ff7b72;font-style:normal;font-weight:600;text-transform:uppercase;font-size:13px}
+.qhint{font-size:11.5px;color:var(--mu);margin-top:8px;font-style:italic}
+
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.opt{width:100%;text-align:left;background:var(--sur2);border:1.5px solid var(--brd);border-radius:9px;padding:12px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:13.5px;line-height:1.55;cursor:pointer;transition:all .15s;display:flex;gap:11px;align-items:flex-start}
+.opt:hover:not(:disabled){border-color:var(--bl);background:rgba(88,166,255,.04)}
+.opt .letter{font-family:'Syne',sans-serif;font-weight:800;color:var(--mu);min-width:18px;font-size:12px;flex-shrink:0;padding-top:1px}
+.opt.sel{border-color:var(--bl);background:rgba(88,166,255,.08)}
+.opt.sel .letter{color:var(--bl)}
+.opt.ok{border-color:var(--gr);background:rgba(63,185,80,.1);color:var(--gr)}
+.opt.ok .letter{color:var(--gr)}
+.opt.no{border-color:var(--rd);background:rgba(248,81,73,.08);color:#ff7b72}
+.opt.no .letter{color:#ff7b72}
+.opt:disabled{cursor:default}
+
+.submit-row{display:flex;gap:9px}
+.btn-submit{flex:1;background:var(--bl);color:#0d1117;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;padding:12px;border-radius:9px;cursor:pointer;transition:filter .15s}
+.btn-submit:hover:not(:disabled){filter:brightness(1.1)}
+.btn-submit:disabled{background:var(--sur2);color:var(--mu);cursor:not-allowed}
+.btn-next{flex:1;background:var(--gr);color:#0d1117;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;padding:12px;border-radius:9px;cursor:pointer;display:none}
+.btn-next.on{display:block}
+
+/* ── FEEDBACK ── */
+.fbk{display:none;border-radius:var(--R);padding:15px;margin-top:12px;animation:fu .3s ease}
+.fbk.on{display:block}
+.fbk.correct{background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.28)}
+.fbk.wrong{background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.28)}
+.fbk-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.fbk-emoji{font-size:20px}
+.fbk-title{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:800;letter-spacing:.3px}
+.fbk.correct .fbk-title{color:var(--gr)}
+.fbk.wrong .fbk-title{color:#ff7b72}
+.fbk-body{font-size:13px;line-height:1.7;color:#cdd9e5}
+.fbk-body b{color:var(--yw)}
+.fbk-trap{background:rgba(227,179,65,.08);border-left:3px solid var(--yw);padding:8px 11px;border-radius:4px;margin-top:10px;font-size:12px;line-height:1.55;color:#cdd9e5}
+.fbk-trap b{color:var(--yw)}
+
+/* ── RESULTS ── */
+.result{display:none;text-align:center;padding:24px 10px;animation:fu .4s ease}
+.result.on{display:block}
+.result-emoji{font-size:64px;margin-bottom:10px}
+.result h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:900;margin-bottom:8px}
+.result .grade{font-family:'Syne',sans-serif;font-size:42px;font-weight:900;margin:8px 0;display:inline-block;padding:10px 28px;border-radius:16px}
+.result .grade.excellent{background:rgba(63,185,80,.12);color:var(--gr)}
+.result .grade.good{background:rgba(88,166,255,.12);color:var(--bl)}
+.result .grade.ok{background:rgba(227,179,65,.12);color:var(--yw)}
+.result .grade.bad{background:rgba(248,81,73,.12);color:#ff7b72}
+.result p{color:var(--mu);font-size:13.5px;margin-bottom:16px;line-height:1.6}
+.result-stats{display:flex;gap:8px;margin:20px 0}
+.rs{flex:1;background:var(--sur);border:1px solid var(--brd);border-radius:10px;padding:12px 8px;text-align:center}
+.rs .n{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;line-height:1}
+.rs .l{font-size:10px;color:var(--mu);margin-top:3px;letter-spacing:.5px}
+.result .btn-restart{background:var(--sur2);color:var(--tx);border:1px solid var(--brd);padding:12px 28px;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;margin-top:10px}
+.btn-home{background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.3);color:#67e8f9;padding:12px 24px;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;margin-top:10px;margin-right:8px}
+.result .btn-restart:hover{border-color:var(--bl);color:var(--bl)}
+
+.review{text-align:left;margin-top:24px}
+.review h3{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--yw);margin-bottom:10px}
+.revq{background:var(--sur);border:1px solid var(--brd);border-radius:9px;padding:12px 14px;margin-bottom:8px;font-size:12.5px;line-height:1.55}
+.revq.wrong{border-left:3px solid var(--rd)}
+.revq.right{border-left:3px solid var(--gr)}
+.revq .rev-num{font-family:'Syne',sans-serif;font-size:10.5px;color:var(--mu);margin-bottom:4px;font-weight:700;letter-spacing:1px}
+.revq .rev-q{color:var(--tx);margin-bottom:5px}
+.revq .rev-a{font-size:11.5px}
+.revq .rev-a b{font-weight:600}
+.revq .rev-a .good{color:var(--gr)}
+.revq .rev-a .bad{color:#ff7b72;text-decoration:line-through;opacity:.7}
+
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* progress bar */
+.pbar{height:3px;background:var(--sur2);position:relative;overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,#f85149,#a371f7);transition:width .4s ease;width:0%}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="pill">⚠️ Simulacro · Dificultad Alta</div>
+  <h1>Examen de<br><em>Biología I</em></h1>
+  <div class="sub">Prof. Halebian</div>
+  <div class="warn">⏱ 20 preguntas · 20 minutos · leé con atención</div>
+</div>
+
+<div class="topbar">
+  <div class="tb time"><div class="n" id="tTime">20:00</div><div class="l">Tiempo</div></div>
+  <div class="tb prog"><div class="n"><span id="tCur">0</span>/<span id="tTot">20</span></div><div class="l">Pregunta</div></div>
+  <div class="tb score"><div class="n" id="tScore">0</div><div class="l">Correctas</div></div>
+</div>
+
+<div class="pbar"><div class="pfill" id="pfill"></div></div>
+
+<div class="body">
+
+  <!-- ── START SCREEN ── -->
+  <div class="start" id="start">
+    <div style="font-size:56px;margin-bottom:8px">📝</div>
+    <h2>Simulacro de Examen</h2>
+    <p>Este simulacro tiene preguntas con el mismo nivel de dificultad que tendrías en un examen escrito real.</p>
+
+    <div class="rules">
+      <h3>⚠️ Antes de empezar — leé esto</h3>
+      <ul>
+        <li>Las preguntas tienen <b>trampas</b>, negaciones y opciones parecidas — leé despacio</li>
+        <li>A veces la respuesta correcta es <b>"Ninguna"</b> o <b>"Todas"</b></li>
+        <li>Una vez que respondés no podés cambiar la respuesta</li>
+        <li>Tenés 20 minutos — el reloj empieza al tocar "Empezar"</li>
+        <li>Al final vas a ver el repaso completo con las explicaciones</li>
+      </ul>
+    </div>
+
+    <button class="btn-start" onclick="startExam()">▶ Empezar examen</button>
+  </div>
+
+  <!-- ── QUESTION AREA ── -->
+  <div class="qwrap" id="qwrap">
+    <div class="qmeta">
+      <div class="qnum">Pregunta <span id="qNum">1</span></div>
+      <div class="qtopic" id="qTopic"></div>
+    </div>
+
+    <div class="qcard">
+      <div class="qtxt" id="qTxt"></div>
+      <div class="qhint" id="qHint"></div>
+    </div>
+
+    <div class="opts" id="opts"></div>
+
+    <div class="submit-row">
+      <button class="btn-submit" id="btnSubmit" disabled onclick="submitAnswer()">Confirmar respuesta</button>
+      <button class="btn-next" id="btnNext" onclick="nextQuestion()">Siguiente →</button>
+    </div>
+
+    <div class="fbk" id="fbk"></div>
+  </div>
+
+  <!-- ── RESULTS ── -->
+  <div class="result" id="result">
+    <div class="result-emoji" id="rEmoji">🎓</div>
+    <h2 id="rTitle">Examen completado</h2>
+    <div class="grade" id="rGrade">0/20</div>
+    <p id="rMsg"></p>
+    <div class="result-stats">
+      <div class="rs"><div class="n" style="color:var(--gr)" id="rOk">0</div><div class="l">✓ CORRECTAS</div></div>
+      <div class="rs"><div class="n" style="color:var(--rd)" id="rBad">0</div><div class="l">✗ INCORRECTAS</div></div>
+      <div class="rs"><div class="n" style="color:var(--yw)" id="rPct">0%</div><div class="l">NOTA</div></div>
+    </div>
+    <button class="btn-home" onclick="goPortalH()">← Volver al Portal</button> <button class="btn-restart" onclick="restart()">↺ Rehacer examen</button>
+
+    <div class="review" id="review"></div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// QUESTIONS — alta dificultad, con trampas
+// ═══════════════════════════════════════════════════════
+const QUESTIONS = [
+
+{topic:"Células",
+q:"Una bacteria y un paramecio (protozoo) comparten una característica fundamental: ambos son organismos <em>unicelulares</em>. Sin embargo, hay una diferencia clave que permite distinguirlos. ¿Cuál de las siguientes afirmaciones es la correcta?",
+opts:[
+ "Ninguna bacteria tiene ADN, pero los paramecios sí lo tienen",
+ "Los paramecios son pluricelulares, mientras que las bacterias son unicelulares",
+ "Ambos tienen núcleo, pero las bacterias lo tienen más pequeño",
+ "Ambos son unicelulares — no hay diferencia celular relevante entre ellos a nivel de categorización",
+ "Ninguna de las anteriores es correcta"
+],
+cor:4,
+trap:"Trampa: las opciones juegan con datos cercanos pero equivocados. TODOS los seres vivos tienen ADN (opción 1 falsa). El paramecio es unicelular, no pluricelular (opción 2 falsa). La opción 3 es una invención. La opción 4 parece tentadora pero ignora diferencias reales de estructura — sin embargo, para lo que estudiaste, ambos son unicelulares. La respuesta 'Ninguna' recuerda que hay que leer con cuidado qué afirmaciones son verdaderas.",
+exp:"La opción correcta es <b>'Ninguna de las anteriores'</b>. Las opciones 1, 2 y 3 contienen errores factuales. La opción 4 es ambigua: aunque ambos son unicelulares, SÍ hay diferencias celulares relevantes (tamaño, organización del ADN). A nivel de tu programa, lo que importa es que ambos son unicelulares."},
+
+{topic:"Célula",
+q:"Indicá cuál de las siguientes afirmaciones <em>NO</em> es verdadera sobre las partes de la célula:",
+opts:[
+ "La membrana controla qué entra y sale de la célula",
+ "El citoplasma es donde se encuentran los orgánulos",
+ "El núcleo contiene el material genético",
+ "El ADN se encuentra principalmente en el citoplasma",
+ "Todas las afirmaciones son verdaderas"
+],
+cor:3,
+trap:"Trampa clásica: la pregunta pide la que NO es verdadera. Si leés rápido, podés marcar una correcta pensando que te preguntan la correcta.",
+exp:"La incorrecta es <b>'El ADN se encuentra principalmente en el citoplasma'</b>. El ADN se encuentra principalmente en el <b>núcleo</b>. Las otras tres son todas correctas."},
+
+{topic:"ADN y ARN",
+q:"¿Qué función cumple el ARN en la célula?",
+opts:[
+ "Contiene el material genético principal del organismo",
+ "Participa en la síntesis de proteínas",
+ "Forma la membrana celular",
+ "Es el mismo que el ADN, pero en otras células",
+ "Todas son correctas"
+],
+cor:1,
+trap:"Trampa: el ADN es el material genético principal (no el ARN). El ARN participa en la síntesis de proteínas.",
+exp:"El ARN <b>participa en la síntesis de proteínas</b>. El ADN es el que contiene el material genético principal."},
+
+{topic:"Ramas",
+q:"Un científico estudia cómo los <em>hongos</em> se reproducen y compiten por nutrientes en un ecosistema. ¿Qué ramas de la Biología aplica?",
+opts:[
+ "Micología y Botánica",
+ "Micología y Zoología",
+ "Solo Micología",
+ "Micología y algo más (la Biología no estudia ecosistemas completos)",
+ "Micología y Ecología"
+],
+cor:4,
+trap:"Trampa: la Botánica es para plantas, no hongos. Los hongos son un reino aparte (que se estudia con Micología). La Ecología estudia las relaciones entre seres vivos y su ambiente.",
+exp:"<b>Micología y Ecología</b>. Micología estudia los hongos, y Ecología estudia las relaciones entre organismos y su entorno. La Botánica es solo para plantas."},
+
+{topic:"Ramas",
+q:"Asociá correctamente la rama con lo que estudia. ¿Cuál está <em>MAL</em>?",
+opts:[
+ "Ictiología — peces",
+ "Herpetología — reptiles",
+ "Ornitología — mamíferos",
+ "Mastozoología — mamíferos",
+ "Paleontología — fósiles"
+],
+cor:2,
+trap:"Trampa con nombres parecidos: Ornitología es AVES, no mamíferos. Mastozoología sí es mamíferos.",
+exp:"La incorrecta es <b>'Ornitología — mamíferos'</b>. Ornitología estudia las <b>aves</b>. Los mamíferos los estudia la Mastozoología."},
+
+{topic:"Características",
+q:"Un robot que se construye a sí mismo a partir de materiales del ambiente, se repara, y puede fabricar copias de sí mismo, ¿sería considerado un ser vivo según Biología?",
+opts:[
+ "Sí, porque cumple con la reproducción y la nutrición",
+ "Sí, pero solo si tiene ADN sintético",
+ "No, porque le falta al menos una característica fundamental (como estar formado por células)",
+ "Depende — si es autónomo totalmente, sí",
+ "Sí, porque cumple varias de las 9 características"
+],
+cor:2,
+trap:"Trampa filosófica: aunque el robot cumple varias funciones vitales, un ser vivo debe cumplir TODAS las 9 características, y la más básica es estar formado por células con biomoléculas (CHONP).",
+exp:"<b>No</b>. Un ser vivo debe cumplir las <b>9 características</b>, entre ellas estar formado por <b>células</b> y tener <b>composición química compleja</b> (biomoléculas, no metales o plásticos). Cumplir algunas no alcanza."},
+
+{topic:"Desarrollo",
+q:"Una <em>rana</em> pasa por una etapa de renacuajo antes de llegar a su forma adulta. Un <em>perro</em> nace como cachorro y crece hasta su forma adulta. ¿Qué afirmación es correcta?",
+opts:[
+ "Ambos tienen desarrollo directo",
+ "La rana tiene desarrollo directo, el perro tiene indirecto",
+ "La rana tiene desarrollo indirecto (metamorfosis), el perro tiene directo",
+ "Ninguno tiene desarrollo directo porque todos los animales cambian",
+ "Depende de la especie de rana"
+],
+cor:2,
+trap:"Trampa típica invertida: hay que distinguir cuál es directo y cuál indirecto. Renacuajo → rana es cambio radical (indirecto). Cachorro → perro es solo crecimiento (directo).",
+exp:"<b>La rana tiene desarrollo indirecto</b> (metamorfosis: renacuajo → rana adulta con forma muy distinta). El perro tiene <b>desarrollo directo</b> (nace con el mismo plan corporal de adulto, solo crece)."},
+
+{topic:"Nutrición",
+q:"Los <em>hongos</em> son organismos heterótrofos. Teniendo en cuenta eso, ¿qué podemos afirmar?",
+opts:[
+ "Los hongos hacen fotosíntesis como las plantas",
+ "Los hongos deben alimentarse de otros organismos, vivos o muertos",
+ "Los hongos producen su propia glucosa al recibir luz solar",
+ "Los hongos son autótrofos pero no hacen fotosíntesis",
+ "Todas las afirmaciones anteriores son correctas"
+],
+cor:1,
+trap:"Trampa: mucha gente piensa que los hongos hacen algo parecido a las plantas. FALSO — son heterótrofos. 'Heterótrofo' significa que no puede producir su propio alimento.",
+exp:"Los hongos son <b>heterótrofos</b>: deben alimentarse de otros organismos (vivos o muertos). NO hacen fotosíntesis. No son autótrofos."},
+
+{topic:"Reproducción",
+q:"Una bacteria se divide en dos por fisión binaria. ¿Cuál de las siguientes afirmaciones sobre ese proceso es <em>FALSA</em>?",
+opts:[
+ "Se trata de reproducción asexual",
+ "Hay un solo progenitor",
+ "Las bacterias hijas son genéticamente idénticas a la bacteria original",
+ "Se forma una cigota durante el proceso",
+ "No hay fecundación"
+],
+cor:3,
+trap:"Trampa: la cigota se forma en reproducción SEXUAL (unión de gametas). En asexual no hay cigota.",
+exp:"FALSO: <b>No se forma cigota</b>. La cigota aparece en la reproducción <b>sexual</b> (óvulo + espermatozoide → cigota). En la fisión binaria no hay gametas ni fecundación."},
+
+{topic:"Reproducción",
+q:"¿En cuál de los siguientes casos la progenie es <em>idéntica</em> a los progenitores?",
+opts:[
+ "Un par de perros que tienen cachorros",
+ "Una planta que produce semillas a partir de flores fecundadas",
+ "Una bacteria que se divide por fisión binaria",
+ "Un pez macho fertiliza huevos puestos por una hembra",
+ "Ninguno, la progenie nunca es idéntica"
+],
+cor:2,
+trap:"Trampa: las opciones 1, 2 y 4 son todas reproducción sexual (progenie NO idéntica). La opción 3 es asexual (progenie idéntica). La opción 5 es una generalización falsa.",
+exp:"<b>La bacteria por fisión binaria</b>. La reproducción asexual produce progenie <b>idéntica</b>. Las opciones 1, 2 y 4 son sexuales (progenie combinada, no idéntica)."},
+
+{topic:"Biomoléculas",
+q:"¿Cuál de las siguientes NO es una biomolécula?",
+opts:[
+ "Glucosa",
+ "ADN",
+ "Agua",
+ "Hemoglobina",
+ "Colesterol"
+],
+cor:2,
+trap:"Trampa MUY común: el agua es esencial para la vida, pero es una molécula INORGÁNICA, no una biomolécula. Las biomoléculas son grandes y complejas.",
+exp:"<b>El agua (H₂O)</b> NO es una biomolécula. Es una <b>molécula inorgánica</b> (pequeña y simple). Las biomoléculas son grandes y complejas: glucosa (hidrato de carbono), ADN (ácido nucleico), hemoglobina (proteína) y colesterol (lípido) sí lo son."},
+
+{topic:"Biomoléculas",
+q:"La hemoglobina, las enzimas y los anticuerpos pertenecen al mismo grupo de biomoléculas. ¿Cuál?",
+opts:[
+ "Hidratos de carbono",
+ "Ácidos nucleicos",
+ "Lípidos",
+ "Proteínas",
+ "Son de grupos diferentes"
+],
+cor:3,
+trap:"Trampa: si no recordás que la hemoglobina es una proteína, podés confundirla con 'algo de la sangre' (no un grupo). Los anticuerpos también son proteínas. Las enzimas también.",
+exp:"Todos son <b>proteínas</b>. Hemoglobina transporta oxígeno, anticuerpos defienden el cuerpo, enzimas aceleran reacciones químicas."},
+
+{topic:"CHONP",
+q:"¿Qué átomos están presentes en la glucosa (C₆H₁₂O₆)?",
+opts:[
+ "Solo C, H, O",
+ "C, H, O, N",
+ "C, H, O, N, P (los 5 átomos CHONP)",
+ "Solo los átomos del CHONP presentes en la fórmula: C, H, O",
+ "Depende del tipo de glucosa"
+],
+cor:3,
+trap:"Trampa sutil: las opciones 1 y 4 dicen casi lo mismo, pero la 4 es más precisa y contextualiza con CHONP. Es lo que se esperaría en un examen real. La 5 es puro relleno.",
+exp:"La respuesta correcta técnicamente es <b>'Solo los átomos del CHONP presentes en la fórmula: C, H, O'</b>. Aunque CHONP lista los 5 átomos principales de los seres vivos, en la glucosa solo hay C, H y O. La respuesta 1 también es correcta pero menos completa. Cualquiera de las dos se podría aceptar."},
+
+{topic:"Fotosíntesis",
+q:"En la fotosíntesis, ¿qué materia prima y qué productos se obtienen? Elegí la opción correcta:",
+opts:[
+ "Materia prima: glucosa + O₂. Productos: H₂O + CO₂",
+ "Materia prima: H₂O + CO₂. Productos: glucosa + O₂",
+ "Materia prima: H₂O + O₂. Productos: glucosa + CO₂",
+ "Materia prima: CO₂. Producto único: glucosa",
+ "La fotosíntesis solo produce oxígeno, no glucosa"
+],
+cor:1,
+trap:"Trampa con dirección invertida: la opción 1 tiene todo al revés. Si memorizaste mal cuál es input y cuál output, la elegís.",
+exp:"<b>Materia prima: H₂O + CO₂ + luz solar → Productos: glucosa (C₆H₁₂O₆) + O₂</b>. El agua y el dióxido de carbono son la materia prima, y la planta produce glucosa (alimento) y libera oxígeno."},
+
+{topic:"Homeostasis",
+q:"Un hombre corre 5 km en verano y su cuerpo suda para mantener una temperatura interna cercana a 37°C. Este es un ejemplo claro de:",
+opts:[
+ "Reproducción asexual",
+ "Desarrollo directo",
+ "Homeostasis (autorregulación)",
+ "Relación con el entorno solamente",
+ "Nutrición heterótrofa"
+],
+cor:2,
+trap:"Trampa: la opción 4 es tentadora porque el cuerpo responde al ambiente, pero la característica específica que mantiene el equilibrio interno es homeostasis.",
+exp:"<b>Homeostasis</b>: es la capacidad de mantener el equilibrio interno estable (37°C) a pesar de cambios externos (calor). Sudar es un mecanismo homeostático."},
+
+{topic:"Organización",
+q:"Ordená jerárquicamente de <em>menor a mayor</em> complejidad. ¿Cuál es el orden correcto?",
+opts:[
+ "Célula → Biomolécula → Tejido → Órgano → Sistema → Organismo",
+ "Biomolécula → Célula → Tejido → Órgano → Sistema → Organismo",
+ "Biomolécula → Tejido → Célula → Órgano → Organismo → Sistema",
+ "Átomo → Biomolécula → Célula → Tejido → Órgano → Sistema → Organismo",
+ "Tejido → Célula → Biomolécula → Órgano → Sistema → Organismo"
+],
+cor:1,
+trap:"Trampa: la opción 4 agrega 'Átomo' al principio. Aunque técnicamente los átomos son más chicos que las biomoléculas, en TU programa el orden empieza en Biomoléculas. La opción correcta es la 2.",
+exp:"El orden correcto es: <b>Biomolécula → Célula → Tejido → Órgano → Sistema de órganos → Organismo</b>. Aunque los átomos son más pequeños, el programa empieza en biomoléculas."},
+
+{topic:"Reproducción",
+q:"Se observa que cierta especie de lagarto hembra puede tener crías <em>sin ningún macho presente</em>. Esto es un ejemplo de:",
+opts:[
+ "Reproducción sexual normal",
+ "Fisión binaria",
+ "Partenogénesis (reproducción asexual a partir de óvulo sin fecundar)",
+ "Gemación",
+ "Es imposible biológicamente"
+],
+cor:2,
+trap:"Trampa: la opción 5 parece contundente pero es falsa — la partenogénesis existe. Las opciones 2 y 4 son otros tipos de asexual pero no corresponden.",
+exp:"<b>Partenogénesis</b>: reproducción asexual donde un óvulo se desarrolla sin ser fecundado. Ocurre en algunos insectos, reptiles y peces."},
+
+{topic:"Características",
+q:"¿Cuál de las siguientes características <em>NO</em> forma parte de las 9 características de los seres vivos?",
+opts:[
+ "Organización jerárquica",
+ "Composición química compleja",
+ "Evolución",
+ "Capacidad de pensar",
+ "Homeostasis"
+],
+cor:3,
+trap:"Trampa: 'capacidad de pensar' suena razonable si confundís seres vivos con humanos. Pero las plantas y bacterias no piensan y son seres vivos. La capacidad de pensar NO es una de las 9 características.",
+exp:"La <b>capacidad de pensar</b> NO es una de las 9 características. Las 9 son: composición química compleja, células, organización jerárquica, nutrición, desarrollo, reproducción, evolución, homeostasis y relación con el entorno."},
+
+{topic:"Biología",
+q:"La <em>Química</em> es una ciencia natural, pero ¿cuál es la diferencia principal con la Biología?",
+opts:[
+ "La Química estudia solo moléculas y la Biología solo células",
+ "La Química es parte de la Biología",
+ "La Biología estudia la vida y los seres vivos; la Química estudia la materia y sus transformaciones",
+ "No hay diferencia: son sinónimos",
+ "La Química solo se aplica a los no vivos"
+],
+cor:2,
+trap:"Trampa: la opción 5 es tentadora porque suena lógica, pero es falsa (la química también se aplica a seres vivos, a través de la Bioquímica). La opción 3 es la más precisa.",
+exp:"<b>La Biología estudia la vida y los seres vivos; la Química estudia la materia y sus transformaciones</b>. Ambas son ciencias naturales pero con objetos de estudio diferentes."},
+
+{topic:"Integración",
+q:"Un alumno escribe: <em>'Todos los seres vivos están formados por células, tienen ADN, se reproducen y hacen fotosíntesis.'</em> ¿Qué parte de esa afirmación es <em>incorrecta</em>?",
+opts:[
+ "Que están formados por células",
+ "Que tienen ADN",
+ "Que se reproducen",
+ "Que hacen fotosíntesis",
+ "Todas las partes están bien"
+],
+cor:3,
+trap:"Trampa integradora: suena razonable a primera vista, pero la fotosíntesis la hacen SOLO los autótrofos (plantas, algas, algunas bacterias). Los animales, hongos y muchos otros son heterótrofos y NO la hacen.",
+exp:"La parte incorrecta es <b>'hacen fotosíntesis'</b>. Solo los <b>autótrofos</b> hacen fotosíntesis. Los heterótrofos (animales, hongos, muchas bacterias) NO. Todos los seres vivos sí tienen células, ADN y se reproducen."},
+
+];
+
+// ═══════════════════════════════════════════════════════
+// ENGINE
+// ═══════════════════════════════════════════════════════
+let curQ = 0, selected = -1, answered = false, correct = 0, wrong = 0;
+const answers = [];
+let timeLeft = 20 * 60, timerInterval;
+
+function startExam() {
+  document.getElementById('start').style.display = 'none';
+  document.getElementById('qwrap').classList.add('on');
+  document.getElementById('tTot').textContent = QUESTIONS.length;
+  startTimer();
+  renderQuestion();
+}
+
+function startTimer() {
+  updateTimer();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      finishExam();
+    }
+  }, 1000);
+}
+
+function updTimer() { updateTimer(); }
+function updateTimer() {
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  document.getElementById('tTime').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  if (timeLeft < 120) document.getElementById('tTime').style.color = 'var(--rd)';
+  else if (timeLeft < 300) document.getElementById('tTime').style.color = 'var(--or)';
+}
+
+function renderQuestion() {
+  selected = -1;
+  answered = false;
+  const q = QUESTIONS[curQ];
+  document.getElementById('qNum').textContent = (curQ + 1);
+  document.getElementById('qTopic').textContent = q.topic;
+  document.getElementById('tCur').textContent = (curQ + 1);
+  document.getElementById('qTxt').innerHTML = q.q;
+  document.getElementById('qHint').textContent = '';
+  document.getElementById('fbk').classList.remove('on');
+  document.getElementById('btnSubmit').disabled = true;
+  document.getElementById('btnSubmit').style.display = 'block';
+  document.getElementById('btnNext').classList.remove('on');
+
+  const opts = document.getElementById('opts');
+  opts.innerHTML = '';
+  const letters = ['A','B','C','D','E','F'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = '<span class="letter">' + letters[i] + '</span><span>' + opt + '</span>';
+    btn.onclick = () => selectOption(i, btn);
+    opts.appendChild(btn);
+  });
+
+  // progress bar
+  document.getElementById('pfill').style.width = ((curQ) / QUESTIONS.length * 100) + '%';
+}
+
+function selectOption(idx, btn) {
+  if (answered) return;
+  document.querySelectorAll('.opt').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  selected = idx;
+  document.getElementById('btnSubmit').disabled = false;
+}
+
+function submitAnswer() {
+  if (selected === -1 || answered) return;
+  answered = true;
+  const q = QUESTIONS[curQ];
+  const isCorrect = (selected === q.cor);
+  answers.push({ selected: selected, correct: q.cor, isCorrect: isCorrect, q: q });
+
+  const optBtns = document.querySelectorAll('.opt');
+  optBtns.forEach((b, i) => {
+    b.disabled = true;
+    b.classList.remove('sel');
+    if (i === q.cor) b.classList.add('ok');
+    else if (i === selected) b.classList.add('no');
+  });
+
+  if (isCorrect) correct++;
+  else wrong++;
+  document.getElementById('tScore').textContent = correct;
+
+  // feedback
+  const fbk = document.getElementById('fbk');
+  fbk.className = 'fbk on ' + (isCorrect ? 'correct' : 'wrong');
+  fbk.innerHTML = '<div class="fbk-head"><span class="fbk-emoji">' + (isCorrect ? '✓' : '✗') + '</span>'
+    + '<span class="fbk-title">' + (isCorrect ? '¡Correcto!' : 'Incorrecto') + '</span></div>'
+    + '<div class="fbk-body">' + q.exp + '</div>'
+    + (q.trap ? '<div class="fbk-trap"><b>⚠️ Trampa:</b> ' + q.trap + '</div>' : '');
+
+  document.getElementById('btnSubmit').style.display = 'none';
+  document.getElementById('btnNext').classList.add('on');
+  document.getElementById('btnNext').textContent = (curQ + 1 >= QUESTIONS.length) ? '✓ Finalizar examen' : 'Siguiente →';
+}
+
+function nextQuestion() {
+  curQ++;
+  if (curQ >= QUESTIONS.length) {
+    finishExam();
+    return;
+  }
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function finishExam() {
+  clearInterval(timerInterval);
+  document.getElementById('qwrap').classList.remove('on');
+  document.getElementById('result').classList.add('on');
+  document.getElementById('pfill').style.width = '100%';
+
+  const pct = Math.round(correct / QUESTIONS.length * 100);
+  document.getElementById('rOk').textContent = correct;
+  document.getElementById('rBad').textContent = wrong;
+  document.getElementById('rPct').textContent = pct + '%';
+  document.getElementById('rGrade').textContent = correct + '/' + QUESTIONS.length;
+
+  const g = document.getElementById('rGrade');
+  g.className = 'grade';
+  if (pct >= 90) { g.classList.add('excellent'); document.getElementById('rEmoji').textContent = '🏆'; document.getElementById('rTitle').textContent = '¡Excelente!'; document.getElementById('rMsg').textContent = 'Dominás los conceptos, tenés todo para el examen real.'; }
+  else if (pct >= 70) { g.classList.add('good'); document.getElementById('rEmoji').textContent = '💪'; document.getElementById('rTitle').textContent = '¡Muy bien!'; document.getElementById('rMsg').textContent = 'Estás bien encaminado. Repasá las que fallaste y listo.'; }
+  else if (pct >= 50) { g.classList.add('ok'); document.getElementById('rEmoji').textContent = '📚'; document.getElementById('rTitle').textContent = 'Podés mejorar'; document.getElementById('rMsg').textContent = 'Tenés lo básico pero faltan detalles. Leé las explicaciones.'; }
+  else { g.classList.add('bad'); document.getElementById('rEmoji').textContent = '⏰'; document.getElementById('rTitle').textContent = 'Hay que repasar'; document.getElementById('rMsg').textContent = 'Necesitás estudiar más. Revisá las tarjetas y volvé a intentar.'; }
+
+  // review
+  const rev = document.getElementById('review');
+  rev.innerHTML = '<h3>📋 Repaso de respuestas</h3>';
+  answers.forEach((a, i) => {
+    const div = document.createElement('div');
+    div.className = 'revq ' + (a.isCorrect ? 'right' : 'wrong');
+    div.innerHTML = '<div class="rev-num">Pregunta ' + (i + 1) + ' · ' + a.q.topic + '</div>'
+      + '<div class="rev-q">' + a.q.q.replace(/<em>/g,'').replace(/<\/em>/g,'') + '</div>'
+      + (a.isCorrect
+        ? '<div class="rev-a"><b>✓ Respondiste:</b> <span class="good">' + a.q.opts[a.selected] + '</span></div>'
+        : '<div class="rev-a"><b>Respondiste:</b> <span class="bad">' + a.q.opts[a.selected] + '</span><br>'
+          + '<b>✓ Correcta:</b> <span class="good">' + a.q.opts[a.correct] + '</span></div>');
+    rev.appendChild(div);
+  });
+}
+
+function goPortalH(){try{window.parent.document.getElementById('backBtn').click();}catch(e){window.history.back();}} function restart() {
+  curQ = 0; selected = -1; answered = false; correct = 0; wrong = 0;
+  answers.length = 0;
+  timeLeft = 20 * 60;
+  document.getElementById('result').classList.remove('on');
+  document.getElementById('start').style.display = 'block';
+  document.getElementById('tScore').textContent = '0';
+  document.getElementById('tCur').textContent = '0';
+  document.getElementById('pfill').style.width = '0%';
+  document.getElementById('tTime').style.color = '';
+}
+</script>
+</body>
+</html>

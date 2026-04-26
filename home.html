@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Estudio — Gael</title>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/app-loader.css">
+</head>
+<body>
+
+<div id="home">
+  <div style="padding-bottom:60px">
+    <div class="hero">
+      <div class="hero-badge"><span class="hero-dot"></span>Portal de Estudio</div>
+      <h1>Hola,<br><span class="hero-name">Gael 👋</span></h1>
+      <p class="hero-sub">Todo tu material en un solo lugar. Elegí una materia y arrancá.</p>
+    </div>
+
+    <!-- NAV TABS -->
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-section="proximos">📅 Próximos Exámenes</button>
+      <button class="nav-tab" data-section="historico">🗂 Histórico</button>
+    </div>
+
+    <!-- SECCIÓN: PRÓXIMOS EXÁMENES -->
+    <div id="section-proximos">
+
+      <div class="exam-row">
+        <div class="exam-alert">
+          <div class="ea-icon">📅</div>
+          <div class="ea-text">
+            <strong>Próximo examen</strong>
+            Historia — Lunes 28/04
+          </div>
+        </div>
+        <div class="exam-alert" style="border-left-color:#3b82f6">
+          <div class="ea-icon">🇬🇧</div>
+          <div class="ea-text">
+            <strong>Próximo examen</strong>
+            Inglés — Jueves 29/04
+          </div>
+        </div>
+      </div>
+
+      <!-- Widget de preguntas random -->
+      <div class="quick-quiz" id="quickQuiz">
+        <div class="qq-head">
+          <div class="qq-icon">⚡</div>
+          <div class="qq-title-wrap">
+            <div class="qq-badge">Repaso Rápido</div>
+            <div class="qq-title">5 preguntas al azar</div>
+          </div>
+          <div class="qq-progress" id="qqProg">1/5</div>
+        </div>
+        <div id="qqContent"></div>
+      </div>
+
+      <!-- ══ TENSE TIMELINE WIDGET ══ -->
+      <div class="tense-widget" id="tenseWidget">
+        <div class="tense-widget-head">
+          <div class="tense-widget-icon">📐</div>
+          <div>
+            <div class="tense-widget-title">Tiempos Verbales — Línea de Tiempo</div>
+            <div class="tense-widget-sub">Usá las pestañas para ver cada tiempo · Inglés B1</div>
+          </div>
+        </div>
+
+        <div class="tense-tabs" id="tenseTabs">
+          <button class="tense-tab active" onclick="switchTense(0)" style="--tc:#3b82f6;--tc-rgb:59,130,246">Present Simple</button>
+          <button class="tense-tab" onclick="switchTense(1)" style="--tc:#f0883e;--tc-rgb:240,136,62">Past Simple</button>
+          <button class="tense-tab" onclick="switchTense(2)" style="--tc:#10b981;--tc-rgb:16,185,129">Present Continuous</button>
+          <button class="tense-tab" onclick="switchTense(3)" style="--tc:#a371f7;--tc-rgb:163,113,247">Past Continuous</button>
+        </div>
+
+        <!-- Timeline visual -->
+        <div class="tl-wrap" id="tlWrap">
+          <div class="tl-line"></div>
+          <div class="tl-person">🧍</div>
+          <div class="tl-person-line"></div>
+          <div id="tlMarker"></div>
+          <div class="tl-labels">
+            <span class="tl-lbl">PAST</span>
+            <span style="flex:1"></span>
+            <span class="tl-lbl">FUTURE</span>
+          </div>
+          <span class="tl-lbl now">NOW</span>
+        </div>
+
+        <!-- Info cards -->
+        <div class="tense-info" id="tenseInfo"></div>
+      </div>
+
+      <div class="section-label"><span>Historia · Geografía</span><span class="sl-count">7 recursos</span></div>
+      <div class="cards-list">
+
+        <button class="subject-card" data-app="hist-cards" data-subject="Historia" data-name="Tarjetas con Diagramas" style="--cc:#f0883e;--ib:rgba(240,136,62,.1);--tb:rgba(240,136,62,.08);--tbr:rgba(240,136,62,.2)">
+          <div class="sc-inner"><div class="sc-icon">📜</div><div class="sc-info"><div class="sc-subject">Historia</div><div class="sc-title">Tarjetas con Diagramas</div><div class="sc-desc">Introducción a la Historia · con líneas de tiempo 📊</div><div class="sc-tags"><span class="sc-tag">Tiempo</span><span class="sc-tag">Fuentes</span><span class="sc-tag">Periodos</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+        <button class="subject-card" data-app="hist-practice" data-subject="Historia I" data-name="Práctica con IA" style="--cc:#e3b341;--ib:rgba(227,179,65,.1);--tb:rgba(227,179,65,.08);--tbr:rgba(227,179,65,.2)">
+          <div class="sc-inner"><div class="sc-icon">🤖</div><div class="sc-info"><div class="sc-subject">Historia I</div><div class="sc-title">Práctica con IA</div><div class="sc-desc">Tarjetas · opción múltiple · escritura evaluada por IA</div><div class="sc-tags"><span class="sc-tag">⚡ Tarjetas</span><span class="sc-tag">🎯 Múltiple</span><span class="sc-tag">✍️ Escribir</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+        <button class="subject-card" data-app="hist-exam" data-subject="Historia" data-name="Simulacro de Examen" style="--cc:#f85149;--ib:rgba(248,81,73,.1);--tb:rgba(248,81,73,.08);--tbr:rgba(248,81,73,.2)">
+          <div class="sc-inner"><div class="sc-icon">📝</div><div class="sc-info"><div class="sc-subject">Historia</div><div class="sc-title">Simulacro de Examen</div><div class="sc-desc">20 preguntas con trampas · 20 min · dificultad alta</div><div class="sc-tags"><span class="sc-tag">⏱ Con tiempo</span><span class="sc-tag">⚠️ Difícil</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+        <button class="subject-card" data-app="geo" data-subject="Geografía" data-name="Vocabulario en Inglés" style="--cc:#f59e0b;--ib:rgba(245,158,11,.1);--tb:rgba(245,158,11,.08);--tbr:rgba(245,158,11,.2)">
+          <div class="sc-inner"><div class="sc-icon">🌍</div><div class="sc-info"><div class="sc-subject">Geografía</div><div class="sc-title">Vocabulario en Inglés</div><div class="sc-desc">Landforms & Volcanoes · tarjetas + quiz con pronunciación</div><div class="sc-tags"><span class="sc-tag">🏔 Landforms</span><span class="sc-tag">🌋 Volcanoes</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+
+        <!-- ═══ INGLÉS ═══ -->
+        <div class="section-label" style="margin-top:8px"><span>Inglés</span><span style="background:rgba(248,127,53,.15);border:1px solid rgba(248,127,53,.3);color:#fb923c;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-left:8px">🔥 Jue 29/04</span></div>
+
+        <button class="subject-card" data-app="eng-cards" data-subject="Inglés" data-name="Tarjetas de Gramática" style="--cc:#3b82f6;--ib:rgba(59,130,246,.1);--tb:rgba(59,130,246,.08);--tbr:rgba(59,130,246,.2)">
+          <div class="sc-inner"><div class="sc-icon">📚</div><div class="sc-info"><div class="sc-subject">Inglés · B1</div><div class="sc-title">Tarjetas de Gramática</div><div class="sc-desc">Present/Past Simple, Continuous, Used to, Vocab Family</div><div class="sc-tags"><span class="sc-tag">⚡ Tarjetas</span><span class="sc-tag">9 temas</span><span class="sc-tag">35 cards</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+        <button class="subject-card" data-app="eng-practice" data-subject="Inglés" data-name="Práctica Duolingo" style="--cc:#7c3aed;--ib:rgba(124,58,237,.1);--tb:rgba(124,58,237,.08);--tbr:rgba(124,58,237,.2)">
+          <div class="sc-inner"><div class="sc-icon">🎮</div><div class="sc-info"><div class="sc-subject">Inglés · Práctica</div><div class="sc-title">Práctica Duolingo</div><div class="sc-desc">Opción múltiple · Completar · Armar oraciones · ❤️❤️❤️ vidas</div><div class="sc-tags"><span class="sc-tag">🎯 Múltiple</span><span class="sc-tag">✍️ Completar</span><span class="sc-tag">🧩 Oraciones</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+        <button class="subject-card" data-app="eng-exam" data-subject="Inglés" data-name="Simulacro de Examen" style="--cc:#f85149;--ib:rgba(248,81,73,.1);--tb:rgba(248,81,73,.08);--tbr:rgba(248,81,73,.2)">
+          <div class="sc-inner"><div class="sc-icon">📝</div><div class="sc-info"><div class="sc-subject">Inglés · Examen</div><div class="sc-title">Simulacro de Examen</div><div class="sc-desc">20 preguntas · 20 min · resultado por tema</div><div class="sc-tags"><span class="sc-tag">⏱ Con tiempo</span><span class="sc-tag">📊 Por tema</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+        <button class="subject-card" data-app="eng-gateway" data-subject="Inglés" data-name="Gateway B1 – Practice Zone" style="--cc:#10b981;--ib:rgba(16,185,129,.1);--tb:rgba(16,185,129,.08);--tbr:rgba(16,185,129,.2)">
+          <div class="sc-inner"><div class="sc-icon">🎯</div><div class="sc-info"><div class="sc-subject">Inglés · B1 · Units 1–2</div><div class="sc-title">Gateway B1 – Practice Zone</div><div class="sc-desc">Family vocab · Adverbs · Present/Past tenses · Mixed test</div><div class="sc-tags"><span class="sc-tag">⚡ Interactivo</span><span class="sc-tag">8 secciones</span><span class="sc-tag">90+ preguntas</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+        <button class="subject-card soon" style="--cc:#64748b;--ib:rgba(100,116,139,.08)">
+          <div class="sc-badge-soon">Próximamente</div>
+          <div class="sc-inner"><div class="sc-icon">📐</div><div class="sc-info"><div class="sc-subject">Matemática</div><div class="sc-title">Próximo contenido</div></div></div>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- SECCIÓN: HISTÓRICO -->
+    <div id="section-historico" style="display:none">
+      <div class="section-label">
+        <span>Biología I</span>
+        <span class="hist-past-badge">Examen 24/04 · Pasado</span>
+      </div>
+      <div class="cards-list">
+
+        <button class="subject-card hist-card" data-app="bio-cards" data-subject="Biología I" data-name="Tarjetas con Diagramas" style="--cc:#10b981;--ib:rgba(16,185,129,.1);--tb:rgba(16,185,129,.08);--tbr:rgba(16,185,129,.2)">
+          <div class="sc-inner"><div class="sc-icon">🧬</div><div class="sc-info"><div class="sc-subject">Biología I</div><div class="sc-title">Tarjetas con Diagramas</div><div class="sc-desc">Repaso con ilustraciones explicativas 📊</div><div class="sc-tags"><span class="sc-tag">Célula</span><span class="sc-tag">Reproducción</span><span class="sc-tag">Fotosíntesis</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+        <button class="subject-card hist-card" data-app="bio-practice" data-subject="Biología I" data-name="Práctica con IA" style="--cc:#7c3aed;--ib:rgba(124,58,237,.1);--tb:rgba(124,58,237,.08);--tbr:rgba(124,58,237,.2)">
+          <div class="sc-inner"><div class="sc-icon">🤖</div><div class="sc-info"><div class="sc-subject">Biología I</div><div class="sc-title">Práctica con IA</div><div class="sc-desc">Tarjetas · opción múltiple · escritura evaluada por IA</div><div class="sc-tags"><span class="sc-tag">⚡ Tarjetas</span><span class="sc-tag">🎯 Múltiple</span><span class="sc-tag">✍️ Escribir</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+        <button class="subject-card hist-card" data-app="bio-exam" data-subject="Biología I" data-name="Simulacro de Examen" style="--cc:#f85149;--ib:rgba(248,81,73,.1);--tb:rgba(248,81,73,.08);--tbr:rgba(248,81,73,.2)">
+          <div class="sc-inner"><div class="sc-icon">📝</div><div class="sc-info"><div class="sc-subject">Biología I</div><div class="sc-title">Simulacro de Examen</div><div class="sc-desc">20 preguntas con trampas · 20 min · dificultad alta</div><div class="sc-tags"><span class="sc-tag">⏱ Con tiempo</span><span class="sc-tag">⚠️ Difícil</span></div></div><div class="sc-arrow">›</div></div>
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="appScreen">
+  <div class="app-topbar">
+    <button class="back-btn-portal" id="backBtn">← Volver</button>
+    <div style="flex:1;min-width:0">
+      <div class="atb-subject" id="atbSubject"></div>
+      <div class="atb-name" id="atbName"></div>
+    </div>
+  </div>
+  <iframe id="appFrame"></iframe>
+</div>
+
+<script src="js/data/questions.js"></script>
+<script src="js/data/tenses-data.js"></script>
+<script src="js/data/apps.js"></script>
+<script src="js/navigation.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/tenses.js"></script>
+<script src="js/app-loader.js"></script>
+<script>
+  if (!sessionStorage.getItem('gael_ok')) {
+    window.location.href = 'index.html';
+  }
+
+  // Exponer switchTense globalmente para los onclick en el HTML
+  window.switchTense = function (n) { Portal.switchTense(n); };
+
+  Portal.setupNavTabs();
+  Portal.initQuickQuiz();
+  Portal.switchTense(0);
+
+  document.querySelectorAll('.subject-card[data-app]').forEach(function (card) {
+    card.addEventListener('click', function () {
+      if (card.classList.contains('soon')) return;
+      Portal.openApp(
+        card.getAttribute('data-app'),
+        card.getAttribute('data-subject'),
+        card.getAttribute('data-name')
+      );
+    });
+  });
+
+  document.getElementById('backBtn').addEventListener('click', Portal.closeApp);
+</script>
+</body>
+</html>

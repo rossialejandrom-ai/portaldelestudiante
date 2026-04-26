@@ -1,0 +1,223 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulacro — Inglés</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--sur:#161b22;--sur2:#1c2330;--brd:#2d333b;--ac:#3b82f6;--gr:#3fb950;--rd:#f85149;--yw:#e3b341;--tx:#e6edf3;--mu:#8b949e;--R:12px}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;max-width:620px;margin:0 auto;min-height:100vh;padding-bottom:40px}
+.hdr{background:linear-gradient(155deg,#1a0b0b,#0d1117 55%);border-bottom:1px solid var(--brd);padding:20px 20px 14px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(248,81,73,.06),transparent 70%);pointer-events:none}
+.pill{display:inline-block;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:#ff7b72;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:99px;margin-bottom:8px;position:relative}
+.hdr h1{font-family:'Syne',sans-serif;font-size:clamp(16px,4.5vw,22px);font-weight:900;line-height:1.2;position:relative}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px;position:relative}
+.timer{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#ff7b72}
+.timer.warn{color:var(--rd);animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.q-count{font-size:12px;color:var(--mu)}
+.prog-bar{height:3px;background:var(--brd)}
+.prog-fill{height:100%;background:var(--rd);transition:width .3s}
+.q-wrap{padding:20px 16px}
+.q-meta{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.q-num{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#ff7b72}
+.q-topic{font-size:11px;color:var(--mu);background:var(--sur2);padding:2px 8px;border-radius:99px}
+.q-text{font-size:16px;font-weight:600;line-height:1.55;margin-bottom:18px}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{width:100%;text-align:left;background:var(--sur);border:1.5px solid var(--brd);border-radius:10px;padding:12px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;display:flex;gap:10px;align-items:center;transition:all .15s}
+.opt:hover:not(.sel){border-color:#3b82f6}
+.opt.sel{border-color:var(--ac);background:rgba(59,130,246,.1);color:#93c5fd}
+.opt .ltr{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;color:var(--mu);min-width:18px;flex-shrink:0}
+.opt.sel .ltr{color:#60a5fa}
+.fill-input{width:100%;background:var(--sur);border:1.5px solid var(--brd);border-radius:10px;padding:13px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .2s}
+.fill-input:focus{border-color:var(--ac)}
+.nav-row{display:flex;gap:8px;margin-top:20px}
+.btn-prev{background:var(--sur);border:1px solid var(--brd);border-radius:10px;padding:12px 18px;color:var(--tx);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.btn-nav{flex:1;background:var(--ac);border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.btn-entregar{width:100%;background:var(--rd);border:none;border-radius:10px;padding:14px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px}
+.dot-nav{display:flex;flex-wrap:wrap;gap:4px;padding:12px 16px;border-bottom:1px solid var(--brd)}
+.dot{width:22px;height:22px;border-radius:50%;background:var(--sur);border:1.5px solid var(--brd);font-size:9px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--mu);transition:all .15s;font-family:'Syne',sans-serif}
+.dot.ans{background:rgba(59,130,246,.15);border-color:var(--ac);color:#60a5fa}
+.dot.cur{background:var(--ac);border-color:var(--ac);color:#fff}
+/* RESULT */
+#viewResult{display:none;padding:20px 16px}
+.score-hdr{text-align:center;padding:28px 20px;background:var(--sur);border-radius:16px;margin-bottom:20px;border:1px solid var(--brd)}
+.score-icon{font-size:56px;margin-bottom:10px}
+.score-nota{font-family:'Syne',sans-serif;font-size:42px;font-weight:900;margin-bottom:4px}
+.score-sub{color:var(--mu);font-size:13px}
+.score-detail{font-size:14px;margin-top:10px;line-height:1.5}
+.topics-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mu);margin-bottom:12px}
+.topic-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--brd)}
+.topic-name{flex:1;font-size:13px;font-weight:500}
+.topic-score{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;min-width:30px;text-align:right}
+.topic-bar-bg{width:70px;height:5px;background:var(--brd);border-radius:99px;overflow:hidden}
+.topic-bar-fg{height:100%;border-radius:99px}
+.btn-retry{width:100%;background:var(--ac);border:none;border-radius:10px;padding:14px;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:20px}
+.btn-home{width:100%;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.3);border-radius:10px;padding:14px;color:#67e8f9;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:10px}
+</style></head>
+<body>
+
+<div class="hdr">
+  <div class="pill">SIMULACRO · INGLÉS B1</div>
+  <h1>Examen de Inglés</h1>
+  <div class="hdr-row">
+    <div class="timer" id="timer">20:00</div>
+    <div class="q-count" id="qcount">1 de 20</div>
+  </div>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="progFill" style="width:5%"></div></div>
+
+<div id="viewExam">
+  <div class="dot-nav" id="dotNav"></div>
+  <div class="q-wrap" id="qWrap"></div>
+</div>
+
+<div id="viewResult"></div>
+
+<script>
+var QS=[
+  // Present Simple (4)
+  {topic:'Present Simple',q:'My sister ___ in a hospital.',opts:['work','works','is working','worked'],cor:1,type:'mc'},
+  {topic:'Present Simple',q:'___ your parents speak English?',opts:['Do','Does','Are','Is'],cor:0,type:'mc'},
+  {topic:'Present Simple',q:'He never ___ late to class.',opts:['arrive','arrives','is arriving','arrived'],cor:1,type:'mc'},
+  {topic:'Present Simple',q:'Completá: "She ___ (not/like) coffee."',ans:"doesn't like",type:'fill'},
+  // Present Continuous (3)
+  {topic:'Present Continuous',q:'Listen! Someone ___ at the door.',opts:['knock','knocks','is knocking','knocked'],cor:2,type:'mc'},
+  {topic:'Present Continuous',q:'I ___ my homework right now.',opts:['do','does','am doing','did'],cor:2,type:'mc'},
+  {topic:'Present Continuous',q:'Which verb CANNOT use continuous form?',opts:['run','eat','know','sleep'],cor:2,type:'mc'},
+  // Adverbs & Adjectives (2)
+  {topic:'Adverbs of Frequency',q:'"Raramente" en inglés es:',opts:['always','usually','rarely','often'],cor:2,type:'mc'},
+  {topic:'Adjectives',q:'She is a ___ student. (inteligente)',opts:['intelligence','clever','cleverly','clevers'],cor:1,type:'mc'},
+  // Family (2)
+  {topic:'Family Vocabulary',q:'The daughter of my sibling is my ___.',opts:['cousin','aunt','niece','sister-in-law'],cor:2,type:'mc'},
+  {topic:'Family Vocabulary',q:'Completá: "Mi padrastro en inglés es ___."',ans:'stepfather',type:'fill'},
+  // Past Simple (5)
+  {topic:'Past Simple',q:'We ___ a great film last night.',opts:['see','sees','saw','are seeing'],cor:2,type:'mc'},
+  {topic:'Past Simple',q:'___ you go to school yesterday?',opts:['Do','Does','Did','Were'],cor:2,type:'mc'},
+  {topic:'Past Simple',q:"They didn't ___ the game.",opts:['won','win','wins','winning'],cor:1,type:'mc'},
+  {topic:'Past Simple',q:'Completá: "Past Simple de \'write\' es ___."',ans:'wrote',type:'fill'},
+  // Past Continuous (2)
+  {topic:'Past Continuous',q:'She ___ a book when the lights went out.',opts:['read','reads','was reading','is reading'],cor:2,type:'mc'},
+  {topic:'Past Continuous',q:'While he ___, she was cooking.',opts:['is studying','was studying','studied','study'],cor:1,type:'mc'},
+  // Used to (2)
+  {topic:'Used to',q:"I ___ like vegetables, but now I love them.",opts:["used to not","didn't used to","didn't use to","not used to"],cor:2,type:'mc'},
+  {topic:'Used to',q:'She ___ live in London when she was young.',opts:['use to','used to','was using to','did use to'],cor:1,type:'mc'},
+  // Past Continuous fill
+  {topic:'Past Continuous',q:'Completá: "They ___ (play) when I called."',ans:'were playing',type:'fill'},
+];
+
+var answers=new Array(QS.length).fill(null);
+var cur=0,timerSecs=20*60,timerInt=null;
+
+function startTimer(){
+  timerInt=setInterval(function(){
+    timerSecs--;
+    var m=Math.floor(timerSecs/60),s=timerSecs%60;
+    var el=document.getElementById('timer');
+    el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+    if(timerSecs<=120)el.classList.add('warn');
+    if(timerSecs<=0){clearInterval(timerInt);showResult();}
+  },1000);
+}
+
+function renderDots(){
+  var nav=document.getElementById('dotNav');nav.innerHTML='';
+  QS.forEach(function(q,i){
+    var d=document.createElement('div');
+    d.className='dot'+(i===cur?' cur':answers[i]!==null?' ans':'');
+    d.textContent=i+1;d.onclick=function(){cur=i;renderQ();};
+    nav.appendChild(d);
+  });
+}
+
+function renderQ(){
+  var q=QS[cur];
+  document.getElementById('qcount').textContent=(cur+1)+' de '+QS.length;
+  document.getElementById('progFill').style.width=((cur+1)/QS.length*100)+'%';
+  renderDots();
+
+  var html='<div class="q-meta"><span class="q-num">Pregunta '+(cur+1)+'</span><span class="q-topic">'+q.topic+'</span></div>';
+  html+='<div class="q-text">'+q.q+'</div>';
+
+  if(q.type==='mc'){
+    html+='<div class="opts">';
+    ['A','B','C','D'].forEach(function(l,i){
+      var sel=answers[cur]===i?' sel':'';
+      html+='<button class="opt'+sel+'" onclick="selOpt('+i+')"><span class="ltr">'+l+'</span><span>'+q.opts[i]+'</span></button>';
+    });
+    html+='</div>';
+  } else {
+    var val=answers[cur]||'';
+    html+='<input class="fill-input" type="text" value="'+escHtml(val)+'" placeholder="Escribí tu respuesta..." onchange="answers['+cur+']=this.value;renderDots()" oninput="answers['+cur+']=this.value;renderDots()" autocomplete="off">';
+  }
+
+  html+='<div class="nav-row">';
+  if(cur>0)html+='<button class="btn-prev" onclick="goQ(cur-1)">← Anterior</button>';
+  if(cur<QS.length-1)html+='<button class="btn-nav" onclick="goQ(cur+1)">Siguiente →</button>';
+  else html+='<button class="btn-nav" style="background:var(--rd)" onclick="showResult()">Entregar →</button>';
+  html+='</div>';
+
+  var resp=answers.filter(function(a){return a!==null&&a!=='';}).length;
+  if(resp===QS.length)html+='<button class="btn-entregar" onclick="showResult()">✓ Entregar examen ('+resp+'/'+QS.length+' respondidas)</button>';
+
+  document.getElementById('qWrap').innerHTML=html;
+  if(q.type==='fill'){
+    var inp=document.querySelector('.fill-input');
+    if(inp)inp.focus();
+  }
+}
+
+function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;');}
+function selOpt(i){answers[cur]=i;renderQ();}
+function goQ(n){cur=n;renderQ();}
+
+function showResult(){
+  clearInterval(timerInt);
+  document.getElementById('viewExam').style.display='none';
+  var res=document.getElementById('viewResult');res.style.display='block';
+
+  var correct=0;var byTopic={};
+  QS.forEach(function(q,i){
+    if(!byTopic[q.topic])byTopic[q.topic]={ok:0,total:0};
+    byTopic[q.topic].total++;
+    var ans=answers[i];
+    var ok=false;
+    if(q.type==='mc')ok=(ans===q.cor);
+    else ok=(typeof ans==='string'&&ans.trim().toLowerCase()===q.ans.toLowerCase());
+    if(ok){correct++;byTopic[q.topic].ok++;}
+  });
+
+  var pct=correct/QS.length;
+  var nota=Math.round(pct*10);
+  var emoji,color,msg;
+  if(pct>=0.8){emoji='🏆';color='var(--gr)';msg='¡Excelente! Estás listo para el examen.';}
+  else if(pct>=0.6){emoji='💪';color='var(--yw)';msg='Buen desempeño, repasá los temas rojos.';}
+  else{emoji='📚';color='var(--rd)';msg='Repasá las tarjetas y practicá más.';}
+
+  var html='<div class="score-hdr">';
+  html+='<div class="score-icon">'+emoji+'</div>';
+  html+='<div class="score-nota" style="color:'+color+'">'+nota+'/10</div>';
+  html+='<div class="score-sub">'+correct+' correctas de '+QS.length+'</div>';
+  html+='<div class="score-detail">'+msg+'</div>';
+  html+='</div>';
+  html+='<div class="topics-title">Resultado por tema</div>';
+
+  Object.keys(byTopic).sort().forEach(function(t){
+    var tp=byTopic[t];var p=Math.round(tp.ok/tp.total*100);
+    var c=p>=75?'var(--gr)':p>=50?'var(--yw)':'var(--rd)';
+    html+='<div class="topic-row"><div class="topic-name">'+t+'</div>';
+    html+='<div class="topic-bar-bg"><div class="topic-bar-fg" style="width:'+p+'%;background:'+c+'"></div></div>';
+    html+='<div class="topic-score" style="color:'+c+'">'+tp.ok+'/'+tp.total+'</div></div>';
+  });
+  html+='<button class="btn-home" onclick="goPortal()">← Volver al Portal</button>';
+  html+='<button class="btn-retry" onclick="location.reload()">↺ Repetir simulacro</button>';
+  res.innerHTML=html;
+}
+
+function goPortal(){try{window.parent.document.getElementById('backBtn').click();}catch(e){window.history.back();}}
+
+renderQ();startTimer();
+</script>
+</body></html>

@@ -1,0 +1,559 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biología I — </title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--sur:#161b22;--sur2:#1c2330;--brd:#2d333b;
+  --gr:#3fb950;--bl:#58a6ff;--or:#f0883e;--yw:#e3b341;--rd:#f85149;
+  --tx:#e6edf3;--mu:#8b949e;--R:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:60px;max-width:620px;margin:0 auto}
+
+.hdr{background:linear-gradient(155deg,#0b2e18 0%,#0d1117 55%);border-bottom:1px solid var(--brd);padding:28px 20px 20px;text-align:center}
+.pill{display:inline-block;background:rgba(63,185,80,.12);border:1px solid rgba(63,185,80,.3);color:var(--gr);font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:99px;margin-bottom:10px}
+.hdr h1{font-family:'Syne',sans-serif;font-size:clamp(20px,5.5vw,30px);font-weight:800;line-height:1.15}
+.hdr h1 em{color:var(--gr);font-style:normal}
+.hdr .sub{color:var(--mu);font-size:12px;margin-top:5px}
+.exam-badge{display:inline-block;margin-top:10px;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:#ff7b72;font-size:11px;font-weight:600;padding:4px 14px;border-radius:99px}
+
+.scores{display:flex;gap:1px;background:var(--brd);border-bottom:1px solid var(--brd)}
+.sc{flex:1;background:var(--sur);padding:12px 8px;text-align:center}
+.sc .n{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;line-height:1}
+.sc .l{font-size:10px;color:var(--mu);margin-top:2px}
+.sc.g .n{color:var(--gr)}.sc.r .n{color:var(--rd)}.sc.b .n{color:var(--bl)}
+
+.body{padding:18px 16px}
+
+.modes{display:flex;background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:4px;gap:4px;margin-bottom:14px}
+.mt{flex:1;padding:8px 4px;border-radius:8px;border:none;background:transparent;color:var(--mu);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;transition:all .18s;text-align:center}
+.mt.on{background:var(--gr);color:#0d1117}
+
+.trow{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.tp{padding:5px 12px;border-radius:99px;border:1px solid var(--brd);background:transparent;color:var(--mu);font-size:12px;cursor:pointer;transition:all .18s;white-space:nowrap}
+.tp.on{border-color:var(--bl);color:var(--bl);background:rgba(88,166,255,.07)}
+
+.pb{height:4px;background:var(--sur);border-radius:99px;overflow:hidden;margin-bottom:5px}
+.pf{height:100%;background:linear-gradient(90deg,var(--gr),var(--bl));border-radius:99px;transition:width .4s ease}
+.pl{font-size:11px;color:var(--mu);text-align:right;margin-bottom:14px}
+
+.card{background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:20px;margin-bottom:12px}
+.qm{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--bl);margin-bottom:9px}
+.qt{font-size:16px;font-weight:500;line-height:1.55;margin-bottom:16px}
+
+/* FLASHCARD */
+.fcw{perspective:900px;min-height:165px;margin-bottom:6px;cursor:pointer}
+.fc{width:100%;min-height:165px;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.fc.flip{transform:rotateY(180deg)}
+.ff,.fb2{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--R);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:26px 22px;text-align:center;min-height:165px}
+.ff{background:linear-gradient(135deg,#11234a,#1c2330);border:1.5px solid rgba(88,166,255,.25)}
+.fb2{background:linear-gradient(135deg,#0c2c18,#1c2330);border:1.5px solid rgba(63,185,80,.25);transform:rotateY(180deg)}
+.fc-term{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--bl);margin-bottom:6px}
+.fc-top{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.fc-def{font-size:13px;line-height:1.75;color:#cdd9e5}
+.hint{text-align:center;font-size:11px;color:var(--mu);margin-bottom:14px}
+.seval{display:none;gap:9px;margin-top:4px}
+.seval.on{display:flex}
+.bk{flex:1;background:rgba(63,185,80,.12);color:var(--gr);border:1px solid rgba(63,185,80,.28);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:11px;border-radius:9px;cursor:pointer;transition:all .18s}
+.bk:hover{background:rgba(63,185,80,.22)}
+.bn{flex:1;background:rgba(248,81,73,.1);color:#ff7b72;border:1px solid rgba(248,81,73,.25);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;padding:11px;border-radius:9px;cursor:pointer;transition:all .18s}
+.bn:hover{background:rgba(248,81,73,.18)}
+
+/* CHOICES */
+.choices{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.ch{width:100%;text-align:left;background:var(--sur2);border:1.5px solid var(--brd);border-radius:9px;padding:12px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.5;cursor:pointer;transition:all .18s}
+.ch:hover:not(:disabled){border-color:var(--bl)}
+.ch.ok{border-color:var(--gr);background:rgba(63,185,80,.08);color:var(--gr)}
+.ch.no{border-color:var(--rd);background:rgba(248,81,73,.08);color:var(--rd)}
+.ch:disabled{cursor:default}
+
+/* WRITE */
+textarea{width:100%;background:var(--sur2);border:1.5px solid var(--brd);border-radius:9px;padding:12px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.6;resize:none;min-height:100px;outline:none;transition:border-color .2s}
+textarea:focus{border-color:var(--gr)}
+textarea::placeholder{color:var(--mu)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:12px 20px;border-radius:9px;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .18s;width:100%;margin-top:10px}
+.bg{background:var(--gr);color:#0d1117}
+.bg:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.bg:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.bgh{background:var(--sur2);color:var(--tx);border:1px solid var(--brd)}
+.bgh:hover{border-color:var(--bl);color:var(--bl)}
+
+.dbox{background:rgba(88,166,255,.06);border-left:3px solid var(--bl);border-radius:6px;padding:13px 14px;font-size:13.5px;line-height:1.75;color:#cdd9e5;margin-bottom:14px;display:none}
+.dbox b{color:var(--bl)}
+
+.fbk{border-radius:var(--R);padding:15px;margin-top:12px;display:none;animation:fu .3s ease}
+.fbk.on{display:block}
+.fbk.ex{background:rgba(63,185,80,.07);border:1px solid rgba(63,185,80,.28)}
+.fbk.pa{background:rgba(227,179,65,.07);border:1px solid rgba(227,179,65,.22)}
+.fbk.ic{background:rgba(248,81,73,.07);border:1px solid rgba(248,81,73,.22)}
+.fbh{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.fbe{font-size:19px}.fbt{font-family:'Syne',sans-serif;font-size:14px;font-weight:700}
+.fbb{font-size:13.5px;line-height:1.7;color:#cdd9e5}
+.tg{display:inline-block;background:rgba(63,185,80,.13);color:var(--gr);border-radius:4px;padding:1px 7px;font-size:12px;font-weight:500}
+.tb{display:inline-block;background:rgba(248,81,73,.12);color:#ff7b72;border-radius:4px;padding:1px 7px;font-size:12px;font-weight:500}
+
+.dots{display:inline-flex;gap:5px;align-items:center;padding:4px 0}
+.dots span{width:7px;height:7px;background:var(--gr);border-radius:50%;animation:bo 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}
+.dots span:nth-child(3){animation-delay:.3s}
+
+.comp{display:none;text-align:center;padding:48px 20px;animation:fu .4s ease}
+.comp.on{display:block}
+.comp .big{font-size:54px;margin-bottom:14px}
+.comp h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:7px}
+.comp p{color:var(--mu);font-size:13.5px;margin-bottom:24px;line-height:1.6}
+
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bo{0%,80%,100%{transform:scaleY(1)}40%{transform:scaleY(1.6)}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="pill">🧬 Biología I — Prof. Halebian</div>
+  <h1>Preparación para<br><em>el Examen</em></h1>
+  <div class="sub">Todo el material de la carpeta + apunte</div>
+  <div class="exam-badge">📅 Examen: Viernes 24/04</div>
+</div>
+
+<div class="scores">
+  <div class="sc g"><div class="n" id="sc">0</div><div class="l">✓ Correctas</div></div>
+  <div class="sc r"><div class="n" id="sw">0</div><div class="l">✗ Errores</div></div>
+  <div class="sc b"><div class="n" id="st">0</div><div class="l">Intentos</div></div>
+</div>
+
+<div class="body">
+  <div class="modes">
+    <button class="mt on" id="mf" onclick="setMode('flash')">⚡ Tarjetas</button>
+    <button class="mt" id="mm" onclick="setMode('multi')">🎯 Múltiple</button>
+    <button class="mt" id="mw" onclick="setMode('write')">✍️ Escribir</button>
+  </div>
+  <div class="trow" id="trow"></div>
+  <div class="pb"><div class="pf" id="pf" style="width:0%"></div></div>
+  <div class="pl" id="pl">0 / 0</div>
+  <div id="garea">
+    <div class="card" id="mc"><div id="qa"></div></div>
+  </div>
+  <div class="comp" id="comp">
+    <div class="big" id="ce">🏆</div>
+    <h2 id="ct">¡Muy bien!</h2>
+    <p id="cp"></p>
+    <button class="btn bg" style="max-width:260px;margin:0 auto 10px" onclick="reErr()">🔄 Repasar errores</button><br>
+    <button class="btn bgh" style="max-width:260px;margin:0 auto" onclick="reAll()">↺ Empezar de nuevo</button>
+  </div>
+</div>
+
+<script>
+const Q=[
+
+/* ════════════════════════════════════════
+   1. QUÉ ES LA BIOLOGÍA
+════════════════════════════════════════ */
+{id:1,topic:"Biología",
+term:"¿Qué es la Biología?",
+def:"Es la <b>ciencia natural</b> que estudia la vida desde diferentes puntos de vista: ecológico, sistemático, evolutivo y genético. Permite establecer diferencias y relaciones entre los distintos tipos de formas de vida.<br>Etimología: <b>Bio = vida</b><b>Logía = estudio y conocimiento</b>. Del griego: 'estudio de la vida'.",
+keys:["ciencia natural","vida","seres vivos","Bio","Logía","estudio","naturaleza"],
+mc:["Una rama de la Química que analiza moléculas orgánicas","La ciencia natural que estudia la vida y los seres vivos desde enfoques ecológico, evolutivo, sistemático y genético","La disciplina que estudia únicamente los animales y las plantas","Una ciencia que investiga solo los microorganismos del suelo"],cor:1},
+
+{id:2,topic:"Biología",
+term:"¿Qué es un ser vivo?",
+def:"Un ser vivo es un <b>organismo complejo</b> que puede estar formado por una o varias células y tiene capacidad de desempeñar <b>funciones básicas vitales</b>: nutrición, relación y reproducción. Sinónimo: <b>organismo</b>.",
+keys:["organismo","células","nutrición","relación","reproducción","complejo"],
+mc:["Cualquier objeto que se mueve de forma autónoma","Un organismo complejo con células que cumple funciones vitales: nutrición, relación y reproducción","Solo los animales y plantas macroscópicos visibles a simple vista","Un objeto inerte con composición química especial"],cor:1},
+
+{id:3,topic:"Biología",
+term:"Ciencias Naturales",
+def:"Son las ciencias que <b>estudian la naturaleza</b> y abarcan varias disciplinas: <b>Biología, Química, Física, Astronomía y Geología</b>.",
+keys:["naturaleza","Biología","Química","Física","Geología","Astronomía"],
+mc:["Solo la Biología y la Química","Las ciencias que estudian la naturaleza: Biología, Química, Física, Astronomía y Geología","Las ciencias sociales y humanísticas","Solo las ciencias que usan microscopio"],cor:1},
+
+/* ════════════════════════════════════════
+   2. RAMAS DE LA BIOLOGÍA
+════════════════════════════════════════ */
+{id:4,topic:"Ramas",
+term:"Ramas principales (1ª parte)",
+def:"<b>Botánica</b>: plantas · <b>Zoología</b>: animales · <b>Microbiología</b>: microorganismos · <b>Virología</b>: virus · <b>Parasitología</b>: parásitos · <b>Genética</b>: herencia de caracteres · <b>Ictiología</b>: peces · <b>Inmunología</b>: defensa del organismo.",
+keys:["Botánica","Zoología","Microbiología","Virología","Genética","Ictiología","Inmunología","Parasitología"],
+mc:["Botánica=animales, Zoología=plantas, Genética=virus","Botánica=plantas, Zoología=animales, Microbiología=microorganismos, Genética=herencia, Virología=virus","Solo Botánica y Zoología son ramas reconocidas","Botánica=hongos, Genética=virus, Zoología=plantas"],cor:1},
+
+{id:5,topic:"Ramas",
+term:"Ramas principales (2ª parte)",
+def:"<b>Ornitología</b>: aves · <b>Protozología</b>: protozoos · <b>Taxonomía</b>: clasificación · <b>Bioquímica</b>: composición química de los seres vivos · <b>Histología</b>: tejidos biológicos · <b>Paleontología</b>: fósiles · <b>Herpetología</b>: reptiles · <b>Citología</b>: células · <b>Micología</b>: hongos · <b>Mastozoología</b>: mamíferos.",
+keys:["Ornitología","Taxonomía","Bioquímica","Histología","Paleontología","Citología","Micología","Mastozoología","Herpetología"],
+mc:["Citología=fósiles, Paleontología=células","Ornitología=aves, Citología=células, Micología=hongos, Taxonomía=clasificación, Paleontología=fósiles","Histología=virus, Micología=bacterias, Mastozoología=aves","Mastozoología=aves, Ornitología=mamíferos"],cor:1},
+
+/* ════════════════════════════════════════
+   3. CÉLULA
+════════════════════════════════════════ */
+{id:6,topic:"Célula",
+term:"Célula — definición y partes",
+def:"Es la <b>unidad fundamental</b> de los organismos vivos, generalmente microscópica. Sus partes:<br>• <b>Membrana</b>: envoltura que protege la célula y controla qué entra y sale.<br>• <b>Citoplasma</b>: interior donde se encuentran los orgánulos y ocurren las reacciones químicas.<br>• <b>Núcleo</b>: centro de mando que contiene el material genético (ADN).",
+keys:["unidad fundamental","membrana","citoplasma","núcleo","material genético","orgánulos"],
+mc:["La molécula más pequeña de un organismo","La unidad fundamental de los seres vivos, formada por membrana, citoplasma y núcleo con el material genético","Un órgano del sistema nervioso central","Solo existe en organismos pluricelulares animales"],cor:1},
+
+{id:7,topic:"Célula",
+term:"ADN y ARN",
+def:"<b>ADN</b> (Ácido desoxirribonucleico): sustancia constituyente del <b>material genético</b>. Se encuentra principalmente en el núcleo de las células y <b>transmite los caracteres hereditarios</b> de generación en generación.<br><b>ARN</b> (Ácido ribonucleico): ácido nucleico que <b>participa en la síntesis de proteínas</b>.",
+keys:["ADN","material genético","núcleo","caracteres hereditarios","ARN","síntesis de proteínas"],
+mc:["ADN=proteína estructural, ARN=lípido de membrana","ADN=material genético en el núcleo que transmite caracteres hereditarios; ARN=participa en síntesis de proteínas","ADN solo existe en animales superiores","ARN contiene el material genético y ADN sintetiza proteínas"],cor:1},
+
+{id:8,topic:"Célula",
+term:"Unicelular vs Pluricelular",
+def:"<b>Unicelulares</b>: formados por UNA sola célula. Ej: bacterias, protozoos (amebas, paramecios).<br><b>Pluricelulares</b>: formados por MÁS de una célula. Ej: plantas, hongos y animales.",
+keys:["una célula","bacterias","protozoos","más de una célula","plantas","hongos","animales"],
+mc:["Unicelular=plantas; Pluricelular=bacterias","Unicelular=bacterias y protozoos (una célula); Pluricelular=plantas, hongos y animales (muchas células)","Unicelular=animales pequeños; Pluricelular=animales grandes","No hay diferencia funcional entre ambos tipos"],cor:1},
+
+/* ════════════════════════════════════════
+   4. CARACTERÍSTICAS DE LOS SERES VIVOS
+════════════════════════════════════════ */
+{id:9,topic:"Características",
+term:"Las 9 características de los seres vivos",
+def:"1) <b>Composición química compleja</b> 2) <b>Formados por células</b> 3) <b>Organización jerárquica</b> 4) <b>Nutrición</b> 5) <b>Desarrollo</b> 6) <b>Reproducción</b> 7) <b>Evolución</b> 8) <b>Autorregulación / Homeostasis</b> 9) <b>Relación con el entorno</b>",
+keys:["composición química","células","organización jerárquica","nutrición","desarrollo","reproducción","evolución","homeostasis","relación"],
+mc:["Solo nutrición y reproducción son características exclusivas","Composición química, células, organización jerárquica, nutrición, desarrollo, reproducción, evolución, homeostasis y relación con el entorno","Solo 5: células, nutrición, reproducción, desarrollo y evolución","Respiración, digestión, circulación, reproducción y movimiento"],cor:1},
+
+{id:10,topic:"Características",
+term:"Composición química compleja (CHONP)",
+def:"Los seres vivos están compuestos por <b>biomoléculas</b>: moléculas grandes y complejas. Hay 4 grupos: <b>hidratos de carbono, lípidos, proteínas y ácidos nucleicos</b>. Los átomos principales son <b>C (Carbono), H (Hidrógeno), O (Oxígeno), N (Nitrógeno) y P (Fósforo)</b> — se recuerdan como <b>CHONP</b>.",
+keys:["biomoléculas","hidratos de carbono","lípidos","proteínas","ácidos nucleicos","CHONP","C","H","O","N","P"],
+mc:["Solo proteínas y agua forman los seres vivos","Biomoléculas: hidratos de carbono, lípidos, proteínas y ácidos nucleicos. Átomos principales: CHONP (C, H, O, N, P)","Moléculas inorgánicas simples como el agua y el CO₂","Solo el ADN y el glucógeno componen a los seres vivos"],cor:1},
+
+{id:11,topic:"Características",
+term:"Organización jerárquica",
+def:"De menor a mayor complejidad: <b>biomoléculas → células → tejidos → órganos → sistemas de órganos → organismo</b>.<br>Ejemplo: neuronas (célula) → tejido nervioso → cerebro (órgano) → sistema nervioso → ser humano.",
+keys:["biomoléculas","células","tejidos","órganos","sistemas de órganos","organismo"],
+mc:["Átomos → moléculas → tejidos → organismo","Biomoléculas → células → tejidos → órganos → sistemas de órganos → organismo","Células → biomoléculas → órganos → organismo","Tejidos → células → sistemas → organismos"],cor:1},
+
+{id:12,topic:"Características",
+term:"Desarrollo directo",
+def:"El individuo que nace ya tiene el mismo <b>plan corporal</b> (partes del cuerpo) que tendrá de adulto. Solo sufre cambios de <b>crecimiento y maduración</b>.<br>Ejemplos: todos los <b>mamíferos y las aves</b>.",
+keys:["plan corporal","adulto","crecimiento","maduración","mamíferos","aves"],
+mc:["El individuo nace como larva con forma totalmente distinta al adulto","El individuo nace con el mismo plan corporal que el adulto; solo crece y madura. Ejemplos: mamíferos y aves","El individuo cambia radicalmente de forma varias veces en su vida","Solo ocurre en insectos y anfibios"],cor:1},
+
+{id:13,topic:"Características",
+term:"Desarrollo indirecto (metamorfosis)",
+def:"El individuo que nace se llama <b>larva</b> y tiene un plan corporal <b>totalmente distinto</b> al del adulto. Pasa por distintas fases de transformación (<b>metamorfosis</b>).<br>Ejemplos: <b>insectos</b> (mosquito: larva acuática sin alas → adulto volador; oruga → mariposa); <b>anfibios</b> (renacuajo acuático con cola y branquias → rana adulta con patas y pulmones).",
+keys:["larva","distinto","metamorfosis","fases","insectos","anfibios","mosquito","renacuajo","rana"],
+mc:["El individuo nace igual que el adulto y solo crece","El individuo nace como larva con plan corporal diferente al adulto; pasa por metamorfosis. Ej: insectos (mosquito, mariposa) y anfibios (rana)","Solo ocurre en mamíferos acuáticos","El individuo se desarrolla sin salir del huevo"],cor:1},
+
+{id:14,topic:"Características",
+term:"Evolución",
+def:"Proceso de cambio que ocurre en las <b>especies</b> a lo largo de <b>muchas generaciones</b>, permitiéndoles adaptarse mejor al ambiente. Se produce por <b>mutaciones</b> (cambios al azar en el ADN) y recombinación genética en la reproducción sexual. <b>Diferencia clave</b>: la evolución afecta a las especies en miles o millones de años; el desarrollo afecta al individuo en su propia vida.",
+keys:["especies","generaciones","adaptación","mutaciones","ADN","cambio","tiempo largo"],
+mc:["Cambio que ocurre en un individuo durante su vida","Proceso de cambio en las especies a lo largo de muchas generaciones, por mutaciones y recombinación genética, para adaptarse al ambiente","Solo cambios en el tamaño corporal de los animales","Lo mismo que el desarrollo individual"],cor:1},
+
+{id:15,topic:"Características",
+term:"LUCA — Primer ser vivo",
+def:"<b>LUCA</b>: <b>L</b>ast <b>U</b>niversal <b>C</b>ommon <b>A</b>ncestor (Último Ancestro Común Universal). Fue el <b>primer ser vivo unicelular</b> del que descienden TODOS los organismos que existieron o existen. Surgió hace unos <b>3.500 millones de años</b>. Era similar a las bacterias actuales.",
+keys:["LUCA","primer ser vivo","3500 millones","unicelular","bacterias","ancestro común"],
+mc:["El primer animal multicelular que existió en la Tierra","El primer ser vivo unicelular del que descienden todos los organismos; existió hace ~3.500 millones de años; similar a las bacterias","Una especie de bacteria que existe hoy","El ser vivo más grande que existió en la historia"],cor:1},
+
+{id:16,topic:"Características",
+term:"Homeostasis / Autorregulación",
+def:"Capacidad de mantener el <b>medio interno estable y en equilibrio</b> ante cambios internos o externos. Es un equilibrio <b>dinámico</b> (se pierde y recupera continuamente).<br><b>Ejemplo 1</b>: temperatura — calor → sudoración; frío → tiriteo.<br><b>Ejemplo 2</b>: glucemia — exceso de glucosa → el <b>páncreas</b> libera <b>insulina</b> → el <b>hígado</b> almacena la glucosa como <b>glucógeno</b>.",
+keys:["medio interno","estable","equilibrio dinámico","temperatura","sudoración","tiriteo","glucemia","insulina","páncreas","hígado","glucógeno"],
+mc:["La capacidad de moverse en respuesta a estímulos externos","Mantener el medio interno en equilibrio dinámico. Ej: temperatura (sudoración/tiriteo) y glucemia (páncreas→insulina→hígado almacena glucógeno)","Solo la regulación de la temperatura corporal en mamíferos","La capacidad de reproducirse sin necesitar un progenitor"],cor:1},
+
+{id:17,topic:"Características",
+term:"Relación con el entorno",
+def:"Capacidad de captar <b>estímulos</b> del entorno o del interior del cuerpo y generar <b>respuestas</b> apropiadas.<br><b>En animales pluricelulares</b>: receptores sensoriales (ej: ojos) → nervios sensitivos → cerebro (procesa) → nervios motores → órganos efectores (ej: músculos).<br><b>En plantas</b>: no tienen sistema nervioso, pero tienen <b>fototropismo</b> (crecen en dirección a la luz).",
+keys:["estímulos","respuestas","receptores sensoriales","sistema nervioso","cerebro","nervios motores","efectores","fototropismo"],
+mc:["Solo la capacidad de moverse de un lugar a otro","Captar estímulos y generar respuestas; en animales involucra el sistema nervioso; en plantas se da el fototropismo","Solo ocurre en animales con cerebro desarrollado","La producción de hormonas digestivas en el estómago"],cor:1},
+
+/* ════════════════════════════════════════
+   5. NUTRICIÓN
+════════════════════════════════════════ */
+{id:18,topic:"Nutrición",
+term:"Función de nutrición — definición",
+def:"Los seres vivos intercambian <b>materia y energía</b> con el medio. La función de nutrición incluye tres tareas complementarias:<br>1) <b>Alimentación</b>: incorporar materia (alimentos).<br>2) <b>Respiración</b>: incorporar O₂ y liberar CO₂.<br>3) <b>Excreción</b>: eliminar desechos (CO₂, urea).",
+keys:["materia","energía","alimentación","respiración","excreción","CO₂","urea","O₂"],
+mc:["Solo la digestión y absorción de alimentos","Alimentación (incorporar materia), respiración (O₂/CO₂) y excreción (eliminar desechos): las tres forman la nutrición","Solo el intercambio de gases con el ambiente","La producción de glucosa por fotosíntesis"],cor:1},
+
+{id:19,topic:"Nutrición",
+term:"Autótrofos vs Heterótrofos — tabla comparativa",
+def:"<b>AUTÓTROFOS</b> (= Productores): producen su propio alimento. Son: plantas, algas, fitoplancton. Proceso: fotosíntesis.<br><b>HETERÓTROFOS</b> (= Consumidores): no producen alimento, consumen otros seres vivos. Son: animales, hongos, algunos microorganismos. Procesos: animales = ingestión + digestión interna; hongos = digestión externa + absorción.",
+keys:["autótrofos","productores","heterótrofos","consumidores","plantas","algas","animales","hongos","fotosíntesis","digestión externa","ingestión"],
+mc:["Autótrofos consumen animales; Heterótrofos consumen plantas","Autótrofos (productores) = plantas, algas, fitoplancton → fotosíntesis; Heterótrofos (consumidores) = animales, hongos → ingestión o digestión externa","Solo las plantas son autótrofas y solo los animales son heterótrofos","Autótrofos respiran O₂; Heterótrofos no respiran"],cor:1},
+
+{id:20,topic:"Nutrición",
+term:"Clasificación de los heterótrofos",
+def:"<b>Herbívoros</b>: comen plantas. Subgrupos: <b>frutívoros</b> (frutos) y <b>granívoros</b> (granos y semillas).<br><b>Carnívoros</b>: comen animales. Subgrupos: <b>piscívoros</b> (peces) e <b>insectívoros</b> (insectos).<br><b>Omnívoros</b>: comen tanto plantas como animales.",
+keys:["herbívoros","carnívoros","omnívoros","frutívoros","granívoros","piscívoros","insectívoros"],
+mc:["Solo herbívoros y carnívoros","Herbívoros (con frutívoros y granívoros), carnívoros (con piscívoros e insectívoros) y omnívoros","Solo carnívoros y omnívoros son heterótrofos","Productores y consumidores primarios"],cor:1},
+
+{id:21,topic:"Nutrición",
+term:"Fotosíntesis — proceso completo",
+def:"Proceso de los organismos <b>autótrofos</b> para producir su alimento. Combinan <b>agua (H₂O)</b> y <b>dióxido de carbono (CO₂)</b> usando <b>energía solar (lumínica → química)</b> para producir <b>glucosa (C₆H₁₂O₆)</b>. Como producto secundario liberan <b>oxígeno molecular (O₂)</b> a la atmósfera.<br>Ecuación: <b>6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂</b>",
+keys:["agua","CO₂","energía solar","glucosa","C₆H₁₂O₆","O₂","oxígeno","6CO₂","6H₂O","autótrofos"],
+mc:["La quema de glucosa para obtener energía celular","Producción de glucosa (C₆H₁₂O₆) a partir de CO₂ + H₂O usando energía solar; se libera O₂. Ecuación: 6CO₂+6H₂O→C₆H₁₂O₆+6O₂","La absorción de agua y minerales por las raíces","La digestión de alimentos en el estómago de los animales"],cor:1},
+
+{id:22,topic:"Nutrición",
+term:"Excreción — desechos de la nutrición",
+def:"Los seres vivos producen <b>desechos</b> que deben eliminar al ambiente:<br>• <b>CO₂</b> (dióxido de carbono): se elimina por la respiración.<br>• <b>Urea</b>: se elimina por la orina.<br>Ambos son productos de los procesos metabólicos internos.",
+keys:["desechos","CO₂","urea","respiración","orina","eliminar"],
+mc:["Los seres vivos no producen desechos","Los seres vivos eliminan desechos como el CO₂ (por respiración) y la urea (por orina) como resultado de sus procesos metabólicos","Solo los animales producen desechos","La excreción solo incluye la orina"],cor:1},
+
+/* ════════════════════════════════════════
+   6. REPRODUCCIÓN
+════════════════════════════════════════ */
+{id:23,topic:"Reproducción",
+term:"Reproducción — concepto general",
+def:"Capacidad de los seres vivos de producir <b>copias de sí mismos</b>, transmitiendo <b>información genética (ADN)</b> a sus descendientes. Permite conservar características de generación en generación y <b>perpetuar las especies</b>.<br><b>Progenitores</b> = padres · <b>Progenie</b> = hijos.",
+keys:["copias","ADN","información genética","progenitores","progenie","perpetuar","especies"],
+mc:["Solo la división celular de las bacterias","Capacidad de producir copias de sí mismos, transmitiendo ADN a la progenie para perpetuar las especies","Solo ocurre en organismos pluricelulares","Un proceso que solo sirve para crecer"],cor:1},
+
+{id:24,topic:"Reproducción",
+term:"Reproducción asexual",
+def:"Interviene <b>un solo progenitor</b>. <b>No hay gametas ni fecundación</b>. La progenie es <b>idéntica</b> entre sí y con el progenitor.<br>Tipos:<br>• <b>Fisión binaria</b>: bacteria divide su célula en dos (da 2 bacterias idénticas).<br>• <b>Gemación / Brotación</b>: a partir de un brote nace un nuevo ser (plantas, algunos invertebrados).<br>• <b>Partenogénesis</b>: óvulo sin fecundar da lugar a nuevo individuo (algunos insectos).",
+keys:["un progenitor","sin gametas","sin fecundación","idéntica","fisión binaria","gemación","brotación","partenogénesis"],
+mc:["Requiere dos progenitores y fecundación obligatoria","Un progenitor; progenie idéntica; sin fecundación. Tipos: fisión binaria, gemación/brotación, partenogénesis","Solo ocurre en plantas con flores y semillas","Produce descendientes con características mezcladas de ambos padres"],cor:1},
+
+{id:25,topic:"Reproducción",
+term:"Reproducción sexual",
+def:"Requiere <b>dos progenitores</b>: uno <b>femenino ♀</b> y uno <b>masculino ♂</b>. Poseen <b>gametas sexuales</b>: óvulos (♀) y espermatozoides (♂).<br><b>Fecundación</b>: unión de ambas gametas → forma una <b>cigota</b> → embrión → nuevo organismo.<br>La progenie es <b>similar pero NO idéntica</b>: tiene características <b>combinadas de ambos progenitores</b>.",
+keys:["dos progenitores","femenino","masculino","gametas","óvulo","espermatozoide","fecundación","cigota","embrión","no idéntica","combinadas"],
+mc:["Un solo progenitor que produce copias idénticas de sí mismo","Dos progenitores con gametas (óvulo+espermatozoide); fecundación forma cigota→embrión; progenie no idéntica, con características combinadas de ambos padres","Solo ocurre en bacterias y hongos","Los hijos son copias exactas del padre o de la madre"],cor:1},
+
+{id:26,topic:"Reproducción",
+term:"Diferencias clave: asexual vs sexual",
+def:"<table style='width:100%;font-size:13px;border-collapse:collapse'><tr><td style='padding:5px 8px;border:1px solid #2d333b;color:#58a6ff;font-weight:600'>Asexual</td><td style='padding:5px 8px;border:1px solid #2d333b;color:#3fb950;font-weight:600'>Sexual</td></tr><tr><td style='padding:5px 8px;border:1px solid #2d333b'>1 progenitor</td><td style='padding:5px 8px;border:1px solid #2d333b'>2 progenitores</td></tr><tr><td style='padding:5px 8px;border:1px solid #2d333b'>Sin gametas</td><td style='padding:5px 8px;border:1px solid #2d333b'>Con gametas (óvulo + esperm.)</td></tr><tr><td style='padding:5px 8px;border:1px solid #2d333b'>Sin fecundación</td><td style='padding:5px 8px;border:1px solid #2d333b'>Con fecundación → cigota</td></tr><tr><td style='padding:5px 8px;border:1px solid #2d333b'>Progenie idéntica</td><td style='padding:5px 8px;border:1px solid #2d333b'>Progenie similar (no idéntica)</td></tr></table>",
+keys:["un progenitor","dos progenitores","gametas","fecundación","cigota","idéntica","no idéntica"],
+mc:["No hay diferencias significativas entre ambos tipos","Asexual=1 progenitor, sin gametas, sin fecundación, progenie idéntica; Sexual=2 progenitores, con gametas y fecundación, progenie no idéntica","Asexual es más compleja que la sexual","Sexual produce progenie idéntica y asexual produce progenie variable"],cor:1},
+
+/* ════════════════════════════════════════
+   7. BIOMOLÉCULAS Y CÉLULAS (APUNTE)
+════════════════════════════════════════ */
+{id:27,topic:"Biomoléculas",
+term:"Los 4 grupos de biomoléculas + ejemplos",
+def:"<b>1) Hidratos de carbono</b>: glucosa, almidón, azúcares.<br><b>2) Lípidos</b>: grasas, aceites, colesterol.<br><b>3) Proteínas</b>: enzimas digestivas, hemoglobina, anticuerpos, miosina (músculos).<br><b>4) Ácidos nucleicos</b>: ADN y ARN.",
+keys:["hidratos de carbono","glucosa","almidón","lípidos","grasas","colesterol","proteínas","hemoglobina","anticuerpos","ácidos nucleicos","ADN","ARN"],
+mc:["Solo proteínas y ADN son biomoléculas","Hidratos de carbono (glucosa, almidón), lípidos (grasas, colesterol), proteínas (hemoglobina, anticuerpos) y ácidos nucleicos (ADN, ARN)","Vitaminas, minerales, proteínas y agua","Glucógeno, insulina, colágeno y glucosa"],cor:1},
+
+{id:28,topic:"Biomoléculas",
+term:"Glucosa — la molécula energética",
+def:"La <b>glucosa</b> (C₆H₁₂O₆) es una biomolécula del grupo de los <b>hidratos de carbono</b>. Es la principal <b>fuente de energía</b> para las células: se 'quema' al combinarse con oxígeno molecular (O₂). Es el alimento producido por las plantas en la <b>fotosíntesis</b>.",
+keys:["glucosa","C₆H₁₂O₆","hidratos de carbono","energía","O₂","fotosíntesis"],
+mc:["Una proteína que transporta oxígeno en la sangre","Una biomolécula (hidrato de carbono) que es la principal fuente de energía celular; producida en la fotosíntesis; fórmula C₆H₁₂O₆","Una molécula inorgánica como el agua","Un lípido almacenado en el tejido adiposo"],cor:1},
+
+{id:29,topic:"Biomoléculas",
+term:"Moléculas inorgánicas vs biomoléculas",
+def:"<b>Moléculas inorgánicas</b>: pequeñas y simples. Ejemplos: agua (H₂O), oxígeno molecular (O₂), dióxido de carbono (CO₂).<br><b>Biomoléculas</b>: más grandes y complejas, propias de los seres vivos. Ejemplos: glucosa, proteínas, ADN.",
+keys:["inorgánicas","pequeñas","simples","agua","O₂","CO₂","biomoléculas","grandes","complejas","glucosa","proteínas","ADN"],
+mc:["Son lo mismo: todas las moléculas son iguales","Inorgánicas=pequeñas y simples (agua, O₂, CO₂); Biomoléculas=grandes y complejas, propias de los seres vivos (glucosa, proteínas, ADN)","Las inorgánicas son más grandes que las biomoléculas","Las biomoléculas solo existen en los animales"],cor:1},
+
+{id:30,topic:"Biomoléculas",
+term:"Fotosíntesis — átomos y moléculas",
+def:"Los seres vivos están formados principalmente por los átomos <b>C, H, O, N, P</b>.<br>Las moléculas clave de la fotosíntesis son:<br>• <b>H₂O</b> (agua) — materia prima<br>• <b>CO₂</b> (dióxido de carbono) — materia prima<br>• <b>O₂</b> (oxígeno molecular) — producto secundario liberado al aire<br>• <b>C₆H₁₂O₆</b> (glucosa) — producto principal",
+keys:["C","H","O","N","P","H₂O","CO₂","O₂","C₆H₁₂O₆","glucosa","materia prima"],
+mc:["La fotosíntesis solo usa nitrógeno y fósforo","Materia prima: H₂O + CO₂; con energía solar produce glucosa (C₆H₁₂O₆) y libera O₂; átomos clave: C, H, O, N, P","La fotosíntesis produce CO₂ y consume O₂","Solo el agua participa en la fotosíntesis"],cor:1},
+
+];
+
+/* ══════════════ ENGINE ══════════════ */
+let mode='flash', atop=new Set(), queue=[], idx=0, errs=[], cor=0, wr=0, tot=0, flipped=false, answered=false;
+const topics=[...new Set(Q.map(q=>q.topic))];
+
+function init(){
+  const tr=document.getElementById('trow');
+  tr.innerHTML='';
+  topics.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='tp'+(atop.has(t)?' on':'');
+    b.textContent=t;
+    b.onclick=()=>togT(t,b);
+    tr.appendChild(b);
+  });
+  buildQ();render();
+}
+
+function togT(t,b){
+  atop.has(t)?atop.delete(t):atop.add(t);
+  b.classList.toggle('on');
+  reset();buildQ();render();
+}
+
+function reset(){idx=0;errs=[];cor=0;wr=0;tot=0;updS()}
+
+function buildQ(){
+  const pool=atop.size===0?[...Q]:Q.filter(q=>atop.has(q.topic));
+  queue=shuf([...pool]);idx=0;
+}
+
+function shuf(a){for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function setMode(m){
+  mode=m;
+  ['flash','multi','write'].forEach(x=>document.getElementById('m'+x[0]).classList.toggle('on',x===m));
+  reset();buildQ();render();
+}
+
+function updS(){
+  document.getElementById('sc').textContent=cor;
+  document.getElementById('sw').textContent=wr;
+  document.getElementById('st').textContent=tot;
+}
+
+function updP(){
+  const t=queue.length,d=Math.min(idx,t),p=t?(d/t*100):0;
+  document.getElementById('pf').style.width=p+'%';
+  document.getElementById('pl').textContent=d+' / '+t;
+}
+
+function render(){
+  document.getElementById('comp').classList.remove('on');
+  document.getElementById('mc').style.display='';
+  updP();
+  if(!queue.length){document.getElementById('qa').innerHTML='<p style="color:var(--mu);font-size:14px;padding:8px 0">Seleccioná un tema para empezar.</p>';return}
+  if(idx>=queue.length){showComp();return}
+  answered=false;flipped=false;
+  const q=queue[idx];
+  if(mode==='flash')rFlash(q);
+  else if(mode==='multi')rMulti(q);
+  else rWrite(q);
+}
+
+/* ── FLASH ── */
+function rFlash(q){
+  document.getElementById('qa').innerHTML=`
+    <div class="qm">${q.topic}</div>
+    <div class="fcw" onclick="doFlip()">
+      <div class="fc" id="fc">
+        <div class="ff"><div class="fc-top">${q.topic}</div><div class="fc-term">${q.term}</div></div>
+        <div class="fb2"><div class="fc-def">${q.def}</div></div>
+      </div>
+    </div>
+    <div class="hint" id="hint">Tocá la tarjeta para ver la definición</div>
+    <div class="seval" id="se">
+      <button class="bk" onclick="fcR(true)">✓ Lo sabía</button>
+      <button class="bn" onclick="fcR(false)">✗ No lo sabía</button>
+    </div>`;
+}
+function doFlip(){
+  if(answered)return;
+  flipped=!flipped;
+  document.getElementById('fc').classList.toggle('flip',flipped);
+  if(flipped){document.getElementById('hint').textContent='¿Lo sabías?';document.getElementById('se').classList.add('on')}
+}
+function fcR(k){
+  answered=true;tot++;
+  k?cor++:(wr++,errs.push(queue[idx]));
+  updS();idx++;setTimeout(render,280);
+}
+
+/* ── MULTI ── */
+function rMulti(q){
+  const opts=shuf(q.mc.map((t,i)=>({t,i}))), ct=q.mc[q.cor];
+  let h=`<div class="qm">${q.topic}</div><div class="qt">¿Cómo se define correctamente: <strong>${q.term}</strong>?</div><div class="choices" id="chs">`;
+  opts.forEach(o=>{h+=`<button class="ch" onclick="chkM(this,'${o.t===ct?'ok':'no'}')">${o.t}</button>`});
+  h+=`</div><div class="fbk" id="fbk"></div>`;
+  document.getElementById('qa').innerHTML=h;
+}
+function chkM(btn,res){
+  if(answered)return;
+  answered=true;tot++;
+  const q=queue[idx],ct=q.mc[q.cor];
+  document.querySelectorAll('.ch').forEach(b=>{b.disabled=true;if(b.textContent===ct)b.classList.add('ok');else if(b===btn&&res==='no')b.classList.add('no')});
+  const fb=document.getElementById('fbk');
+  if(res==='ok'){cor++;fb.className='fbk ex on';fb.innerHTML=`<div class="fbh"><span class="fbe">🎯</span><span class="fbt">¡Correcto!</span></div><div class="fbb">${q.def}</div>`}
+  else{wr++;errs.push(q);fb.className='fbk ic on';fb.innerHTML=`<div class="fbh"><span class="fbe">📖</span><span class="fbt">Repasemos</span></div><div class="fbb">Respuesta correcta: <b>${ct}</b><br><br>${q.def}</div>`}
+  updS();
+  const nx=document.createElement('button');
+  nx.className='btn bg';nx.style.marginTop='12px';
+  nx.textContent=idx<queue.length-1?'→ Siguiente':'✓ Finalizar';
+  nx.onclick=()=>{idx++;render()};
+  fb.after(nx);
+}
+
+/* ── WRITE ── */
+function rWrite(q){
+  document.getElementById('qa').innerHTML=`
+    <div class="qm">${q.topic}</div>
+    <div class="qt">Explicá con tus palabras: <strong>${q.term}</strong></div>
+    <div class="dbox" id="dbox">${q.def}</div>
+    <textarea id="ans" placeholder="Escribí tu definición acá..." rows="4"></textarea>
+    <button class="btn bg" id="evb" onclick="evalW()" disabled>Evaluar mi respuesta</button>
+    <div class="fbk" id="fbk2"></div>`;
+  document.getElementById('ans').addEventListener('input',()=>{
+    document.getElementById('evb').disabled=document.getElementById('ans').value.trim().length<5;
+  });
+}
+async function evalW(){
+  if(answered)return;
+  const q=queue[idx],ans=document.getElementById('ans').value.trim();
+  if(!ans)return;
+  answered=true;tot++;updS();
+  const evb=document.getElementById('evb');
+  evb.disabled=true;evb.innerHTML='<div class="dots"><span></span><span></span><span></span></div>';
+  document.getElementById('dbox').style.display='block';
+
+  const prompt=`Sos un profesor de Biología de 1er año de secundaria evaluando la respuesta de un alumno de 13-14 años.
+
+TÉRMINO: "${q.term}"
+DEFINICIÓN DE REFERENCIA: "${q.def.replace(/<[^>]+>/g,'').replace(/\n/g,' ')}"
+PALABRAS CLAVE ESPERADAS: ${q.keys.join(', ')}
+RESPUESTA DEL ALUMNO: "${ans}"
+
+Evaluá brevemente. Respondé SOLO con JSON sin markdown ni backticks:
+{"nivel":"excelente"|"parcial"|"incompleta","bien":["palabra1","palabra2"],"falto":["palabra3"],"comentario":"1 frase alentadora y específica"}`;
+
+  let nivel='parcial',bien=[],falto=[],comentario='';
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,messages:[{role:"user",content:prompt}]})});
+    const d=await r.json();
+    const raw=(d.content?.find(c=>c.type==='text')?.text||'{}').replace(/```[a-z]*/g,'').replace(/```/g,'').trim();
+    const p=JSON.parse(raw);
+    nivel=p.nivel||'parcial';bien=p.bien||[];falto=p.falto||[];comentario=p.comentario||'';
+  }catch{
+    const low=ans.toLowerCase();
+    const f=q.keys.filter(k=>low.includes(k.toLowerCase()));
+    const ms=q.keys.filter(k=>!low.includes(k.toLowerCase()));
+    const pct=f.length/q.keys.length;
+    nivel=pct>=.75?'excelente':pct>=.4?'parcial':'incompleta';
+    bien=f;falto=ms;comentario=pct>=.75?'¡Muy bien, incluiste los conceptos principales!':'Revisá los conceptos que te faltaron en la definición.';
+  }
+  nivel==='excelente'?cor++:(wr++,errs.push(q));
+  updS();
+  const em={excelente:'🌟',parcial:'💡',incompleta:'📖'};
+  const ti={excelente:'¡Excelente!',parcial:'Casi, seguí mejorando',incompleta:'Hay que repasar esto'};
+  const cl={excelente:'ex',parcial:'pa',incompleta:'ic'};
+  const fb=document.getElementById('fbk2');
+  fb.className=`fbk ${cl[nivel]} on`;
+  fb.innerHTML=`<div class="fbh"><span class="fbe">${em[nivel]}</span><span class="fbt">${ti[nivel]}</span></div>
+  <div class="fbb">${comentario}
+  ${bien.length?`<br><br><b>✓ Incluiste:</b> ${bien.map(b=>`<span class="tg">${b}</span>`).join(' ')}`:''}
+  ${falto.length?`<br><br><b>✗ Te faltó mencionar:</b> ${falto.map(b=>`<span class="tb">${b}</span>`).join(' ')}`:''}
+  </div>`;
+  evb.innerHTML=idx<queue.length-1?'→ Siguiente':'✓ Finalizar';
+  evb.disabled=false;evb.onclick=()=>{idx++;render()};
+}
+
+/* ── COMPLETION ── */
+function showComp(){
+  document.getElementById('mc').style.display='none';
+  document.getElementById('comp').classList.add('on');
+  const pct=tot?Math.round(cor/tot*100):0;
+  document.getElementById('ce').textContent=pct>=80?'🏆':pct>=50?'💪':'📚';
+  document.getElementById('ct').textContent=pct>=80?'¡Excelente!':pct>=50?'¡Bien, seguí practicando!':'¡Un poco más de repaso!';
+  document.getElementById('cp').textContent=`${cor} de ${tot} correctas (${pct}%).`+(errs.length?` Tenés ${errs.length} para repasar.`:' ¡Todo perfecto!');
+}
+function reErr(){
+  if(!errs.length){reAll();return}
+  queue=shuf([...errs]);errs=[];idx=0;cor=0;wr=0;tot=0;updS();
+  document.getElementById('comp').classList.remove('on');
+  document.getElementById('mc').style.display='';render();
+}
+function reAll(){
+  reset();buildQ();
+  document.getElementById('comp').classList.remove('on');
+  document.getElementById('mc').style.display='';render();
+}
+
+init();
+</script>
+</body>
+</html>
