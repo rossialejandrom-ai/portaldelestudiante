@@ -534,8 +534,6 @@ async function callGroqAPI(trimmedHist, retries, delay){
 
   if(data.error){
     if(res.status === 429 && retries > 0){
-      const secs = Math.round(delay/1000);
-      showBubble('Busy... retrying in ' + secs + 's');
       await new Promise(r => setTimeout(r, delay));
       return callGroqAPI(trimmedHist, retries-1, delay*2);
     }
