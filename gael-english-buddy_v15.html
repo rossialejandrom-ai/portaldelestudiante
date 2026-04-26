@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BUDDY</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; background:#000; overflow:hidden; font-family:'Press Start 2P', monospace; }
+
+.pixel-face {
+  position:fixed; inset:0; width:100vw; height:100vh;
+  image-rendering:pixelated; image-rendering:crisp-edges;
+}
+
+/* Status dot — arriba izquierda, barely visible */
+#status-dot {
+  position:fixed; top:14px; left:16px;
+  width:8px; height:8px; border-radius:50%;
+  background:#111; z-index:40; pointer-events:none;
+  transition:background 0.3s, box-shadow 0.3s;
+}
+#status-dot.listening { background:#ff6b9d; box-shadow:0 0 8px #ff6b9d88; }
+#status-dot.speaking  { background:#00d4ff; box-shadow:0 0 8px #00d4ff88; }
+#status-dot.thinking  { background:#ffd700; box-shadow:0 0 8px #ffd70088; }
+#status-dot.asleep    { background:#1a1a1a; box-shadow:none; }
+
+.hint {
+  position:fixed; bottom:16px; right:20px;
+  font-size:9px; color:#1a1a1a;
+  letter-spacing:1px; pointer-events:none;
+  text-transform:uppercase; z-index:40; transition:color 0.3s;
+}
+.hint.visible { color:#333; }
+
+/* SETUP */
+.setup {
+  position:fixed; inset:0; background:#000;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:16px; z-index:9999; padding:24px; overflow-y:auto;
+}
+.setup.hidden { display:none !important; }
+.setup-title { font-size:clamp(0.5rem,2vw,0.8rem); color:#00d4ff; text-shadow:0 0 12px #00d4ff; text-align:center; }
+.setup-box {
+  width:100%; max-width:360px; background:#0a0a14; border:2px solid #00d4ff;
+  padding:16px 20px; font-size:clamp(0.35rem,1.5vw,0.5rem); line-height:2.3; color:#ff6b9d;
+}
+.setup-box a { color:#ffd700; } .setup-box b { color:#ffd700; }
+.key-inp {
+  width:100%; max-width:360px; padding:12px 14px;
+  background:#0a0a14; border:2px solid #333;
+  color:#fff; font-family:'Press Start 2P'; font-size:clamp(0.4rem,1.5vw,0.55rem); outline:none;
+}
+.key-inp:focus { border-color:#00d4ff; }
+.go-btn {
+  width:100%; max-width:360px; padding:14px;
+  background:#00d4ff; color:#000; border:none;
+  font-family:'Press Start 2P'; font-size:clamp(0.4rem,1.5vw,0.6rem);
+  cursor:pointer; letter-spacing:2px;
+}
+.err { font-size:clamp(0.3rem,1.2vw,0.4rem); color:#ff6b9d; text-align:center; min-height:14px; }
+
+/* gear btn — esquina inferior izquierda, casi invisible */
+#gear-btn {
+  position:fixed; bottom:12px; left:14px;
+  font-size:16px; color:#111;
+  background:none; border:none; cursor:pointer;
+  z-index:60; transition:color 0.3s; line-height:1;
+  font-family: monospace;
+}
+#gear-btn:hover { color:#444; }
+
+.key-btn {
+  position:fixed; top:10px; right:14px;
+  font-family:'Press Start 2P'; font-size:clamp(0.25rem,0.8vw,0.32rem);
+  color:#111; background:none; border:none; cursor:pointer; transition:color 0.2s; z-index:60;
+}
+.key-btn:hover { color:#444; }
+
+/* ── TOPIC PANEL ── */
+#topic-panel {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.97);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:flex-start;
+  z-index:300; padding:28px 20px 24px;
+  overflow-y:auto;
+  opacity:0; pointer-events:none;
+  transition:opacity 0.22s;
+}
+#topic-panel.open { opacity:1; pointer-events:all; }
+
+.tp-title {
+  font-size:clamp(0.45rem,2vw,0.7rem);
+  color:#00d4ff; text-shadow:0 0 10px #00d4ff44;
+  margin-bottom:18px; letter-spacing:2px;
+}
+.tp-close {
+  position:absolute; top:14px; right:18px;
+  font-family:'Press Start 2P'; font-size:clamp(0.28rem,1vw,0.4rem);
+  color:#333; background:none; border:none; cursor:pointer; z-index:10;
+}
+.tp-close:hover { color:#aaa; }
+
+.tp-section-label {
+  width:100%; max-width:440px;
+  font-size:clamp(0.28rem,1vw,0.38rem);
+  color:#333; letter-spacing:2px; margin:10px 0 6px;
+  text-transform:uppercase;
+}
+
+.tp-grid {
+  display:grid; grid-template-columns:repeat(2,1fr);
+  gap:7px; width:100%; max-width:440px; margin-bottom:4px;
+}
+.tp-pill {
+  font-family:'Press Start 2P'; font-size:clamp(0.26rem,1vw,0.36rem);
+  padding:9px 6px; border:1px solid #1a1a1a;
+  background:transparent; color:#333; cursor:pointer;
+  text-transform:uppercase; transition:all 0.18s;
+  text-align:center; line-height:1.9;
+}
+.tp-pill:hover { border-color:#444; color:#666; }
+.tp-pill.active { border-color:#00d4ff; color:#000; background:#00d4ff; }
+
+/* feedback — corrección gramatical visible */
+#feedback {
+  position:fixed; bottom:0; left:0; right:0;
+  padding:14px 20px 18px;
+  background:#0a0010; border-top:2px solid #ff6b9d;
+  font-size:clamp(0.55rem,2.2vw,0.85rem); line-height:2;
+  color:#ff6b9d; text-align:center;
+  transform:translateY(100%); transition:transform 0.35s;
+  pointer-events:none; z-index:70;
+}
+#feedback .fb-label {
+  display:block; font-size:0.7em; color:#ff6b9d88;
+  letter-spacing:2px; margin-bottom:4px;
+}
+#feedback .fb-wrong { color:#ff4466; text-decoration:line-through; }
+#feedback .fb-arrow { color:#555; margin:0 6px; }
+#feedback .fb-right { color:#00ffaa; font-weight:bold; }
+#feedback.show { transform:translateY(0); }
+
+.bubble {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  max-width:85vw; padding:10px 18px;
+  background:rgba(0,0,0,0.85); border:1px solid #1a1a30;
+  font-size:clamp(0.4rem,1.8vw,0.65rem); line-height:1.9;
+  color:#00d4ff; text-align:center;
+  opacity:0; transition:opacity 0.3s;
+  pointer-events:none; z-index:60; border-radius:4px;
+}
+.bubble.show { opacity:1; }
+.bubble.user { color:#aaa; border-color:#111; font-size:clamp(0.35rem,1.5vw,0.55rem); }
+
+#mv,#mc { display:none; }
+</style>
+</head>
+<body>
+
+<video id="mv" autoplay playsinline muted></video>
+<canvas id="mc"></canvas>
+
+<!-- SETUP -->
+<div class="setup" id="setup">
+  <div class="setup-title">[ BUDDY SETUP ]</div>
+  <div class="setup-box">
+    <b>GET FREE KEY (Groq):</b><br>
+    1. Open <a href="https://console.groq.com/keys" target="_blank">console.groq.com/keys</a><br>
+    2. Sign in / create account<br>
+    3. Tap <b>Create API Key</b><br>
+    4. Copy the key &amp; paste below<br><br>
+    ✓ 100% FREE &nbsp;·&nbsp; ✓ 30 req/min &nbsp;·&nbsp; ✓ Saved on this device
+  </div>
+  <input class="key-inp" id="ki" type="password" placeholder="gsk_..." autocomplete="off" spellcheck="false"/>
+  <div class="err" id="ke"></div>
+  <button class="go-btn" onclick="saveKey()">▶ START BUDDY</button>
+</div>
+
+<!-- PIXEL FACE -->
+<svg class="pixel-face" id="face"
+  viewBox="0 0 16 12" xmlns="http://www.w3.org/2000/svg"
+  preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges">
+</svg>
+
+<!-- Status dot -->
+<div id="status-dot"></div>
+
+<!-- Gear button — esquina inferior izquierda -->
+<button id="gear-btn" onclick="openPanel()" title="Topics">⚙</button>
+
+<button class="key-btn" onclick="showSetup()">key</button>
+<div class="hint" id="hint"></div>
+<div class="bubble" id="bubble"></div>
+
+<!-- Feedback strip -->
+<div id="feedback"></div>
+
+<!-- Topic Panel -->
+<div id="topic-panel">
+  <button class="tp-close" onclick="closePanel()">✕</button>
+  <div class="tp-title">[ BUDDY TOPICS ]</div>
+  <div id="tp-active" style="font-size:clamp(0.26rem,1vw,0.36rem);color:#ffd700;margin-bottom:8px;text-align:center;min-height:1em;">Present Simple</div>
+
+  <div class="tp-section-label">▸ tenses</div>
+  <div class="tp-grid">
+    <button class="tp-pill active" data-l="present_simple"     onclick="setLvl(this)">Present<br>Simple</button>
+    <button class="tp-pill"        data-l="present_continuous" onclick="setLvl(this)">Present<br>Continuous</button>
+    <button class="tp-pill"        data-l="past_simple"        onclick="setLvl(this)">Past<br>Simple</button>
+    <button class="tp-pill"        data-l="past_continuous"    onclick="setLvl(this)">Past<br>Continuous</button>
+    <button class="tp-pill"        data-l="present_perfect"    onclick="setLvl(this)">Present<br>Perfect</button>
+    <button class="tp-pill"        data-l="future"             onclick="setLvl(this)">Future<br>will / going to</button>
+  </div>
+
+  <div class="tp-section-label">▸ grammar</div>
+  <div class="tp-grid">
+    <button class="tp-pill" data-l="used_to"     onclick="setLvl(this)">Used To /<br>Would</button>
+    <button class="tp-pill" data-l="frequency"   onclick="setLvl(this)">Frequency<br>Adverbs</button>
+    <button class="tp-pill" data-l="irregular"   onclick="setLvl(this)">Irregular<br>Verbs</button>
+    <button class="tp-pill" data-l="conditionals" onclick="setLvl(this)">Conditionals<br>if / would</button>
+  </div>
+
+  <div class="tp-section-label">▸ vocabulary & style</div>
+  <div class="tp-grid">
+    <button class="tp-pill" data-l="adjectives"  onclick="setLvl(this)">Adjectives &<br>Adverbs</button>
+    <button class="tp-pill" data-l="vocabulary"  onclick="setLvl(this)">General<br>Vocabulary</button>
+    <button class="tp-pill" data-l="opinions"    onclick="setLvl(this)">Opinions &<br>Debate</button>
+    <button class="tp-pill" data-l="storytelling" onclick="setLvl(this)">Storytelling<br>& Narrative</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+let apiKey       = localStorage.getItem('buddy_groq_key') || '';
+let levels       = ['present_simple']; // array — multi-topic support
+let hist         = [];
+let spk          = false;
+let mouthTmr     = null;
+let bubbleTmr    = null;
+let blinkInt     = null;
+let isSetup      = !apiKey;
+let listeningActive = false;
+let recog        = null;
+let asleep       = false;   // modo dormido por inactividad
+let lastMotion   = Date.now();
+const SLEEP_AFTER = 60000; // 1 min sin movimiento → duerme
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+// ── PROMPTS ──
+// FEEDBACK FORMAT: if Gael makes a grammar error, reply normally then add:
+// [CORRECTION: what he said → correct form]
+// Example: "Oh cool! [CORRECTION: I go yesterday → I went yesterday]"
+const FB_RULE = ` GRAMMAR CORRECTION RULES (mandatory, strict):
+You MUST check every single thing Gael says for grammar errors. Be strict and thorough. Check: verb tenses, subject-verb agreement, irregular verbs, word order, auxiliaries (do/does/did/have/has), articles (a/an/the), prepositions, and vocabulary misuse.
+Your response format MUST always be exactly two parts separated by |||:
+PART 1: Your short conversational reply (1 sentence max). If there was an error, naturally model the correct form in your reply without pointing it out explicitly.
+PART 2 (ALWAYS include, even if no error): Either the correction or the word OK.
+  - If error found: WRONG: [exact wrong phrase] >>> RIGHT: [correct phrase] | RULE: [very short rule, max 5 words]
+  - If no error: OK
+Examples:
+"I go to school yesterday" → Reply: Oh cool, what did you do there? ||| WRONG: I go yesterday >>> RIGHT: I went yesterday | RULE: past simple irregular verb
+"I have 15 years" → Oh nice! How old are you turning next? ||| WRONG: I have 15 years >>> RIGHT: I am 15 years old | RULE: age uses verb "to be"
+"Yesterday I play football" → That sounds fun, who did you play with? ||| WRONG: I play football >>> RIGHT: I played football | RULE: past simple needs -ed
+"I went to the park" (correct) → Cool! Did you go alone or with friends? ||| OK
+NEVER skip Part 2. NEVER merge both parts. Always use ||| as separator.`;
+
+const PROMPTS = {
+  present_simple:
+    'You are BUDDY, a fun robot friend helping Gael practice Present Simple. Talk about habits, routines, facts, likes/dislikes. Use questions like "What do you usually do?", "Do you like...?", "How often do you...?". Keep the conversation natural.' + FB_RULE,
+
+  present_continuous:
+    'You are BUDDY helping Gael practice Present Continuous. Talk about things happening right now or temporary situations. Use "What are you doing?", "Are you studying...?", "I am thinking about...". Contrast with present simple when useful.' + FB_RULE,
+
+  past_simple:
+    'You are BUDDY helping Gael practice Past Simple. Ask about things Gael did: yesterday, last weekend, childhood. Use "Did you...?", "What happened?", "How was it?". Focus on regular and irregular verbs in past.' + FB_RULE,
+
+  past_continuous:
+    'You are BUDDY helping Gael practice Past Continuous. Ask about interrupted past actions: "What were you doing when...?", "Were you sleeping at 10pm?". Combine with past simple naturally.' + FB_RULE,
+
+  present_perfect:
+    'You are BUDDY helping Gael practice Present Perfect. Ask about experiences and recent events: "Have you ever...?", "Have you done...?", "How long have you...?". Contrast with past simple when useful.' + FB_RULE,
+
+  future:
+    'You are BUDDY helping Gael practice Future forms (will and going to). Ask about plans and predictions: "What are you going to do this weekend?", "Do you think it will rain?", "What will you do after school?". Use both forms naturally.' + FB_RULE,
+
+  used_to:
+    'You are BUDDY helping Gael practice "used to" and "would" for past habits. Ask about things he used to do as a child, old routines, things that changed. "Did you use to...?", "I used to... but now I...".' + FB_RULE,
+
+  frequency:
+    'You are BUDDY helping Gael practice frequency adverbs: always, usually, often, sometimes, rarely, never, every day, once a week. Ask about routines. Make him use frequency words in every answer.' + FB_RULE,
+
+  irregular:
+    'You are BUDDY helping Gael master irregular verbs. Focus on: go/went, see/saw, eat/ate, buy/bought, take/took, give/gave, make/made, come/came, get/got, have/had, know/knew, think/thought, feel/felt, write/wrote, read/read. Ask questions that naturally require past forms.' + FB_RULE,
+
+  conditionals:
+    'You are BUDDY helping Gael practice Conditionals. Mix first conditional (If + present, will) for real situations, and second conditional (If + past, would) for hypotheticals. "What would you do if...?", "If you could..., what would you choose?".' + FB_RULE,
+
+  adjectives:
+    'You are BUDDY helping Gael practice adjectives and adverbs. Ask him to describe things, people, places, feelings. Encourage comparative and superlative forms (bigger, the best). "How would you describe...?", "What is it like?".' + FB_RULE,
+
+  vocabulary:
+    'You are BUDDY helping Gael expand his English vocabulary. Talk about everyday topics: food, sports, school, technology, feelings. When Gael uses a limited word, suggest a richer alternative. Ask questions that push him to use new words.' + FB_RULE,
+
+  opinions:
+    'You are BUDDY helping Gael practice expressing opinions and debating in English. Ask for his views: "What do you think about...?", "Do you agree that...?", "Why do you feel that way?". Teach opinion phrases: I think, In my opinion, I believe, I am not sure but...' + FB_RULE,
+
+  storytelling:
+    'You are BUDDY helping Gael practice storytelling and narrative in English. Ask him to tell you about something that happened. Guide him to use past tenses, connectors (first, then, after that, finally), and descriptive language. Keep it conversational.' + FB_RULE,
+};
+
+// ── PIXEL ART ──
+function r(x,y,w,h,fill){
+  const el=document.createElementNS('http://www.w3.org/2000/svg','rect');
+  el.setAttribute('x',x);el.setAttribute('y',y);
+  el.setAttribute('width',w);el.setAttribute('height',h);
+  el.setAttribute('fill',fill);return el;
+}
+const C='#00d4ff',P='#ff6b9d',Y='#ffd700',G='#1a1a1a';
+const EXPRS={
+  happy:()=>[r(3,2,1,1,C),r(4,3,2,1,C),r(6,2,1,1,C),r(9,2,1,1,C),r(10,3,2,1,C),r(12,2,1,1,C),r(5,8,1,1,C),r(6,9,1,1,C),r(7,9,1,1,C),r(8,9,1,1,C),r(9,8,1,1,C)],
+  love:()=>[r(2,2,1,1,P),r(4,2,1,1,P),r(1,3,4,1,P),r(2,4,3,1,P),r(3,5,1,1,P),r(9,2,1,1,P),r(11,2,1,1,P),r(8,3,4,1,P),r(9,4,3,1,P),r(10,5,1,1,P),r(5,8,1,1,P),r(6,9,1,1,P),r(7,9,1,1,P),r(8,9,1,1,P),r(9,8,1,1,P)],
+  thinking:()=>[r(3,3,4,2,Y),r(9,2,1,1,Y),r(10,3,2,1,Y),r(12,2,1,1,Y),r(4,9,8,1,Y),r(1,5,1,2,Y),r(2,7,1,1,Y)],
+  listening:()=>[r(2,2,4,1,P),r(2,3,1,3,P),r(5,3,1,3,P),r(2,5,4,1,P),r(9,2,4,1,P),r(9,3,1,3,P),r(12,3,1,3,P),r(9,5,4,1,P),r(5,7,5,1,P),r(5,8,1,3,P),r(9,8,1,3,P),r(5,10,5,1,P)],
+  speak_open:()=>[r(3,2,1,1,C),r(4,3,2,1,C),r(6,2,1,1,C),r(9,2,1,1,C),r(10,3,2,1,C),r(12,2,1,1,C),r(4,7,7,1,C),r(4,8,1,3,C),r(10,8,1,3,C),r(4,10,7,1,C)],
+  speak_closed:()=>[r(3,2,1,1,C),r(4,3,2,1,C),r(6,2,1,1,C),r(9,2,1,1,C),r(10,3,2,1,C),r(12,2,1,1,C),r(4,8,7,2,C)],
+  sleeping:()=>[r(2,3,5,2,G),r(9,3,5,2,G),r(5,9,6,1,G),r(13,1,2,1,G),r(14,2,1,1,G),r(13,3,2,1,G)],
+};
+
+let curExpr='sleeping';
+function setExpr(name){
+  curExpr=name;
+  const svg=document.getElementById('face');
+  svg.innerHTML='';
+  (EXPRS[name]||EXPRS.happy)().forEach(p=>svg.appendChild(p));
+}
+
+function setDot(state){
+  document.getElementById('status-dot').className=state;
+}
+
+function startBlink(){
+  if(blinkInt)clearInterval(blinkInt);
+  blinkInt=setInterval(()=>{
+    if(spk||curExpr==='sleeping'||curExpr==='listening')return;
+    const prev=curExpr;
+    const svg=document.getElementById('face');
+    svg.innerHTML='';
+    EXPRS.sleeping().forEach(p=>svg.appendChild(p));
+    setTimeout(()=>{if(!spk)setExpr(prev);},120);
+  },3000+Math.random()*2500);
+}
+
+let mOpen=false;
+function startMouth(){
+  if(mouthTmr)clearInterval(mouthTmr);
+  mOpen=false;
+  mouthTmr=setInterval(()=>{
+    mOpen=!mOpen;
+    const svg=document.getElementById('face');
+    svg.innerHTML='';
+    (mOpen?EXPRS.speak_open:EXPRS.speak_closed)().forEach(p=>svg.appendChild(p));
+  },220);
+}
+function stopMouth(){if(mouthTmr)clearInterval(mouthTmr);mouthTmr=null;}
+
+function showBubble(txt,isUser=false){
+  const b=document.getElementById('bubble');
+  b.textContent=txt;
+  b.className='bubble show'+(isUser?' user':'');
+  if(bubbleTmr)clearTimeout(bubbleTmr);
+  bubbleTmr=setTimeout(()=>b.classList.remove('show'),isUser?3000:5000);
+}
+
+function setHint(txt){
+  const h=document.getElementById('hint');
+  h.textContent=txt;
+  h.classList.toggle('visible',!!txt);
+}
+
+// ────────────────────────────────────────────
+// SLEEP / WAKE
+// ────────────────────────────────────────────
+function goToSleep(){
+  if(asleep)return;
+  asleep=true;
+  stopListening();
+  setExpr('sleeping');
+  setDot('asleep');
+  setHint('');
+}
+
+function wakeUp(){
+  if(!asleep)return;
+  asleep=false;
+  lastMotion=Date.now();
+  setExpr('happy');
+  setDot('');
+  startListening();
+}
+
+// Check idle every 10s
+setInterval(()=>{
+  if(isSetup||spk||listeningActive)return;
+  if(!asleep && Date.now()-lastMotion > SLEEP_AFTER) goToSleep();
+},10000);
+
+// ────────────────────────────────────────────
+// CONTINUOUS SPEECH RECOGNITION
+// ────────────────────────────────────────────
+function startListening(){
+  if(!SR||listeningActive||spk||isSetup||asleep)return;
+  if(recog){try{recog.abort();}catch(e){}}
+
+  recog=new SR();
+  recog.lang='en-US';
+  recog.continuous=false;       // one utterance at a time — más estable en mobile
+  recog.interimResults=false;
+  recog.maxAlternatives=1;
+
+  recog.onstart=()=>{
+    listeningActive=true;
+    setExpr('listening');
+    setDot('listening');
+    setHint('listening...');
+  };
+
+  recog.onresult=(e)=>{
+    listeningActive=false;
+    lastMotion=Date.now();
+    const txt=e.results[0][0].transcript.trim();
+    if(txt.length>1){
+      idleLastTalk = Date.now();
+      scheduleIdleFace(); // reset idle timer
+      setExpr('thinking');
+      setDot('thinking');
+      setHint('thinking...');
+      handleIn(txt);
+    } else {
+      setExpr('happy');setDot('');setHint('');
+      setTimeout(startListening,500);
+    }
+  };
+
+  recog.onnomatch=()=>{
+    listeningActive=false;
+    setExpr('happy');setDot('');setHint('');
+    setTimeout(startListening,500);
+  };
+
+  recog.onerror=(e)=>{
+    listeningActive=false;
+    if(e.error==='not-allowed'){
+      setHint('allow mic in browser!');
+      setDot('');
+      return; // no reintentar
+    }
+    // network, aborted, no-speech → reintentar
+    if(!spk&&!isSetup&&!asleep) setTimeout(startListening,1000);
+  };
+
+  recog.onend=()=>{
+    listeningActive=false;
+    // Auto-restart si no está hablando ni en setup ni dormido
+    if(!spk&&!isSetup&&!asleep) setTimeout(startListening,600);
+  };
+
+  try{recog.start();}catch(e){listeningActive=false;}
+}
+
+function stopListening(){
+  listeningActive=false;
+  if(recog){try{recog.abort();}catch(e){}}
+}
+
+// ── GROQ API ──
+// Formato OpenAI-compatible. Modelo: llama-3.3-70b-versatile
+// Límite gratis: 30 RPM, 14400 req/día — mucho más holgado que Gemini
+
+function buildMessages(trimmedHist){
+  // Combinar prompts de todos los temas activos
+  let systemPrompt;
+  if(levels.length === 1){
+    systemPrompt = PROMPTS[levels[0]];
+  } else {
+    const names = levels.map(l => l.replace(/_/g,' ')).join(', ');
+    const combined = levels.map(l => PROMPTS[l]).join(' | ');
+    systemPrompt = 'You are BUDDY, a robot friend helping Gael practice multiple English topics: ' + names + '. Rotate naturally between them. ' + combined;
+  }
+  const msgs = [{role:'system', content: systemPrompt}];
+  trimmedHist.forEach(turn => {
+    msgs.push({
+      role: turn.role === 'model' ? 'assistant' : 'user',
+      content: turn.parts[0].text
+    });
+  });
+  return msgs;
+}
+
+async function callGroqAPI(trimmedHist, retries, delay){
+  retries = retries === undefined ? 3 : retries;
+  delay   = delay   === undefined ? 5000 : delay;
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: buildMessages(trimmedHist),
+      max_tokens: 60,
+      temperature: 0.9
+    })
+  });
+  const data = await res.json();
+
+  if(data.error){
+    if(res.status === 429 && retries > 0){
+      const secs = Math.round(delay/1000);
+      showBubble('Busy... retrying in ' + secs + 's');
+      await new Promise(r => setTimeout(r, delay));
+      return callGroqAPI(trimmedHist, retries-1, delay*2);
+    }
+    throw new Error((data.error.message||'API error')+'|code:'+res.status);
+  }
+
+  return data.choices[0].message.content.trim();
+}
+
+async function askGemini(txt){
+  hist.push({role:'user', parts:[{text:txt}]});
+  const trimmedHist = hist.slice(-8);
+  const reply = await callGroqAPI(trimmedHist);
+  hist.push({role:'model', parts:[{text:reply}]});
+  return reply;
+}
+
+async function handleIn(txt){
+  stopListening();
+  try{
+    let raw = await askGemini(txt);
+
+    // Parsear formato: REPLY ||| CORRECTION o OK
+    let reply = raw;
+    let correction = null;
+
+    const sepIdx = raw.indexOf('|||');
+    if(sepIdx !== -1){
+      reply      = raw.slice(0, sepIdx).trim();
+      const part2 = raw.slice(sepIdx + 3).trim();
+      if(part2 && part2.toUpperCase() !== 'OK'){
+        // Parsear: WRONG: x >>> RIGHT: y | RULE: z
+        const wrongMatch = part2.match(/WRONG:\s*(.+?)\s*>>>/i);
+        const rightMatch = part2.match(/>>>\s*RIGHT:\s*(.+?)(?:\s*\|\s*RULE:|$)/i);
+        const ruleMatch  = part2.match(/RULE:\s*(.+)/i);
+        if(wrongMatch && rightMatch){
+          correction = {
+            wrong: wrongMatch[1].trim(),
+            right: rightMatch[1].trim(),
+            rule:  ruleMatch ? ruleMatch[1].trim() : ''
+          };
+        }
+      }
+    }
+
+    if(correction) showFeedback(correction);
+    else hideFeedback();
+
+    const correctionSpeech = correction
+      ? ' The correct form is: ' + correction.right + '.'
+      : '';
+    say((reply || raw) + correctionSpeech);
+  }catch(e){
+    let msg = 'Connection error — try again!';
+    if(e.message.includes('429')) msg = 'Too busy right now. Try in a moment!';
+    if(e.message.includes('401')||e.message.includes('403')) msg = 'API key problem. Tap KEY.';
+    showBubble(msg); hist.pop();
+    setExpr('happy'); setDot(''); setHint('');
+    setTimeout(startListening, 3000);
+  }
+}
+
+// ── TTS ──
+function say(txt){
+  if(!window.speechSynthesis){setExpr('happy');setTimeout(startListening,600);return;}
+  if(speechSynthesis.speaking)speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang='en-US';u.rate=0.9;u.pitch=1.1;
+  const voices=speechSynthesis.getVoices();
+  const v=voices.find(v=>v.lang.startsWith('en')&&v.localService)||voices.find(v=>v.lang.startsWith('en'));
+  if(v)u.voice=v;
+  u.onstart=()=>{spk=true;setDot('speaking');setHint('speaking...');startMouth();};
+  u.onend=()=>{
+    spk=false;stopMouth();setExpr('happy');setDot('');setHint('');
+    lastMotion=Date.now();
+    setTimeout(startListening,2500);
+  };
+  u.onerror=()=>{spk=false;stopMouth();setExpr('happy');setDot('');setTimeout(startListening,2500);};
+  spk=true;
+  speechSynthesis.speak(u);
+}
+
+// ── SETUP ──
+function showSetup(){
+  isSetup=true;stopListening();
+  document.getElementById('setup').classList.remove('hidden');
+}
+
+function saveKey(){
+  const v=document.getElementById('ki').value.trim();
+  if(v.length<15){document.getElementById('ke').textContent='Key too short';return;}
+  apiKey=v;
+  localStorage.setItem('buddy_groq_key',v);
+  isSetup=false;
+  document.getElementById('setup').classList.add('hidden');
+  init();
+}
+
+// ── MOTION DETECTION (cámara) ──
+async function initCamera(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:80,height:60}});
+    const vid=document.getElementById('mv');
+    vid.srcObject=stream;vid.play();
+    const canvas=document.getElementById('mc');
+    canvas.width=80;canvas.height=60;
+    const ctx=canvas.getContext('2d',{willReadFrequently:true});
+    let lastFrame=null;
+
+    setInterval(()=>{
+      ctx.drawImage(vid,0,0,80,60);
+      const frame=ctx.getImageData(0,0,80,60);
+      if(lastFrame){
+        let diff=0;
+        for(let i=0;i<frame.data.length;i+=4)
+          diff+=Math.abs(frame.data[i]-lastFrame.data[i]);
+        const motion=diff/frame.data.length*4; // promedio por pixel
+        if(motion>12){            // umbral: movimiento detectado
+          lastMotion=Date.now();
+          if(asleep) wakeUp();
+        }
+      }
+      lastFrame=frame;
+    },800);
+  }catch(e){
+    // sin cámara = sin detección de movimiento, igual funciona
+  }
+}
+
+// ── IDLE FACE ANIMATIONS ──
+// Caras aleatorias cuando Gael no habla por un rato
+const IDLE_EXPRS = ['love','thinking','happy','happy','happy']; // happy más frecuente
+let idleLastTalk = Date.now();
+let idleFaceTmr  = null;
+
+function scheduleIdleFace(){
+  if(idleFaceTmr) clearTimeout(idleFaceTmr);
+  // esperar entre 6 y 14 segundos sin hablar
+  const wait = 6000 + Math.random() * 8000;
+  idleFaceTmr = setTimeout(()=>{
+    if(spk || listeningActive || asleep || isSetup) { scheduleIdleFace(); return; }
+    const expr = IDLE_EXPRS[Math.floor(Math.random()*IDLE_EXPRS.length)];
+    setExpr(expr);
+    // volver a happy después de 2-3s
+    setTimeout(()=>{
+      if(!spk && !listeningActive) setExpr('happy');
+      scheduleIdleFace();
+    }, 2000 + Math.random()*1000);
+  }, wait);
+}
+
+function init(){
+  setExpr('happy');
+  setDot('');
+  startBlink();
+  speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+  initCamera();
+  setTimeout(()=>say("Hey Gael! I'm Buddy. Let's practice English!"),500);
+  scheduleIdleFace();
+}
+
+function setLvl(btn){
+  const l = btn.dataset.l;
+  const idx = levels.indexOf(l);
+  if(idx === -1){
+    // agregar tema
+    levels.push(l);
+    btn.classList.add('active');
+  } else if(levels.length > 1){
+    // quitar tema (solo si hay más de uno)
+    levels.splice(idx,1);
+    btn.classList.remove('active');
+  }
+  // No cerrar el panel — el usuario puede seguir seleccionando
+  // Mostrar temas activos en el título
+  const names = levels.map(l => document.querySelector('.tp-pill[data-l="'+l+'"]').textContent.replace(/\n/g,' ').trim()).join(' + ');
+  document.getElementById('tp-active').textContent = names;
+}
+
+function applyTopics(){
+  hist = [];
+  closePanel();
+  const names = levels.map(l => document.querySelector('.tp-pill[data-l="'+l+'"]').textContent.replace(/\n/g,' ').trim()).join(' and ');
+  if(!spk && !isSetup && !asleep) say("Ok! Let's practice " + names + "!");
+}
+
+function openPanel(){
+  stopListening();
+  document.getElementById('topic-panel').classList.add('open');
+}
+function closePanel(){
+  document.getElementById('topic-panel').classList.remove('open');
+  if(!spk && !isSetup && !asleep) setTimeout(startListening, 400);
+}
+
+let feedbackTmr = null;
+function showFeedback(obj){
+  const el = document.getElementById('feedback');
+  el.innerHTML =
+    '<span class="fb-label">✎ CORRECTION</span>' +
+    '<span class="fb-wrong">' + obj.wrong + '</span>' +
+    '<span class="fb-arrow">→</span>' +
+    '<span class="fb-right">' + obj.right + '</span>' +
+    (obj.rule ? '<br><span style="font-size:0.7em;color:#888;letter-spacing:1px">' + obj.rule + '</span>' : '');
+  el.classList.add('show');
+  if(feedbackTmr) clearTimeout(feedbackTmr);
+  feedbackTmr = setTimeout(()=>el.classList.remove('show'), 8000);
+}
+function hideFeedback(){
+  if(feedbackTmr) clearTimeout(feedbackTmr);
+  document.getElementById('feedback').classList.remove('show');
+}
+
+// ── START ──
+setExpr('sleeping');
+if(apiKey){
+  isSetup=false;
+  document.getElementById('setup').classList.add('hidden');
+  init();
+}
+</script>
+</body>
+</html>
