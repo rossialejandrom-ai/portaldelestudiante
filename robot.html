@@ -477,7 +477,7 @@ function startListening(){
     if(listenTimeoutTmr){ clearTimeout(listenTimeoutTmr); listenTimeoutTmr=null; }
     setExpr('happy'); setDot(''); setHint('');
     // Auto-restart si no está hablando ni en setup ni dormido
-    if(!spk&&!isSetup&&!asleep) setTimeout(startListening,600);
+    if(!spk&&!isSetup&&!asleep) setTimeout(startListening,300);
   };
 
   try{recog.start();}catch(e){listeningActive=false;}
@@ -525,7 +525,7 @@ async function callGroqAPI(trimmedHist, retries, delay){
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
       messages: buildMessages(trimmedHist),
-      max_tokens: 60,
+      max_tokens: 40,
       temperature: 0.9
     })
   });
@@ -602,13 +602,15 @@ function say(txt){
   const u=new SpeechSynthesisUtterance(txt);
   u.lang='en-US';u.rate=0.9;u.pitch=1.1;
   const voices=speechSynthesis.getVoices();
-  const v=voices.find(v=>v.lang.startsWith('en')&&v.localService)||voices.find(v=>v.lang.startsWith('en'));
+  const v=voices.find(v=>v.lang.startsWith('en')&&v.name.includes('Google'))
+    ||voices.find(v=>v.lang==='en-US'&&!v.localService)
+    ||voices.find(v=>v.lang.startsWith('en'));
   if(v)u.voice=v;
   u.onstart=()=>{spk=true;setDot('speaking');setHint('speaking...');startMouth();};
   u.onend=()=>{
     spk=false;stopMouth();setExpr('happy');setDot('');setHint('');
     lastMotion=Date.now();
-    setTimeout(startListening,2500);
+    setTimeout(startListening,800);
   };
   u.onerror=()=>{spk=false;stopMouth();setExpr('happy');setDot('');setTimeout(startListening,2500);};
   spk=true;
@@ -745,6 +747,19 @@ function hideFeedback(){
   if(feedbackTmr) clearTimeout(feedbackTmr);
   document.getElementById('feedback').classList.remove('show');
 }
+
+// ── TAP TO INTERRUPT ──
+document.addEventListener('click', ()=>{
+  if(isSetup) return;
+  if(spk){
+    speechSynthesis.cancel();
+    spk=false; stopMouth(); setExpr('happy'); setDot(''); setHint('');
+    hideFeedback();
+    setTimeout(startListening, 300);
+  } else if(asleep){
+    wakeUp();
+  }
+});
 
 // ── START ──
 setExpr('sleeping');
