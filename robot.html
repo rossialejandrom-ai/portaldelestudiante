@@ -257,7 +257,7 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 // Example: "Oh cool! [CORRECTION: I go yesterday → I went yesterday]"
 const FB_RULE = ` GRAMMAR CORRECTION RULES (mandatory, strict):
 You MUST check every single thing Gael says for grammar errors. Be strict and thorough. Check: verb tenses, subject-verb agreement, irregular verbs, word order, auxiliaries (do/does/did/have/has), articles (a/an/the), prepositions, and vocabulary misuse.
-IMPORTANT — DO NOT correct: (1) punctuation marks (question marks, exclamation marks, periods — ignore them completely); (2) capitalization (uppercase/lowercase — ignore completely); (3) sentences where most of the content is correct — only flag a clear, concrete grammar error that changes the meaning or breaks a rule. If the sentence is mostly right, reply OK.
+IMPORTANT — DO NOT correct: (1) any punctuation at all (periods, commas, question marks, exclamation marks — ignore all punctuation completely); (2) capitalization (uppercase/lowercase — ignore completely); (3) sentences where most of the content is correct — only flag a clear, concrete grammar error that changes the meaning or breaks a rule. If the sentence is mostly right, reply OK.
 Your response format MUST always be exactly two parts separated by |||:
 PART 1: Your short conversational reply (1 sentence max). If there was an error, naturally model the correct form in your reply without pointing it out explicitly.
 PART 2 (ALWAYS include, even if no error): Either the correction or the word OK.
