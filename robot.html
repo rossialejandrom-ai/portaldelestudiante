@@ -246,6 +246,7 @@ let listeningActive = false;
 let listenTimeoutTmr = null;
 let recog        = null;
 let asleep       = false;   // modo dormido por inactividad
+let lastApiCall  = 0;       // cooldown entre llamadas API
 let lastMotion   = Date.now();
 const SLEEP_AFTER = 60000; // 1 min sin movimiento → duerme
 
@@ -440,7 +441,7 @@ function startListening(){
     if(listenTimeoutTmr){ clearTimeout(listenTimeoutTmr); listenTimeoutTmr=null; }
     lastMotion=Date.now();
     const txt=e.results[0][0].transcript.trim();
-    if(txt.length>1){
+    if(txt.split(' ').length>=2 && txt.length>=6){
       idleLastTalk = Date.now();
       scheduleIdleFace(); // reset idle timer
       setExpr('thinking');
@@ -553,8 +554,15 @@ async function askGemini(txt){
 }
 
 async function handleIn(txt){
+  const now = Date.now();
+  if(now - lastApiCall < 3000){ // ignorar si la última llamada fue hace menos de 3s
+    setExpr('happy'); setDot(''); setHint('');
+    setTimeout(startListening, 500);
+    return;
+  }
+  lastApiCall = now;
   stopListening();
-  spk = true; // bloquea el micro mientras procesa y habla
+  spk = true;
   try{
     let raw = await askGemini(txt);
 
