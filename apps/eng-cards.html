@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inglés — Tarjetas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--sur:#161b22;--sur2:#1c2330;--brd:#2d333b;--ac:#3b82f6;--tx:#e6edf3;--mu:#8b949e;--R:12px}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;max-width:620px;margin:0 auto;min-height:100vh}
+.hdr{background:linear-gradient(155deg,#0b1830,#0d1117 55%);border-bottom:1px solid var(--brd);padding:22px 20px 16px;text-align:center}
+.pill{display:inline-block;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:#60a5fa;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:99px;margin-bottom:8px}
+.hdr h1{font-family:'Syne',sans-serif;font-size:clamp(18px,5vw,26px);font-weight:800;line-height:1.2}
+.hdr h1 em{color:#60a5fa;font-style:normal}
+.hdr .sub{color:var(--mu);font-size:12px;margin-top:4px}
+.exam-tag{display:inline-block;margin-top:8px;background:rgba(248,81,73,.12);border:1px solid rgba(248,81,73,.3);color:#ff7b72;font-size:11px;font-weight:600;padding:3px 12px;border-radius:99px}
+.idx-body{padding:16px}
+.idx-section{margin-bottom:20px}
+.idx-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:10px;padding-left:2px}
+.idx-grid{display:flex;flex-direction:column;gap:6px}
+.idx-item{display:flex;align-items:center;gap:12px;background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:12px 14px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;width:100%}
+.idx-item:hover{border-color:var(--ac);background:var(--sur2)}
+.idx-icon{font-size:22px;flex-shrink:0}
+.idx-info{flex:1}
+.idx-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+.idx-count{color:var(--mu);font-size:12px;margin-top:2px}
+.idx-arr{color:var(--mu);font-size:18px}
+.card-hdr{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--brd);background:var(--sur)}
+.card-back-btn{background:none;border:1px solid var(--brd);border-radius:8px;color:var(--tx);font-size:13px;padding:6px 12px;cursor:pointer}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1}
+.card-prog{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--ac)}
+.prog-bar{height:3px;background:var(--brd)}
+.prog-fill{height:100%;background:var(--ac);border-radius:99px;transition:width .3s}
+.fc-wrap{padding:16px}
+.fc{perspective:1000px;height:230px;cursor:pointer;user-select:none;margin-bottom:10px}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.fc.flip .fc-inner{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;padding:20px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--brd)}
+.fc-front{background:var(--sur);border-color:var(--ac);align-items:center;text-align:center}
+.fc-back{background:var(--sur2);transform:rotateY(180deg);align-items:flex-start;overflow-y:auto}
+.fc-q{font-family:'Syne',sans-serif;font-size:clamp(14px,3.5vw,19px);font-weight:700;line-height:1.4}
+.fc-hint{color:var(--mu);font-size:11px;margin-top:10px}
+.fc-ans{font-size:13px;line-height:1.8;color:var(--tx)}
+.fc-ans b{color:#60a5fa}
+.flip-hint{text-align:center;color:var(--mu);font-size:11px;margin-bottom:10px}
+.fc-btns{display:flex;gap:8px}
+.fc-btn{flex:1;padding:11px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.fc-btn.prev{background:var(--sur);color:var(--tx);border:1px solid var(--brd)}
+.fc-btn.next{background:var(--ac);color:#fff}
+</style></head>
+<body>
+<div class="hdr">
+  <div class="pill">INGLÉS · B1</div>
+  <h1>Tarjetas de <em>Gramática</em></h1>
+  <div class="sub">Gateway B1 · Units 1 &amp; 2 · hasta p. 83</div>
+  <div class="exam-tag">📅 Examen: Jueves 29/04</div>
+</div>
+
+<div id="viewIndex">
+  <div class="idx-body">
+    <div class="idx-section"><div class="idx-title">⚡ Unit 1</div><div class="idx-grid" id="g1"></div></div>
+    <div class="idx-section"><div class="idx-title">⚡ Unit 2</div><div class="idx-grid" id="g2"></div></div>
+  </div>
+</div>
+
+<div id="viewCard" style="display:none">
+  <div class="card-hdr">
+    <button class="card-back-btn" id="backBtn">← Volver</button>
+    <div class="card-title" id="ctitle"></div>
+    <div class="card-prog" id="cprog"></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="pfill"></div></div>
+  <div class="fc-wrap">
+    <div class="fc" id="fc">
+      <div class="fc-inner">
+        <div class="fc-face fc-front"><div class="fc-q" id="fcQ"></div><div class="fc-hint">Tocá para ver la respuesta</div></div>
+        <div class="fc-face fc-back"><div class="fc-ans" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="flip-hint" id="flipHint">🔄 Tocá la tarjeta para girarla</div>
+    <div class="fc-btns">
+      <button class="fc-btn prev" id="prevBtn">← Anterior</button>
+      <button class="fc-btn next" id="nextBtn">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var T=[
+  {u:1,title:'Present Simple',icon:'📌',c:[
+    {f:'¿Cómo se forma el Present Simple?',b:'<b>Sujeto + verbo base</b><br>He/She/It → verbo + <b>s/es</b><br><br>I <b>play</b> football every day.<br>She <b>plays</b> tennis. / He <b>watches</b> TV.'},
+    {f:'¿Cuándo usamos Present Simple?',b:'✔ <b>Rutinas y hábitos:</b> She walks to school.<br>✔ <b>Hechos permanentes:</b> Water boils at 100°C.<br>✔ <b>Horarios:</b> The train leaves at 8 am.<br>✔ <b>Preferencias:</b> I love pizza.'},
+    {f:'Present Simple — Negativa',b:'<b>I/You/We/They:</b> don\'t + verbo<br><b>He/She/It:</b> doesn\'t + verbo<br><br>I <b>don\'t like</b> coffee.<br>She <b>doesn\'t play</b> guitar.<br>⚠️ Después de doesn\'t → verbo sin s.'},
+    {f:'Present Simple — Preguntas',b:'<b>Do / Does</b> + sujeto + verbo base?<br><br><b>Do</b> you like music? → Yes, I do.<br><b>Does</b> she live here? → No, she doesn\'t.<br>⚠️ Después de Does → verbo sin s.'},
+  ]},
+  {u:1,title:'Present Continuous',icon:'🔄',c:[
+    {f:'¿Cómo se forma el Present Continuous?',b:'<b>Sujeto + am / is / are + verbo-ing</b><br><br>I <b>am studying</b> right now.<br>She <b>is watching</b> TV.<br>They <b>are playing</b> football.'},
+    {f:'¿Cuándo usamos Present Continuous?',b:'✔ <b>Ahora mismo:</b> Look! It <b>is raining</b>!<br>✔ <b>Situación temporaria:</b> She <b>is working</b> here this week.<br>✔ <b>Plan futuro cercano:</b> We <b>are meeting</b> tomorrow.'},
+    {f:'Present Continuous — Spelling del -ing',b:'Verbo + e → quita la e: <b>dance→dancing</b><br>CVC corta → duplica consonante: <b>run→running</b><br>Resto → + ing: <b>read→reading</b>, <b>play→playing</b>'},
+    {f:'Stative verbs — NO usan Continuous',b:'<b>Emociones:</b> like, love, hate, want, prefer<br><b>Mente:</b> know, think, believe, understand<br><b>Posesión:</b> have, own, belong<br><br>❌ She <u>is knowing</u> the answer.<br>✅ She <b>knows</b> the answer.'},
+    {f:'Present Simple vs. Present Continuous',b:'<b>Simple</b> → hábito/rutina/siempre<br>I <b>play</b> tennis on weekends.<br><br><b>Continuous</b> → ahora mismo/temporario<br>I <b>am playing</b> tennis right now.'},
+  ]},
+  {u:1,title:'Adverbs of Frequency',icon:'⏱',c:[
+    {f:'¿Cuáles son los Adverbs of Frequency?',b:'<b>always</b> — 100% — siempre<br><b>usually</b> — ~80% — generalmente<br><b>often</b> — ~60% — frecuentemente<br><b>sometimes</b> — ~40% — a veces<br><b>rarely / seldom</b> — ~20% — raramente<br><b>never</b> — 0% — nunca'},
+    {f:'Posición de los Adverbs of Frequency',b:'<b>ANTES del verbo principal:</b><br>She <b>always</b> eats breakfast.<br>They <b>never</b> go to bed late.<br><br><b>DESPUÉS del verbo be:</b><br>He is <b>usually</b> tired.<br>I am <b>sometimes</b> late.'},
+    {f:'Adverbs of Frequency — Expresiones de tiempo',b:'<b>every day / week / month</b><br><b>on Mondays</b> — los lunes<br><b>twice a week</b> — dos veces por semana<br><b>once a month</b> — una vez por mes<br><br>I go to the gym <b>three times a week</b>.'},
+  ]},
+  {u:1,title:'Adjectives',icon:'🎨',c:[
+    {f:'Posición de los adjetivos en inglés',b:'<b>ANTES del sustantivo:</b><br>She is a <b>clever</b> student.<br><br><b>DESPUÉS de be/feel/look/seem:</b><br>She looks <b>tired</b>. / He feels <b>happy</b>.'},
+    {f:'Adjectives — Vocabulario Unit 1',b:'<b>fast</b> — rápido | <b>strong</b> — fuerte<br><b>smart / clever</b> — inteligente<br><b>athletic</b> — atlético | <b>sporty</b> — deportivo<br><b>flexible</b> — flexible | <b>short</b> — bajo<br><b>interesting</b> — interesante<br><b>curious</b> — curioso | <b>useful</b> — útil'},
+    {f:'Adjectives — Opuestos importantes',b:'fast ↔ <b>slow</b> | strong ↔ <b>weak</b><br>smart ↔ <b>silly</b> | tall ↔ <b>short</b><br>young ↔ <b>old</b> | easy ↔ <b>difficult</b><br>friendly ↔ <b>unfriendly</b>'},
+  ]},
+  {u:1,title:'Family Vocabulary',icon:'👨‍👩‍👧',c:[
+    {f:'Familia inmediata',b:'<b>parents</b> — padres | <b>siblings</b> — hermanos<br><b>mother/mum</b> — madre | <b>father/dad</b> — padre<br><b>brother</b> — hermano | <b>sister</b> — hermana<br><b>son</b> — hijo | <b>daughter</b> — hija<br><b>only child</b> — hijo único'},
+    {f:'Familia extendida',b:'<b>grandparents</b> — abuelos<br><b>grandfather/grandad</b> — abuelo<br><b>grandmother/gran</b> — abuela<br><b>uncle</b> — tío | <b>aunt</b> — tía<br><b>cousin</b> — primo/a<br><b>nephew</b> — sobrino | <b>niece</b> — sobrina'},
+    {f:'Familia política y ensamblada',b:'<b>stepfather</b> — padrastro | <b>stepmother</b> — madrastra<br><b>step-brother/sister</b> — hermanastro/a<br><b>half-brother/sister</b> — medio hermano/a<br><b>mother-in-law</b> — suegra<br><b>father-in-law</b> — suegro<br><b>brother/sister-in-law</b> — cuñado/a'},
+    {f:'Close-knit y expresiones de familia',b:'<b>close-knit family</b> — familia muy unida<br><b>immediate family</b> — padres e hijos<br><b>extended family</b> — tíos, primos, etc.<br><b>nuclear family</b> — familia nuclear<br><br>My family is very <b>close-knit</b>.'},
+  ]},
+  {u:2,title:'Past Simple Regular',icon:'📅',c:[
+    {f:'¿Cómo se forma el Past Simple regular?',b:'<b>Verbo + -ed</b> (igual para todas las personas)<br><br>play → <b>played</b><br>watch → <b>watched</b><br>visit → <b>visited</b>'},
+    {f:'Past Simple Regular — Spelling',b:'Verbo + e → solo +d: <b>dance→danced</b><br>CVC corta → duplica: <b>stop→stopped</b><br>Consonante + y → ied: <b>study→studied</b><br>Resto → +ed: <b>walk→walked</b>'},
+    {f:'Past Simple Regular — Pronunciación -ed',b:'<b>/ɪd/</b> → termina en t o d:<br>want→wan<b>ted</b>, visit→visi<b>ted</b><br><br><b>/t/</b> → sonido sordo (k,p,s,f,sh):<br>walk→walk<b>ed</b>, cook→cook<b>ed</b><br><br><b>/d/</b> → resto:<br>play→play<b>ed</b>, live→live<b>d</b>'},
+    {f:'Past Simple — Negativa y pregunta',b:'<b>Negativa:</b> didn\'t + verbo base<br>She <b>didn\'t go</b>. / I <b>didn\'t watch</b> TV.<br><br><b>Pregunta:</b> Did + sujeto + verbo base?<br><b>Did</b> you play? → Yes, I did. / No, I didn\'t.'},
+  ]},
+  {u:2,title:'Past Simple Irregular',icon:'⚡',c:[
+    {f:'Irregulares: go, come, take, give',b:'<b>go → went</b> — ir<br><b>come → came</b> — venir<br><b>take → took</b> — tomar/llevar<br><b>give → gave</b> — dar'},
+    {f:'Irregulares: see, know, think, find',b:'<b>see → saw</b> — ver<br><b>know → knew</b> — saber/conocer<br><b>think → thought</b> — pensar<br><b>find → found</b> — encontrar'},
+    {f:'Irregulares: say, tell, write, read',b:'<b>say → said</b> — decir<br><b>tell → told</b> — decir/contar<br><b>write → wrote</b> — escribir<br><b>read → read</b> ⚠️ se pronuncia /red/'},
+    {f:'Irregulares: make, get, have, be',b:'<b>make → made</b> — hacer/fabricar<br><b>get → got</b> — obtener<br><b>have → had</b> — tener<br><b>be → was / were</b> — ser/estar'},
+    {f:'Más irregulares importantes',b:'<b>buy → bought</b> | <b>bring → brought</b><br><b>feel → felt</b> | <b>leave → left</b><br><b>meet → met</b> | <b>put → put</b><br><b>run → ran</b> | <b>swim → swam</b><br><b>wear → wore</b> | <b>win → won</b>'},
+  ]},
+  {u:2,title:'Past Continuous',icon:'🎬',c:[
+    {f:'¿Cómo se forma el Past Continuous?',b:'<b>was / were + verbo-ing</b><br><br>I / he / she / it → <b>was</b><br>You / we / they → <b>were</b><br><br>I <b>was reading</b>. / They <b>were playing</b>.'},
+    {f:'¿Cuándo usamos Past Continuous?',b:'✔ <b>Acción interrumpida</b> (+ when):<br>She <b>was cooking</b> when he arrived.<br><br>✔ <b>Acciones paralelas</b> (+ while):<br>While I <b>was reading</b>, she <b>was sleeping</b>.<br><br>✔ <b>Contexto/ambiente:</b> It <b>was raining</b>.'},
+    {f:'when vs. while',b:'<b>when</b> → introduce Past Simple (acción puntual):<br>I was reading <b>when</b> the phone <b>rang</b>.<br><br><b>while</b> → introduce Past Continuous:<br><b>While</b> I <b>was reading</b>, she cooked.'},
+  ]},
+  {u:2,title:'Used to',icon:'🕰',c:[
+    {f:'¿Qué expresa "used to"?',b:'<b>Hábitos o estados del pasado</b> que ya NO ocurren.<br><br>I <b>used to play</b> football. (ya no juego)<br>She <b>used to live</b> here. (ya no vive acá)<br>We <b>used to be</b> friends. (ya no)'},
+    {f:'"Used to" — Formas',b:'<b>Afirmativa:</b> used to + verbo base<br>He <b>used to have</b> a dog.<br><br><b>Negativa:</b> didn\'t use to + verbo base<br>She <b>didn\'t use to like</b> vegetables.<br><br><b>Pregunta:</b> Did you <b>use to</b> play guitar?'},
+    {f:'Used to vs. Past Simple',b:'<b>Used to</b> → hábito repetido en el pasado:<br>I <b>used to walk</b> to school. (todos los días)<br><br><b>Past Simple</b> → acción específica:<br>I <b>walked</b> to school yesterday.<br><br>⚠️ "Used to" NO existe en presente → usar <b>usually</b>.'},
+  ]},
+];
+
+var cur=null,ci=0,flipped=false;
+function renderIndex(){
+  document.getElementById('viewIndex').style.display='';
+  document.getElementById('viewCard').style.display='none';
+  ['g1','g2'].forEach(function(id){document.getElementById(id).innerHTML='';});
+  T.forEach(function(t){
+    var b=document.createElement('button');
+    b.className='idx-item';
+    b.innerHTML='<span class="idx-icon">'+t.icon+'</span><div class="idx-info"><div class="idx-name">'+t.title+'</div><div class="idx-count">'+t.c.length+' tarjetas</div></div><span class="idx-arr">›</span>';
+    b.onclick=function(){openT(t);};
+    document.getElementById(t.u===1?'g1':'g2').appendChild(b);
+  });
+}
+function openT(t){cur=t;ci=0;flipped=false;
+  document.getElementById('viewIndex').style.display='none';
+  document.getElementById('viewCard').style.display='';
+  document.getElementById('ctitle').textContent=t.title;
+  renderC();
+}
+function renderC(){
+  var c=cur.c[ci];
+  document.getElementById('cprog').textContent=(ci+1)+'/'+cur.c.length;
+  document.getElementById('pfill').style.width=((ci+1)/cur.c.length*100)+'%';
+  var fc=document.getElementById('fc');
+  fc.classList.remove('flip');flipped=false;
+  document.getElementById('fcQ').innerHTML=c.f;
+  document.getElementById('fcA').innerHTML=c.b;
+  document.getElementById('flipHint').style.display='';
+  document.getElementById('nextBtn').textContent=ci===cur.c.length-1?'Finalizar ✓':'Siguiente →';
+}
+document.getElementById('fc').onclick=function(){
+  flipped=!flipped;this.classList.toggle('flip',flipped);
+  document.getElementById('flipHint').style.display=flipped?'none':'';
+};
+document.getElementById('backBtn').onclick=renderIndex;
+document.getElementById('prevBtn').onclick=function(){if(ci>0){ci--;renderC();}};
+document.getElementById('nextBtn').onclick=function(){
+  if(ci<cur.c.length-1){ci++;renderC();}else{renderIndex();}
+};
+renderIndex();
+</script>
+</body></html>

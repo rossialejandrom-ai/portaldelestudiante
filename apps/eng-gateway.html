@@ -1,0 +1,1342 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gateway B1 – Practice Zone 🎯</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#FF6B35;--teal:#4ECDC4;--blue:#45B7D1;--purple:#A29BFE;
+  --yellow:#FDCB6E;--green:#55EFC4;--pink:#FD79A8;--red:#FF7675;
+  --dark:#2D3436;--mid:#636e72;--light:#DFE6E9;--cream:#FFF9F0;
+  --correct:#00B894;--wrong:#E84393;--white:#FFFFFF;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--dark);min-height:100vh}
+
+/* ── LAYOUT ───────────────────────────────── */
+.app{display:grid;grid-template-columns:270px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+header{grid-column:1/-1;background:linear-gradient(135deg,#1e272e,#2D3436);color:#fff;
+  padding:16px 28px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 4px 20px rgba(0,0,0,.3)}
+header h1{font-family:'Poppins',sans-serif;font-size:1.6rem;font-weight:900;line-height:1}
+header h1 span{color:var(--orange)}
+header h1 small{display:block;font-size:.7rem;font-weight:600;color:rgba(255,255,255,.5);letter-spacing:2px;text-transform:uppercase}
+.score-board{display:flex;gap:20px}
+.score-box{background:rgba(255,255,255,.08);border-radius:12px;padding:8px 18px;text-align:center;border:1px solid rgba(255,255,255,.1)}
+.score-box .lbl{font-size:.65rem;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:1px;text-transform:uppercase}
+.score-box .val{font-size:1.6rem;font-weight:900;color:var(--yellow)}
+
+/* ── SIDEBAR ───────────────────────────────── */
+.sidebar{background:#1e272e;overflow-y:auto;border-right:1px solid rgba(255,255,255,.05)}
+.sidebar-label{color:rgba(255,255,255,.35);font-size:.65rem;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;padding:18px 20px 8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 20px;cursor:pointer;
+  color:rgba(255,255,255,.6);font-weight:700;font-size:.88rem;
+  border-left:4px solid transparent;transition:all .2s;position:relative}
+.nav-item:hover{background:rgba(255,255,255,.04);color:#fff}
+.nav-item.active{border-left-color:var(--orange);background:rgba(255,107,53,.12);color:#fff}
+.nav-item .ico{font-size:1.2rem;width:28px;text-align:center}
+.nav-item .badge{margin-left:auto;font-size:.72rem;font-weight:800;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)}
+.nav-item.done .badge{background:var(--correct);color:#fff}
+.nav-item.done::after{content:'✓';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--correct);font-size:.8rem}
+
+/* ── MAIN ───────────────────────────────────── */
+main{padding:28px 32px;overflow-y:auto;max-height:calc(100vh - 72px)}
+.section-page{display:none}
+.section-page.active{display:block}
+
+.sec-header{margin-bottom:24px}
+.sec-tag{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;
+  font-size:.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;color:#fff}
+.sec-header h2{font-family:'Poppins',sans-serif;font-size:1.9rem;font-weight:900}
+.sec-header p{color:var(--mid);margin-top:6px;font-size:.93rem}
+
+/* Grammar reference box */
+.ref-box{background:#fff;border-radius:14px;padding:18px 22px;margin-bottom:22px;
+  border-left:5px solid var(--orange);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.ref-box h4{font-size:.75rem;font-weight:900;color:var(--orange);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.ref-box p,.ref-box li{font-size:.88rem;color:var(--mid);line-height:1.6}
+.ref-box ul{padding-left:18px}
+.ref-box strong{color:var(--dark);font-weight:800}
+.ref-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ref-col{background:#f8f9fa;border-radius:10px;padding:12px;font-size:.84rem}
+.ref-col h5{font-weight:800;margin-bottom:6px;color:var(--dark)}
+.ref-col code{background:#e9ecef;border-radius:4px;padding:1px 6px;font-size:.82rem}
+
+/* Exercise card */
+.ex-card{background:#fff;border-radius:18px;padding:22px 26px;margin-bottom:22px;
+  box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.ex-card h3{font-family:'Poppins',sans-serif;font-size:1rem;font-weight:800;margin-bottom:4px}
+.ex-inst{color:var(--mid);font-size:.85rem;margin-bottom:16px;padding-bottom:12px;border-bottom:2px dashed #f0f0f0}
+.q-row{padding:11px 0;border-bottom:1px solid #f5f5f5;display:flex;flex-direction:column;gap:7px}
+.q-row:last-child{border-bottom:none}
+.q-label{font-size:.9rem;font-weight:700}
+.q-label em{color:var(--mid);font-style:normal}
+
+/* Text input */
+.fill{border:2px solid var(--light);border-radius:8px;padding:5px 12px;font-size:.88rem;
+  font-family:'Nunito',sans-serif;font-weight:700;width:180px;outline:none;transition:border-color .2s}
+.fill:focus{border-color:var(--orange)}
+.fill.ok{border-color:var(--correct)!important;background:rgba(0,184,148,.07);color:var(--correct)}
+.fill.err{border-color:var(--wrong)!important;background:rgba(232,67,147,.07);color:var(--wrong)}
+.fill.wide{width:240px}
+
+/* Multiple choice */
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.opt{padding:7px 16px;border:2px solid var(--light);border-radius:10px;cursor:pointer;
+  font-size:.88rem;font-weight:700;transition:all .15s;background:#fff;user-select:none}
+.opt:hover{border-color:var(--orange);background:rgba(255,107,53,.04)}
+.opt.sel{border-color:var(--orange);background:rgba(255,107,53,.08);color:var(--orange)}
+.opt.ok{border-color:var(--correct)!important;background:rgba(0,184,148,.1)!important;color:var(--correct)!important}
+.opt.err{border-color:var(--wrong)!important;background:rgba(232,67,147,.08)!important;color:var(--wrong)!important}
+.opt:disabled,.opt[disabled]{pointer-events:none}
+
+/* Matching */
+.match-wrap{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.col-left,.col-right{display:flex;flex-direction:column;gap:8px}
+.m-item{padding:10px 14px;border:2px solid var(--light);border-radius:10px;cursor:pointer;
+  font-size:.87rem;font-weight:700;transition:all .15s;background:#fff;min-height:42px;display:flex;align-items:center}
+.m-item:hover{border-color:var(--orange)}
+.m-item.sel{border-color:var(--orange);background:rgba(255,107,53,.08)}
+.m-item.matched{border-color:var(--correct);background:rgba(0,184,148,.08);color:var(--correct);cursor:default}
+.m-item.bad{border-color:var(--wrong);background:rgba(232,67,147,.08);animation:shake .3s}
+
+/* Classification drag */
+.classify-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.classify-bank{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;padding:14px;background:#f8f9fa;border-radius:12px;margin-bottom:6px}
+.chip{padding:6px 14px;background:#fff;border:2px solid var(--light);border-radius:20px;
+  font-size:.84rem;font-weight:700;cursor:pointer;user-select:none;transition:all .15s}
+.chip:hover{border-color:var(--orange)}
+.chip.used{opacity:.25;pointer-events:none}
+.drop-zone{min-height:80px;background:#f8f9fa;border:2px dashed var(--light);border-radius:12px;padding:10px}
+.drop-zone h5{font-size:.75rem;font-weight:800;color:var(--mid);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.drop-zone .chip{cursor:default;margin:3px}
+
+/* Sort pronunciation */
+.pron-wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pron-col{background:#f8f9fa;border-radius:12px;padding:14px;text-align:center;min-height:100px}
+.pron-col h5{font-size:1rem;font-weight:900;margin-bottom:8px;color:var(--dark)}
+.pron-word-pool{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;justify-content:center}
+
+/* Feedback & actions */
+.fb{margin-top:8px;font-size:.82rem;font-weight:800;padding:5px 12px;border-radius:8px;display:none}
+.fb.show{display:inline-block}
+.fb.ok{background:rgba(0,184,148,.1);color:var(--correct)}
+.fb.err{background:rgba(232,67,147,.08);color:var(--wrong)}
+.ans-reveal{color:var(--wrong);font-size:.82rem;font-weight:800;display:none}
+.ans-reveal.show{display:inline}
+
+.actions{margin-top:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{padding:10px 26px;border:none;border-radius:11px;font-family:'Nunito',sans-serif;
+  font-size:.95rem;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-check{background:var(--orange);color:#fff}
+.btn-check:hover{background:#e05a25;transform:translateY(-2px);box-shadow:0 6px 16px rgba(255,107,53,.3)}
+.btn-reset{background:var(--light);color:var(--dark)}
+.btn-reset:hover{background:#b2bec3}
+.btn-next{background:var(--teal);color:#fff}
+.btn-next:hover{background:#38b8af}
+.ex-score{font-size:.88rem;font-weight:800;color:var(--mid)}
+
+/* Color themes per section */
+.s-family .sec-tag,.s-family .ex-card h3{color:#fff}
+.s-family .sec-tag{background:var(--pink)}
+.s-family .ex-card{border-top:4px solid var(--pink)}
+.s-family .ex-card h3{color:var(--pink)}
+.s-family .ref-box{border-left-color:var(--pink)}
+.s-family .ref-box h4{color:var(--pink)}
+.s-family .fill:focus{border-color:var(--pink)}
+.s-family .opt:hover,.s-family .opt.sel{border-color:var(--pink);color:var(--pink)}
+
+.s-adverbs .sec-tag{background:var(--purple)}
+.s-adverbs .ex-card{border-top:4px solid var(--purple)}
+.s-adverbs .ex-card h3{color:var(--purple)}
+.s-adverbs .ref-box{border-left-color:var(--purple)}
+.s-adverbs .ref-box h4{color:var(--purple)}
+.s-adverbs .fill:focus{border-color:var(--purple)}
+.s-adverbs .opt:hover,.s-adverbs .opt.sel{border-color:var(--purple);color:var(--purple)}
+
+.s-ps .sec-tag{background:var(--blue)}
+.s-ps .ex-card{border-top:4px solid var(--blue)}
+.s-ps .ex-card h3{color:var(--blue)}
+.s-ps .ref-box{border-left-color:var(--blue)}
+.s-ps .ref-box h4{color:var(--blue)}
+
+.s-pc .sec-tag{background:var(--teal)}
+.s-pc .ex-card{border-top:4px solid var(--teal)}
+.s-pc .ex-card h3{color:var(--teal)}
+
+.s-psc .sec-tag{background:#6c5ce7}
+.s-psc .ex-card{border-top:4px solid #6c5ce7}
+.s-psc .ex-card h3{color:#6c5ce7}
+
+.s-past .sec-tag{background:var(--orange)}
+.s-past .ex-card{border-top:4px solid var(--orange)}
+.s-past .ex-card h3{color:var(--orange)}
+
+.s-irreg .sec-tag{background:var(--yellow);color:var(--dark)}
+.s-irreg .ex-card{border-top:4px solid var(--yellow)}
+.s-irreg .ex-card h3{color:#b8860b}
+
+.s-mixed .sec-tag{background:var(--correct)}
+.s-mixed .ex-card{border-top:4px solid var(--correct)}
+.s-mixed .ex-card h3{color:var(--correct)}
+
+/* Toast */
+.toast{position:fixed;bottom:28px;right:28px;background:#fff;border-radius:16px;
+  padding:16px 22px;box-shadow:0 8px 32px rgba(0,0,0,.14);transform:translateY(100px);
+  opacity:0;transition:all .35s;z-index:1000;max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast .t-ico{font-size:2rem;text-align:center;margin-bottom:4px}
+.toast .t-msg{font-weight:700;font-size:.93rem}
+.toast .t-sub{font-size:.82rem;color:var(--mid);margin-top:4px}
+
+/* Progress */
+.prog-bar{background:var(--light);border-radius:10px;height:6px;overflow:hidden;margin:12px 0}
+.prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--orange),var(--teal));transition:width .5s}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@keyframes pop{0%{transform:scale(0.8)}60%{transform:scale(1.1)}100%{transform:scale(1)}}
+.pop{animation:pop .25s ease}
+
+@media(max-width:768px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  main{max-height:none;padding:20px 16px}
+  .match-wrap,.classify-wrap,.pron-wrap{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header>
+  <h1>
+    <small>Gateway B1 · Units 1–2</small>
+    Practice <span>Zone</span> 🎯
+  </h1>
+  <div class="score-board">
+    <div class="score-box">
+      <div class="lbl">Score</div>
+      <div class="val" id="totalScore">0</div>
+    </div>
+    <div class="score-box">
+      <div class="lbl">Correct</div>
+      <div class="val" id="totalCorrect">0/0</div>
+    </div>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-label">Sections</div>
+  <div class="nav-item active" onclick="showSection('family')" id="nav-family">
+    <span class="ico">👨‍👩‍👧‍👦</span> Family Vocabulary <span class="badge" id="b-family">12</span>
+  </div>
+  <div class="nav-item" onclick="showSection('adverbs')" id="nav-adverbs">
+    <span class="ico">⏰</span> Frequency Adverbs <span class="badge" id="b-adverbs">8</span>
+  </div>
+  <div class="nav-item" onclick="showSection('ps')" id="nav-ps">
+    <span class="ico">📘</span> Present Simple <span class="badge" id="b-ps">14</span>
+  </div>
+  <div class="nav-item" onclick="showSection('pc')" id="nav-pc">
+    <span class="ico">🔄</span> Present Continuous <span class="badge" id="b-pc">10</span>
+  </div>
+  <div class="nav-item" onclick="showSection('psc')" id="nav-psc">
+    <span class="ico">⚡</span> Simple vs Continuous <span class="badge" id="b-psc">10</span>
+  </div>
+  <div class="nav-item" onclick="showSection('past')" id="nav-past">
+    <span class="ico">🕰️</span> Past Simple <span class="badge" id="b-past">12</span>
+  </div>
+  <div class="nav-item" onclick="showSection('irreg')" id="nav-irreg">
+    <span class="ico">📋</span> Irregular Verbs <span class="badge" id="b-irreg">14</span>
+  </div>
+  <div class="nav-item" onclick="showSection('mixed')" id="nav-mixed">
+    <span class="ico">🎯</span> Mixed Test <span class="badge" id="b-mixed">10</span>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 1: FAMILY VOCABULARY
+═══════════════════════════════════════════════════ -->
+<div class="section-page s-family active" id="sec-family">
+  <div class="sec-header">
+    <span class="sec-tag">👨‍👩‍👧‍👦 Section 1</span>
+    <h2>Family Vocabulary</h2>
+    <p>Dominate all the family words from Unit 1: relatives, stages of life, and family types.</p>
+  </div>
+
+  <div class="ref-box">
+    <h4>📖 Quick Reference – The Family</h4>
+    <p><strong>Immediate family:</strong> parents, brothers, sisters &nbsp;|&nbsp; <strong>Extended family:</strong> grandparents, aunts, uncles, cousins…</p>
+    <p style="margin-top:6px"><strong>Other key words:</strong> nephew (sister/brother's son) · niece (sister/brother's daughter) · stepfather/stepmother · son/daughter-in-law · only child · twin · partner · relative · divorced · single · extended · immediate</p>
+  </div>
+
+  <!-- Ex 1: MC Definitions -->
+  <div class="ex-card" id="ec-f1">
+    <h3>Exercise 1 — Match the Definition</h3>
+    <div class="ex-inst">Choose the correct family word for each definition. (8 points)</div>
+    <div id="f1-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkMC('f1')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetMC('f1')">Reset</button>
+      <span class="ex-score" id="f1-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 2: Fill in family words -->
+  <div class="ex-card" id="ec-f2">
+    <h3>Exercise 2 — Complete the Sentences</h3>
+    <div class="ex-inst">Fill in each blank with the correct family word from the box. (6 points)
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">
+        <span class="chip">nephew</span><span class="chip">cousin</span><span class="chip">stepmother</span>
+        <span class="chip">niece</span><span class="chip">twin</span><span class="chip">son-in-law</span>
+      </div>
+    </div>
+    <div id="f2-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('f2')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('f2')">Reset</button>
+      <span class="ex-score" id="f2-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 3: Classify male/female/both -->
+  <div class="ex-card" id="ec-f3">
+    <h3>Exercise 3 — Male, Female or Both?</h3>
+    <div class="ex-inst">Click a word, then click the correct column to classify it. (8 points)</div>
+    <div class="classify-bank" id="f3-bank"></div>
+    <div class="classify-wrap" style="grid-template-columns:repeat(3,1fr)">
+      <div class="drop-zone" id="dz-male"><h5>🚹 Male only</h5></div>
+      <div class="drop-zone" id="dz-female"><h5>🚺 Female only</h5></div>
+      <div class="drop-zone" id="dz-both"><h5>🚻 Male or Female</h5></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkClassify()">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetClassify()">Reset</button>
+      <span class="ex-score" id="f3-score"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 2: FREQUENCY ADVERBS
+═══════════════════════════════════════════════════ -->
+<div class="section-page s-adverbs" id="sec-adverbs">
+  <div class="sec-header">
+    <span class="sec-tag">⏰ Section 2</span>
+    <h2>Frequency Adverbs</h2>
+    <p>Master how to use and position adverbs of frequency correctly.</p>
+  </div>
+
+  <div class="ref-box">
+    <h4>📖 Quick Reference</h4>
+    <p><strong>always</strong> (100%) → <strong>usually</strong> (80%) → <strong>often</strong> (60%) → <strong>sometimes</strong> (40%) → <strong>rarely/seldom</strong> (10%) → <strong>never</strong> (0%)</p>
+    <p style="margin-top:8px">📍 <strong>Position:</strong> BEFORE the main verb, but AFTER the verb <em>be</em></p>
+    <p style="background:#fff8e1;padding:8px 12px;border-radius:8px;margin-top:8px;font-size:.85rem">
+      ✅ She <u>always</u> <strong>eats</strong> breakfast. &nbsp;|&nbsp; ✅ He <strong>is</strong> <u>never</u> late.
+    </p>
+  </div>
+
+  <!-- Ex 1: Position of adverb -->
+  <div class="ex-card" id="ec-a1">
+    <h3>Exercise 1 — Put the Adverb in the Right Place</h3>
+    <div class="ex-inst">Rewrite each sentence including the adverb in the correct position. Type the full sentence. (4 points)</div>
+    <div id="a1-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('a1')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('a1')">Reset</button>
+      <span class="ex-score" id="a1-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 2: Choose correct adverb -->
+  <div class="ex-card" id="ec-a2">
+    <h3>Exercise 2 — Choose the Best Adverb</h3>
+    <div class="ex-inst">Select the most logical frequency adverb for each sentence. (4 points)</div>
+    <div id="a2-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkMC('a2')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetMC('a2')">Reset</button>
+      <span class="ex-score" id="a2-score"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 3: PRESENT SIMPLE
+═══════════════════════════════════════════════════ -->
+<div class="section-page s-ps" id="sec-ps">
+  <div class="sec-header">
+    <span class="sec-tag">📘 Section 3</span>
+    <h2>Present Simple</h2>
+    <p>Habits, routines, facts, and permanent situations. The cornerstone of English grammar!</p>
+  </div>
+
+  <div class="ref-box">
+    <h4>📖 Quick Reference</h4>
+    <div class="ref-grid">
+      <div class="ref-col">
+        <h5>➕ Affirmative</h5>
+        I/You/We/They <code>work</code><br>
+        He/She/It <code>works</code><br>
+        <em style="font-size:.8rem">watch→watches · go→goes · study→studies · cry→cries</em>
+      </div>
+      <div class="ref-col">
+        <h5>➖ Negative</h5>
+        I/You/We/They <code>don't work</code><br>
+        He/She/It <code>doesn't work</code>
+      </div>
+      <div class="ref-col">
+        <h5>❓ Question</h5>
+        <code>Do</code> I/you/we/they work?<br>
+        <code>Does</code> he/she/it work?
+      </div>
+    </div>
+  </div>
+
+  <!-- Ex 1: Affirmative forms -->
+  <div class="ex-card" id="ec-ps1">
+    <h3>Exercise 1 — Correct Verb Form (Affirmative)</h3>
+    <div class="ex-inst">Write the correct present simple form of the verb in brackets. (6 points)</div>
+    <div id="ps1-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('ps1')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('ps1')">Reset</button>
+      <span class="ex-score" id="ps1-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 2: Negatives -->
+  <div class="ex-card" id="ec-ps2">
+    <h3>Exercise 2 — Make It Negative</h3>
+    <div class="ex-inst">Write the negative form of the verb. Use contractions. (4 points)</div>
+    <div id="ps2-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('ps2')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('ps2')">Reset</button>
+      <span class="ex-score" id="ps2-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 3: Questions -->
+  <div class="ex-card" id="ec-ps3">
+    <h3>Exercise 3 — Form the Question</h3>
+    <div class="ex-inst">Complete each question with <em>do</em> or <em>does</em>. (4 points)</div>
+    <div id="ps3-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkMC('ps3')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetMC('ps3')">Reset</button>
+      <span class="ex-score" id="ps3-score"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 4: PRESENT CONTINUOUS
+═══════════════════════════════════════════════════ -->
+<div class="section-page s-pc" id="sec-pc">
+  <div class="sec-header">
+    <span class="sec-tag">🔄 Section 4</span>
+    <h2>Present Continuous</h2>
+    <p>Actions happening right now or temporary situations. Don't forget the <em>-ing</em> spelling rules!</p>
+  </div>
+
+  <div class="ref-box">
+    <h4>📖 Quick Reference</h4>
+    <div class="ref-grid">
+      <div class="ref-col">
+        <h5>Structure</h5>
+        <code>am/is/are + verb+ing</code><br>
+        She <em>is reading</em>.<br>
+        They <em>are playing</em>.
+      </div>
+      <div class="ref-col">
+        <h5>-ing Spelling Rules</h5>
+        play → <strong>play</strong>ing<br>
+        make → <strong>mak</strong>ing (drop e)<br>
+        run → <strong>runn</strong>ing (double)<br>
+        study → <strong>study</strong>ing
+      </div>
+      <div class="ref-col">
+        <h5>State Verbs (NO -ing!)</h5>
+        know · love · hate · think<br>
+        believe · need · want<br>
+        understand · like · care
+      </div>
+    </div>
+  </div>
+
+  <!-- Ex 1: Spelling -ing -->
+  <div class="ex-card" id="ec-pc1">
+    <h3>Exercise 1 — Spelling: Write the -ing Form</h3>
+    <div class="ex-inst">Write the correct -ing form of each verb. Be careful with spelling! (5 points)</div>
+    <div id="pc1-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('pc1')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('pc1')">Reset</button>
+      <span class="ex-score" id="pc1-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 2: Full present continuous -->
+  <div class="ex-card" id="ec-pc2">
+    <h3>Exercise 2 — Present Continuous in Context</h3>
+    <div class="ex-inst">Write the full present continuous form (positive, negative, or question as indicated). (5 points)</div>
+    <div id="pc2-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('pc2')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('pc2')">Reset</button>
+      <span class="ex-score" id="pc2-score"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 5: SIMPLE vs CONTINUOUS
+═══════════════════════════════════════════════════ -->
+<div class="section-page s-psc" id="sec-psc">
+  <div class="sec-header">
+    <span class="sec-tag">⚡ Section 5</span>
+    <h2>Simple vs Continuous</h2>
+    <p>The hardest part — knowing WHEN to use each tense. This section is key for your exam!</p>
+  </div>
+
+  <div class="ref-box">
+    <h4>📖 Use Present Simple for…</h4>
+    <p>✔ Regular habits: <em>She goes to school every day.</em><br>
+    ✔ General truths: <em>Water boils at 100°C.</em><br>
+    ✔ State verbs (love, know, need…): <em>I love music.</em></p>
+  </div>
+  <div class="ref-box">
+    <h4>📖 Use Present Continuous for…</h4>
+    <p>✔ Actions happening NOW: <em>She is reading right now.</em><br>
+    ✔ Temporary situations: <em>He is living in London this year.</em><br>
+    ⚠ NOT with state verbs: ✗ <em>I am knowing the answer.</em></p>
+  </div>
+
+  <div class="ex-card" id="ec-psc1">
+    <h3>Exercise 1 — Choose the Correct Tense</h3>
+    <div class="ex-inst">Click the correct form. Think carefully — some are state verbs! (10 points)</div>
+    <div id="psc1-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkMC('psc1')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetMC('psc1')">Reset</button>
+      <span class="ex-score" id="psc1-score"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 6: PAST SIMPLE
+═══════════════════════════════════════════════════ -->
+<div class="section-page s-past" id="sec-past">
+  <div class="sec-header">
+    <span class="sec-tag">🕰️ Section 6</span>
+    <h2>Past Simple</h2>
+    <p>Regular verbs, negatives, questions, and the -ed pronunciation rules.</p>
+  </div>
+
+  <div class="ref-box">
+    <h4>📖 Quick Reference</h4>
+    <div class="ref-grid">
+      <div class="ref-col">
+        <h5>Regular: add -ed</h5>
+        play → <strong>played</strong><br>
+        arrive → <strong>arrived</strong><br>
+        plan → <strong>planned</strong><br>
+        study → <strong>studied</strong>
+      </div>
+      <div class="ref-col">
+        <h5>Negative</h5>
+        subject + <code>didn't</code> + base<br>
+        <em>She didn't go.</em><br>
+        <em>They didn't eat.</em>
+      </div>
+      <div class="ref-col">
+        <h5>Question</h5>
+        <code>Did</code> + subject + base?<br>
+        <em>Did he arrive?</em><br>
+        <em>Did they see it?</em>
+      </div>
+    </div>
+    <p style="margin-top:10px"><strong>-ed pronunciation:</strong> /t/ after voiceless sounds (watched, liked) · /d/ after voiced sounds (arrived, called) · /ɪd/ after t or d (wanted, started)</p>
+  </div>
+
+  <!-- Ex 1: Regular past forms -->
+  <div class="ex-card" id="ec-pt1">
+    <h3>Exercise 1 — Write the Past Simple (Regular Verbs)</h3>
+    <div class="ex-inst">Write the past simple form. Remember the spelling rules! (5 points)</div>
+    <div id="pt1-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('pt1')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('pt1')">Reset</button>
+      <span class="ex-score" id="pt1-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 2: Negatives and questions -->
+  <div class="ex-card" id="ec-pt2">
+    <h3>Exercise 2 — Negatives and Questions</h3>
+    <div class="ex-inst">Complete with the correct negative or question form. (4 points)</div>
+    <div id="pt2-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('pt2')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('pt2')">Reset</button>
+      <span class="ex-score" id="pt2-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 3: Pronunciation sort -->
+  <div class="ex-card" id="ec-pt3">
+    <h3>Exercise 3 — Pronunciation of -ed</h3>
+    <div class="ex-inst">Click each verb, then click the correct pronunciation column. (3 points)</div>
+    <div class="pron-word-pool" id="pt3-bank"></div>
+    <div class="pron-wrap">
+      <div class="pron-col" id="pc-t" onclick="dropPron('t')"><h5>/t/</h5><small>finished, liked</small></div>
+      <div class="pron-col" id="pc-d" onclick="dropPron('d')"><h5>/d/</h5><small>arrived, called</small></div>
+      <div class="pron-col" id="pc-id" onclick="dropPron('id')"><h5>/ɪd/</h5><small>wanted, started</small></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkPron()">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetPron()">Reset</button>
+      <span class="ex-score" id="pt3-score"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 7: IRREGULAR VERBS
+═══════════════════════════════════════════════════ -->
+<div class="section-page s-irreg" id="sec-irreg">
+  <div class="sec-header">
+    <span class="sec-tag">📋 Section 7</span>
+    <h2>Irregular Verbs</h2>
+    <p>The verbs you MUST memorise! Practice the most common ones for your exam.</p>
+  </div>
+
+  <div class="ref-box">
+    <h4>📖 Key Irregular Verbs (Unit 1–2)</h4>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;font-size:.82rem">
+      <span>be → <strong>was/were</strong></span><span>go → <strong>went</strong></span>
+      <span>come → <strong>came</strong></span><span>take → <strong>took</strong></span>
+      <span>find → <strong>found</strong></span><span>see → <strong>saw</strong></span>
+      <span>make → <strong>made</strong></span><span>tell → <strong>told</strong></span>
+      <span>know → <strong>knew</strong></span><span>think → <strong>thought</strong></span>
+      <span>buy → <strong>bought</strong></span><span>have → <strong>had</strong></span>
+      <span>say → <strong>said</strong></span><span>get → <strong>got</strong></span>
+      <span>give → <strong>gave</strong></span><span>meet → <strong>met</strong></span>
+      <span>become → <strong>became</strong></span><span>run → <strong>ran</strong></span>
+      <span>leave → <strong>left</strong></span><span>break → <strong>broke</strong></span>
+    </div>
+  </div>
+
+  <!-- Ex 1: Write irregular past forms -->
+  <div class="ex-card" id="ec-ir1">
+    <h3>Exercise 1 — Write the Past Simple Form</h3>
+    <div class="ex-inst">Write the correct irregular past simple form. (8 points)</div>
+    <div id="ir1-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkFill('ir1')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetFill('ir1')">Reset</button>
+      <span class="ex-score" id="ir1-score"></span>
+    </div>
+  </div>
+
+  <!-- Ex 2: Matching base to past -->
+  <div class="ex-card" id="ec-ir2">
+    <h3>Exercise 2 — Match the Irregular Pairs</h3>
+    <div class="ex-inst">Click a verb on the left, then click its past simple form on the right. (6 points)</div>
+    <div class="match-wrap" id="ir2-match"></div>
+    <div class="actions">
+      <button class="btn btn-reset" onclick="resetMatch('ir2')">Reset</button>
+      <span class="ex-score" id="ir2-score"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION 8: MIXED TEST
+═══════════════════════════════════════════════════ -->
+<div class="section-page s-mixed" id="sec-mixed">
+  <div class="sec-header">
+    <span class="sec-tag">🎯 Section 8</span>
+    <h2>Mixed Test — Exam Practice</h2>
+    <p>All topics combined. This simulates real exam difficulty. Good luck! 🍀</p>
+  </div>
+
+  <div class="ex-card" id="ec-mx1">
+    <h3>Exercise 1 — Multiple Choice (All Topics)</h3>
+    <div class="ex-inst">Choose the correct answer. There is only ONE correct answer per question. (10 points)</div>
+    <div id="mx1-qs"></div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkMC('mx1')">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetMC('mx1')">Reset</button>
+      <span class="ex-score" id="mx1-score"></span>
+    </div>
+  </div>
+
+  <div class="ex-card" id="ec-mx2">
+    <h3>Exercise 2 — Fill in the Blanks (Story)</h3>
+    <div class="ex-inst">
+      Complete the story with the correct form of each verb. Use past simple, present simple, or present continuous.
+      <div style="background:#f8f9fa;border-radius:10px;padding:14px;margin-top:10px;font-size:.9rem;line-height:1.8" id="mx2-story"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-check" onclick="checkStory()">Check ✓</button>
+      <button class="btn btn-reset" onclick="resetStory()">Reset</button>
+      <span class="ex-score" id="mx2-score"></span>
+    </div>
+  </div>
+
+  <div class="ex-card" style="text-align:center;border-top:4px solid var(--correct)">
+    <h3>🏆 Your Final Score</h3>
+    <div style="font-size:3rem;font-weight:900;color:var(--correct);margin:14px 0" id="finalPct">—</div>
+    <p style="color:var(--mid)" id="finalMsg">Complete all sections to see your final score!</p>
+    <div style="margin-top:16px">
+      <button class="btn btn-check" onclick="calcFinal()" style="font-size:1rem">Calculate Final Score 🎉</button>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="t-ico" id="toast-ico">🎉</div>
+  <div class="t-msg" id="toast-msg">Well done!</div>
+  <div class="t-sub" id="toast-sub">Keep going!</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+
+// --- FAMILY MC ---
+const f1Data = [
+  {q:"Your mother's brother is your ___.", opts:["uncle","nephew","cousin","stepfather"], ans:0},
+  {q:"Your sister's son is your ___.", opts:["niece","grandson","nephew","brother-in-law"], ans:2},
+  {q:"The child of your aunt or uncle is your ___.", opts:["relative","twin","stepchild","cousin"], ans:3},
+  {q:"A family with only one parent is called a ___ family.", opts:["extended","immediate","one-parent","single"], ans:2},
+  {q:"Your father's mother is your ___.", opts:["mother-in-law","grandmother","stepmother","godmother"], ans:1},
+  {q:"You are an ___ child if you have no brothers or sisters.", opts:["only","single","sole","alone"], ans:0},
+  {q:"Your brother's daughter is your ___.", opts:["niece","cousin","daughter-in-law","stepdaughter"], ans:0},
+  {q:"'___ family' includes grandparents, cousins, aunts and uncles.", opts:["immediate","nuclear","extended","single"], ans:2},
+];
+
+const f2Data = [
+  {q:"My uncle has a son. He is my ___.", ans:["cousin"]},
+  {q:"My sister has a little boy. He is my ___.", ans:["nephew"]},
+  {q:"My brother has a daughter. She is my ___.", ans:["niece"]},
+  {q:"My mother got married again. Her new husband is my ___.", ans:["stepfather","step-father"]},
+  {q:"My daughter got married. Her husband is my ___.", ans:["son-in-law"]},
+  {q:"Tom and Tim were born on the same day to the same mother. They are ___.", ans:["twins","twin"]},
+];
+
+const f3Data = {
+  words: [
+    {w:"nephew",cat:"male"},{w:"niece",cat:"female"},{w:"uncle",cat:"male"},
+    {w:"aunt",cat:"female"},{w:"grandfather",cat:"male"},{w:"cousin",cat:"both"},
+    {w:"stepfather",cat:"male"},{w:"relative",cat:"both"}
+  ]
+};
+const f3Answers = {male:["nephew","uncle","grandfather","stepfather"],female:["niece","aunt"],both:["cousin","relative"]};
+
+// --- ADVERBS ---
+const a1Data = [
+  {q:'He eats breakfast. (never) → Type the full sentence:', ans:["he never eats breakfast","he never eats breakfast."]},
+  {q:'She is late. (always) → Type the full sentence:', ans:["she is always late","she is always late."]},
+  {q:'We visit our grandparents. (often) → Type the full sentence:', ans:["we often visit our grandparents","we often visit our grandparents."]},
+  {q:'My dad works on Sundays. (sometimes) → Type the full sentence:', ans:["my dad sometimes works on sundays","my dad sometimes works on sundays."]},
+];
+
+const a2Data = [
+  {q:'I go to the cinema every weekend. I ___ miss a good film.',opts:['always','never','sometimes','rarely'],ans:0},
+  {q:'My grandfather is 90. He ___ forgets things — it\'s normal.',opts:['never','always','sometimes','usually'],ans:2},
+  {q:'She practices piano every day. She ___ skips practice.',opts:['always','often','never','sometimes'],ans:2},
+  {q:'She ___ takes the bus — about 4 or 5 days a week.',opts:['never','usually','rarely','seldom'],ans:1},
+];
+
+// --- PRESENT SIMPLE ---
+const ps1Data = [
+  {q:'She ___ (study) English every night.', ans:['studies']},
+  {q:'He ___ (go) to the gym on Mondays.', ans:['goes']},
+  {q:'My sister ___ (cry) during sad films.', ans:['cries']},
+  {q:'The bus ___ (leave) at 8 am every day.', ans:['leaves']},
+  {q:'We ___ (have) lunch at school.', ans:['have']},
+  {q:'He ___ (teach) maths at our school.', ans:['teaches']},
+];
+
+const ps2Data = [
+  {q:'She lives in Madrid. (NOT) → She ___ in Madrid.', ans:["doesn't live","does not live"]},
+  {q:'They play football. (NOT) → They ___ football.', ans:["don't play","do not play"]},
+  {q:'He knows the answer. (NOT) → He ___ the answer.', ans:["doesn't know","does not know"]},
+  {q:'I like horror movies. (NOT) → I ___ horror movies.', ans:["don't like","do not like"]},
+];
+
+const ps3Data = [
+  {q:'___ your sister speak Spanish?', opts:['Do','Does','Is','Are'], ans:1},
+  {q:'___ they live near the school?', opts:['Does','Is','Do','Are'], ans:2},
+  {q:'___ your dad work at weekends?', opts:['Is','Do','Are','Does'], ans:3},
+  {q:'___ I know you from somewhere?', opts:['Does','Are','Do','Am'], ans:2},
+];
+
+// --- PRESENT CONTINUOUS ---
+const pc1Data = [
+  {q:'write → ___ing', ans:['writing']},
+  {q:'run → ___ing', ans:['running']},
+  {q:'study → ___ing', ans:['studying']},
+  {q:'make → ___ing', ans:['making']},
+  {q:'swim → ___ing', ans:['swimming']},
+];
+
+const pc2Data = [
+  {q:'She ___ (read) a book right now. [+]', ans:['is reading']},
+  {q:'They ___ (not/watch) TV at the moment. [-]', ans:["aren't watching","are not watching"]},
+  {q:'___ he ___ (study) for the exam? [?] → Write: Is he studying', ans:['is he studying','is he studying?']},
+  {q:'I ___ (not/listen) to music right now. [-]', ans:["am not listening","i am not listening"]},
+  {q:'We ___ (have) a great time! [+]', ans:['are having']},
+];
+
+// --- SIMPLE vs CONTINUOUS ---
+const psc1Data = [
+  {q:'She ___ (go) to school by bus every day.', opts:['goes','is going'], ans:0, tip:'Routine → Present Simple'},
+  {q:'They ___ (watch) a film right now.', opts:['watch','are watching'], ans:1, tip:'Happening now → Present Continuous'},
+  {q:'I ___ (love) chocolate. ❤️', opts:['love','am loving'], ans:0, tip:'State verb → no -ing!'},
+  {q:'He ___ (study) for his exam at the moment.', opts:['studies','is studying'], ans:1, tip:'Temporary → Continuous'},
+  {q:'We ___ (never go) to school on Sundays.', opts:['never go','are never going'], ans:0, tip:'Habit with frequency adverb → Simple'},
+  {q:'She ___ (think) about the problem now.', opts:['thinks','is thinking'], ans:1, tip:'Active thinking → action meaning → Continuous'},
+  {q:'My grandfather ___ (live) in Córdoba.', opts:['lives','is living'], ans:0, tip:'Permanent situation → Simple'},
+  {q:'What ___ (you/do) right now?', opts:['do you do','are you doing'], ans:1, tip:'Right now → Continuous'},
+  {q:'Dogs ___ (not understand) grammar. 🐶', opts:["don't understand","aren't understanding"], ans:0, tip:'General truth / state → Simple'},
+  {q:'Listen! The baby ___ (cry)!', opts:['cries','is crying'], ans:1, tip:'Listen! = happening right now → Continuous'},
+];
+
+// --- PAST SIMPLE REGULAR ---
+const pt1Data = [
+  {q:'plan → (past simple)', ans:['planned']},
+  {q:'arrive → (past simple)', ans:['arrived']},
+  {q:'study → (past simple)', ans:['studied']},
+  {q:'stop → (past simple)', ans:['stopped']},
+  {q:'watch → (past simple)', ans:['watched']},
+];
+
+const pt2Data = [
+  {q:'He went to the park. [Make it negative] → He ___ to the park.', ans:["didn't go","did not go"]},
+  {q:'She saw the film. [Make it negative] → She ___ the film.', ans:["didn't see","did not see"]},
+  {q:'[Make a question] They arrived late. → ___ they arrive late?', ans:['did they arrive late','did they arrive late?']},
+  {q:'[Make a question] He called the police. → ___ he call the police?', ans:['did he call the police','did he call the police?']},
+];
+
+const pt3Words = [
+  {w:'watched',cat:'t'},{w:'needed',cat:'id'},{w:'liked',cat:'t'},
+  {w:'arrived',cat:'d'},{w:'started',cat:'id'},{w:'called',cat:'d'},
+  {w:'finished',cat:'t'},{w:'wanted',cat:'id'},{w:'played',cat:'d'},
+];
+
+// --- IRREGULAR VERBS ---
+const ir1Data = [
+  {q:'go → (past simple)', ans:['went']},
+  {q:'see → (past simple)', ans:['saw']},
+  {q:'take → (past simple)', ans:['took']},
+  {q:'find → (past simple)', ans:['found']},
+  {q:'make → (past simple)', ans:['made']},
+  {q:'tell → (past simple)', ans:['told']},
+  {q:'come → (past simple)', ans:['came']},
+  {q:'become → (past simple)', ans:['became']},
+];
+
+const ir2Pairs = [
+  {base:'know',past:'knew'},{base:'have',past:'had'},
+  {base:'think',past:'thought'},{base:'give',past:'gave'},
+  {base:'leave',past:'left'},{base:'run',past:'ran'},
+];
+
+// --- MIXED MC ---
+const mx1Data = [
+  {q:'My aunt ___ three children — two boys and a girl.',opts:["have","has","is having","are having"],ans:1},
+  {q:'Listen! Someone ___ at the door!',opts:["knock","knocks","is knocking","knocked"],ans:2},
+  {q:'He ___ the police immediately.',opts:["called","calls","is calling","was calling"],ans:0},
+  {q:'___ your parents usually ___ dinner together?',opts:["Do / have","Does / has","Are / having","Do / has"],ans:0},
+  {q:'I can\'t talk now. I ___ my homework.',opts:["do","does","am doing","did"],ans:2},
+  {q:'She ___ Japanese when she was at university.',opts:["studies","studied","is studying","study"],ans:1},
+  {q:'They ___ (not) like horror films — they prefer comedy.',opts:["doesn't","aren't","don't","isn't"],ans:2},
+  {q:'Two men ___ into the building and stole some money.',opts:["break","broke","are breaking","were breaking"],ans:1},
+  {q:'My cousin is an ___ child. She has no brothers or sisters.',opts:["unique","alone","only","single"],ans:2},
+  {q:'How often ___ she see her grandparents?',opts:["do","are","is","does"],ans:3},
+];
+
+// --- STORY ---
+const storyVerbs = [
+  {v:'call',tense:'past',ans:['called']},
+  {v:'not be',tense:'past',ans:["wasn't","was not"]},
+  {v:'go',tense:'past',ans:['went']},
+  {v:'find',tense:'past',ans:['found']},
+  {v:'start',tense:'past',ans:['started']},
+  {v:'become',tense:'past',ans:['became']},
+];
+const storyTemplate = `In 2016, in a small town in Florida, somebody (a) [call] the police. The person (b) [not be] happy because of some kids playing basketball in the street. A police officer (c) [go] to investigate. He (d) [find] some teenagers playing basketball. He (e) [start] to play with them! Other teenagers came out of their houses. In the end, everybody (f) [become] friends!`;
+
+// ═══════════════════════════════════════════════════
+// GLOBAL STATE
+// ═══════════════════════════════════════════════════
+let totalScore = 0, totalCorrect = 0, totalQ = 0;
+const sectionDone = {};
+
+// ═══════════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════
+
+function renderMC(containerId, data){
+  const el = document.getElementById(containerId+'-qs');
+  el.innerHTML = data.map((d,i)=>`
+    <div class="q-row" id="${containerId}-q${i}">
+      <div class="q-label">${i+1}. ${d.q}</div>
+      <div class="opts" id="${containerId}-opts${i}">
+        ${d.opts.map((o,j)=>`<div class="opt" onclick="selectOpt('${containerId}',${i},${j})">${o}</div>`).join('')}
+      </div>
+      <div class="fb" id="${containerId}-fb${i}"></div>
+    </div>`).join('');
+}
+
+function renderFill(containerId, data){
+  const el = document.getElementById(containerId+'-qs');
+  el.innerHTML = data.map((d,i)=>`
+    <div class="q-row" id="${containerId}-q${i}">
+      <div class="q-label">${i+1}. ${d.q.replace('___','<input class="fill wide" id="${containerId}-in${i}" placeholder="...")>')}</div>
+      ${/* rebuild with real id */''}
+    </div>`).join('');
+  // Rebuild properly
+  el.innerHTML = data.map((d,i)=>`
+    <div class="q-row" id="${containerId}-q${i}">
+      <div class="q-label">${i+1}. ${escQ(d.q,containerId,i)}</div>
+      <div class="fb" id="${containerId}-fb${i}"></div>
+    </div>`).join('');
+}
+
+function escQ(q,cid,i){
+  return q.replace(/___/,`<input class="fill wide" id="${cid}-in${i}" placeholder="type here...">`);
+}
+
+function renderMatch(containerId, pairs){
+  const el = document.getElementById(containerId+'-match');
+  const left = pairs.map((p,i)=>`<div class="m-item" id="${containerId}-L${i}" onclick="selectMatch('${containerId}','L',${i})">${p.base}</div>`).join('');
+  const right = shuffle([...pairs.map((p,i)=>({t:p.past,idx:i}))]).map((p,i)=>`<div class="m-item" id="${containerId}-R${p.idx}" onclick="selectMatch('${containerId}','R',${p.idx})">${p.t}</div>`).join('');
+  el.innerHTML = `<div class="col-left">${left}</div><div class="col-right">${right}</div>`;
+  el._sel = null;
+  el._matched = 0;
+}
+
+// ═══════════════════════════════════════════════════
+// MC LOGIC
+// ═══════════════════════════════════════════════════
+const mcState = {};
+
+function selectOpt(cid, qi, oi){
+  if(!mcState[cid]) mcState[cid]={};
+  if(mcState[cid][qi]!==undefined) return; // already checked individually
+  // deselect old
+  const opts = document.querySelectorAll(`#${cid}-opts${qi} .opt`);
+  opts.forEach(o=>o.classList.remove('sel'));
+  opts[oi].classList.add('sel');
+  if(!mcState[cid].sel) mcState[cid].sel={};
+  mcState[cid].sel[qi]=oi;
+}
+
+function checkMC(cid){
+  const data = getMCData(cid);
+  let correct=0, total=data.length;
+  data.forEach((d,i)=>{
+    const opts = document.querySelectorAll(`#${cid}-opts${i} .opt`);
+    const fb = document.getElementById(`${cid}-fb${i}`);
+    const sel = mcState[cid]?.sel?.[i];
+    opts.forEach(o=>o.style.pointerEvents='none');
+    if(sel===undefined){
+      fb.textContent=`⚠ Not answered. Correct: "${d.opts[d.ans]}"`;
+      fb.className='fb show err';
+    } else if(sel===d.ans){
+      opts[sel].classList.add('ok');
+      fb.textContent='✅ Correct!'; fb.className='fb show ok'; correct++;
+    } else {
+      opts[sel].classList.add('err');
+      opts[d.ans].classList.add('ok');
+      fb.textContent=`❌ Correct answer: "${d.opts[d.ans]}"${d.tip?' — '+d.tip:''}`; fb.className='fb show err';
+    }
+  });
+  addScore(correct,total);
+  document.getElementById(`${cid}-score`).textContent=`${correct}/${total}`;
+  showToast(correct,total);
+}
+
+function resetMC(cid){
+  const data = getMCData(cid);
+  mcState[cid]={};
+  data.forEach((_,i)=>{
+    const opts = document.querySelectorAll(`#${cid}-opts${i} .opt`);
+    opts.forEach(o=>{o.className='opt';o.style.pointerEvents='';});
+    const fb = document.getElementById(`${cid}-fb${i}`);
+    if(fb) fb.className='fb';
+  });
+  document.getElementById(`${cid}-score`).textContent='';
+}
+
+function getMCData(cid){
+  const map={f1:f1Data,a2:a2Data,ps3:ps3Data,psc1:psc1Data,mx1:mx1Data};
+  return map[cid]||[];
+}
+
+// ═══════════════════════════════════════════════════
+// FILL LOGIC
+// ═══════════════════════════════════════════════════
+function checkFill(cid){
+  const data = getFillData(cid);
+  let correct=0, total=data.length;
+  data.forEach((d,i)=>{
+    const inp = document.getElementById(`${cid}-in${i}`);
+    const fb = document.getElementById(`${cid}-fb${i}`);
+    if(!inp) return;
+    inp.readOnly=true;
+    const val = inp.value.trim().toLowerCase();
+    const ok = d.ans.some(a=>a.toLowerCase()===val);
+    if(ok){
+      inp.classList.add('ok'); fb.textContent='✅ Correct!'; fb.className='fb show ok'; correct++;
+    } else {
+      inp.classList.add('err'); fb.textContent=`❌ Answer: ${d.ans[0]}`; fb.className='fb show err';
+    }
+  });
+  addScore(correct,total);
+  document.getElementById(`${cid}-score`).textContent=`${correct}/${total}`;
+  showToast(correct,total);
+}
+
+function resetFill(cid){
+  const data = getFillData(cid);
+  data.forEach((_,i)=>{
+    const inp = document.getElementById(`${cid}-in${i}`);
+    const fb = document.getElementById(`${cid}-fb${i}`);
+    if(inp){inp.value='';inp.className='fill wide';inp.readOnly=false;}
+    if(fb) fb.className='fb';
+  });
+  document.getElementById(`${cid}-score`).textContent='';
+}
+
+function getFillData(cid){
+  const map={f2:f2Data,a1:a1Data,ps1:ps1Data,ps2:ps2Data,pc1:pc1Data,pc2:pc2Data,pt1:pt1Data,pt2:pt2Data,ir1:ir1Data};
+  return map[cid]||[];
+}
+
+// ═══════════════════════════════════════════════════
+// CLASSIFY (family gender)
+// ═══════════════════════════════════════════════════
+let f3Selected=null;
+const f3Placed={};
+
+function renderClassify(){
+  const bank=document.getElementById('f3-bank');
+  bank.innerHTML=f3Data.words.map(d=>`<div class="chip" id="f3c-${d.w}" onclick="selectChip('${d.w}')">${d.w}</div>`).join('');
+  ['male','female','both'].forEach(cat=>{
+    document.getElementById(`dz-${cat}`).innerHTML=`<h5>${cat==='male'?'🚹 Male only':cat==='female'?'🚺 Female only':'🚻 Male or Female'}</h5>`;
+  });
+}
+
+function selectChip(w){
+  document.querySelectorAll('#f3-bank .chip').forEach(c=>c.style.border='2px solid var(--light)');
+  if(f3Selected===w){f3Selected=null;return;}
+  f3Selected=w;
+  document.getElementById('f3c-'+w).style.border='2px solid var(--orange)';
+}
+
+['male','female','both'].forEach(cat=>{
+  window[`dropTo${cat}`]=function(){
+    if(!f3Selected) return;
+    const dz=document.getElementById(`dz-${cat}`);
+    const chip=document.getElementById('f3c-'+f3Selected);
+    chip.classList.add('used');
+    f3Placed[f3Selected]=cat;
+    const copy=document.createElement('div');
+    copy.className='chip';copy.textContent=f3Selected;
+    dz.appendChild(copy);
+    f3Selected=null;
+    document.querySelectorAll('#f3-bank .chip').forEach(c=>c.style.border='2px solid var(--light)');
+  }
+});
+
+// Wire drop zones
+document.addEventListener('DOMContentLoaded',()=>{
+  document.getElementById('dz-male').onclick=()=>dropToCategory('male');
+  document.getElementById('dz-female').onclick=()=>dropToCategory('female');
+  document.getElementById('dz-both').onclick=()=>dropToCategory('both');
+});
+
+function dropToCategory(cat){
+  if(!f3Selected) return;
+  const dz=document.getElementById(`dz-${cat}`);
+  const chip=document.getElementById('f3c-'+f3Selected);
+  chip.classList.add('used');
+  f3Placed[f3Selected]=cat;
+  const copy=document.createElement('span');
+  copy.className='chip';copy.style.cursor='default';copy.textContent=f3Selected;
+  dz.appendChild(copy);
+  f3Selected=null;
+  document.querySelectorAll('#f3-bank .chip').forEach(c=>c.style.border='2px solid var(--light)');
+}
+
+function checkClassify(){
+  let correct=0,total=f3Data.words.length;
+  f3Data.words.forEach(d=>{
+    const placed=f3Placed[d.w];
+    if(placed===d.cat) correct++;
+  });
+  addScore(correct,total);
+  document.getElementById('f3-score').textContent=`${correct}/${total}`;
+  showToast(correct,total);
+  // Visual highlight
+  f3Data.words.forEach(d=>{
+    const chips=document.querySelectorAll(`#dz-${f3Placed[d.w]} .chip, #dz-${f3Placed[d.w]} span`);
+    chips.forEach(c=>{if(c.textContent===d.w)c.style.borderColor=f3Placed[d.w]===d.cat?'var(--correct)':'var(--wrong)'});
+  });
+}
+
+function resetClassify(){
+  f3Selected=null;
+  Object.keys(f3Placed).forEach(k=>delete f3Placed[k]);
+  renderClassify();
+  document.getElementById('f3-score').textContent='';
+}
+
+// ═══════════════════════════════════════════════════
+// PRONUNCIATION SORT
+// ═══════════════════════════════════════════════════
+let pronSel=null;
+const pronPlaced={};
+
+function renderPron(){
+  const bank=document.getElementById('pt3-bank');
+  bank.innerHTML=pt3Words.map(d=>`<div class="chip" id="pw-${d.w}" onclick="selectPron('${d.w}')" style="cursor:pointer">${d.w}</div>`).join('');
+  ['t','d','id'].forEach(c=>{
+    const col=document.getElementById('pc-'+c);
+    // clear placed words but keep header
+    Array.from(col.querySelectorAll('.chip')).forEach(x=>x.remove());
+  });
+}
+
+function selectPron(w){
+  document.querySelectorAll('#pt3-bank .chip').forEach(c=>c.style.border='2px solid var(--light)');
+  if(pronSel===w){pronSel=null;return;}
+  pronSel=w;
+  document.getElementById('pw-'+w).style.border='2px solid var(--orange)';
+}
+
+function dropPron(cat){
+  if(!pronSel) return;
+  const chip=document.getElementById('pw-'+pronSel);
+  chip.classList.add('used');
+  pronPlaced[pronSel]=cat;
+  const col=document.getElementById('pc-'+cat);
+  const copy=document.createElement('div');
+  copy.className='chip';copy.style.cssText='cursor:default;margin:3px auto;display:inline-block';copy.textContent=pronSel;
+  col.appendChild(copy);
+  pronSel=null;
+  document.querySelectorAll('#pt3-bank .chip').forEach(c=>c.style.border='2px solid var(--light)');
+}
+
+function checkPron(){
+  let correct=0,total=pt3Words.length;
+  pt3Words.forEach(d=>{
+    if(pronPlaced[d.w]===d.cat) correct++;
+  });
+  addScore(correct,total);
+  document.getElementById('pt3-score').textContent=`${correct}/${total}`;
+  showToast(correct,total);
+}
+
+function resetPron(){
+  pronSel=null;
+  Object.keys(pronPlaced).forEach(k=>delete pronPlaced[k]);
+  renderPron();
+  document.getElementById('pt3-score').textContent='';
+}
+
+// ═══════════════════════════════════════════════════
+// MATCHING LOGIC
+// ═══════════════════════════════════════════════════
+const matchState={};
+
+function selectMatch(cid,side,idx){
+  if(!matchState[cid]) matchState[cid]={sel:null,matched:new Set(),correct:0};
+  const st=matchState[cid];
+  const el=document.getElementById(`${cid}-${side}${idx}`);
+  if(el.classList.contains('matched')) return;
+  if(st.sel===null){
+    // first click — must be left side
+    if(side!=='L') return;
+    st.sel={side,idx};
+    el.classList.add('sel');
+  } else {
+    if(side==='L'){
+      // reselect left
+      document.getElementById(`${cid}-L${st.sel.idx}`).classList.remove('sel');
+      st.sel={side,idx};
+      el.classList.add('sel');
+      return;
+    }
+    // second click right — check
+    const lIdx=st.sel.idx;
+    const leftEl=document.getElementById(`${cid}-L${lIdx}`);
+    leftEl.classList.remove('sel');
+    if(lIdx===idx){
+      // correct!
+      leftEl.classList.add('matched');
+      el.classList.add('matched');
+      st.matched.add(lIdx);
+      st.correct++;
+      if(st.matched.size===ir2Pairs.length){
+        addScore(st.correct,ir2Pairs.length);
+        document.getElementById(`${cid}-score`).textContent=`${st.correct}/${ir2Pairs.length}`;
+        showToast(st.correct,ir2Pairs.length);
+      }
+    } else {
+      leftEl.classList.add('bad'); el.classList.add('bad');
+      setTimeout(()=>{leftEl.classList.remove('bad');el.classList.remove('bad');},400);
+    }
+    st.sel=null;
+  }
+}
+
+function resetMatch(cid){
+  matchState[cid]={sel:null,matched:new Set(),correct:0};
+  renderMatch(cid,ir2Pairs);
+  document.getElementById(`${cid}-score`).textContent='';
+}
+
+// ═══════════════════════════════════════════════════
+// STORY EXERCISE
+// ═══════════════════════════════════════════════════
+function renderStory(){
+  const el=document.getElementById('mx2-story');
+  let html=storyTemplate;
+  storyVerbs.forEach((v,i)=>{
+    html=html.replace(`[${v.v}]`,`<input class="fill" id="sv-${i}" placeholder="${v.v}" style="width:140px">`);
+  });
+  el.innerHTML=html;
+}
+
+function checkStory(){
+  let correct=0,total=storyVerbs.length;
+  storyVerbs.forEach((d,i)=>{
+    const inp=document.getElementById(`sv-${i}`);
+    if(!inp) return;
+    inp.readOnly=true;
+    const val=inp.value.trim().toLowerCase();
+    const ok=d.ans.some(a=>a.toLowerCase()===val);
+    if(ok){inp.classList.add('ok');correct++;}
+    else{inp.classList.add('err');inp.title=`Answer: ${d.ans[0]}`;}
+  });
+  addScore(correct,total);
+  document.getElementById('mx2-score').textContent=`${correct}/${total}`;
+  showToast(correct,total);
+}
+
+function resetStory(){
+  storyVerbs.forEach((_,i)=>{
+    const inp=document.getElementById(`sv-${i}`);
+    if(inp){inp.value='';inp.className='fill';inp.readOnly=false;inp.title='';}
+  });
+  document.getElementById('mx2-score').textContent='';
+}
+
+// ═══════════════════════════════════════════════════
+// SCORE & TOAST
+// ═══════════════════════════════════════════════════
+function addScore(c,t){
+  totalCorrect+=c; totalQ+=t;
+  totalScore+=c*10;
+  document.getElementById('totalScore').textContent=totalScore;
+  document.getElementById('totalCorrect').textContent=`${totalCorrect}/${totalQ}`;
+}
+
+function showToast(c,t){
+  const pct=Math.round(c/t*100);
+  const ico=pct===100?'🏆':pct>=70?'👍':pct>=50?'😊':'💪';
+  const msg=pct===100?'Perfect!':pct>=70?'Great job!':pct>=50?'Not bad!':'Keep practicing!';
+  const sub=`${c}/${t} correct — ${pct}%`;
+  const toast=document.getElementById('toast');
+  document.getElementById('toast-ico').textContent=ico;
+  document.getElementById('toast-msg').textContent=msg;
+  document.getElementById('toast-sub').textContent=sub;
+  toast.classList.add('show');
+  setTimeout(()=>toast.classList.remove('show'),2800);
+}
+
+function calcFinal(){
+  if(totalQ===0){alert('Complete some exercises first!');return;}
+  const pct=Math.round(totalCorrect/totalQ*100);
+  document.getElementById('finalPct').textContent=pct+'%';
+  const msgs=['Keep studying — you can do it! 💪','You\'re getting there! 📚','Good progress! 👍','Very good! Keep it up! ⭐','Excellent! Almost perfect! 🌟','PERFECT SCORE! Exam ready! 🏆'];
+  const mi=pct<40?0:pct<55?1:pct<70?2:pct<80?3:pct<100?4:5;
+  document.getElementById('finalMsg').textContent=msgs[mi];
+}
+
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+function showSection(id){
+  document.querySelectorAll('.section-page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  // Render all MC
+  renderMC('f1',f1Data);
+  renderMC('a2',a2Data);
+  renderMC('ps3',ps3Data);
+  renderMC('psc1',psc1Data);
+  renderMC('mx1',mx1Data);
+
+  // Render all fill
+  renderFill('f2',f2Data);
+  renderFill('a1',a1Data);
+  renderFill('ps1',ps1Data);
+  renderFill('ps2',ps2Data);
+  renderFill('pc1',pc1Data);
+  renderFill('pc2',pc2Data);
+  renderFill('pt1',pt1Data);
+  renderFill('pt2',pt2Data);
+  renderFill('ir1',ir1Data);
+
+  // Render classify
+  renderClassify();
+
+  // Render match
+  renderMatch('ir2',ir2Pairs);
+
+  // Render pron
+  renderPron();
+
+  // Render story
+  renderStory();
+});
+</script>
+</body>
+</html>

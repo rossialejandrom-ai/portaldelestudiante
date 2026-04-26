@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inglés — Práctica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--sur:#161b22;--sur2:#1c2330;--brd:#2d333b;--ac:#3b82f6;--gr:#3fb950;--rd:#f85149;--yw:#e3b341;--tx:#e6edf3;--mu:#8b949e;--R:12px}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;max-width:620px;margin:0 auto;min-height:100vh}
+.hdr{background:linear-gradient(155deg,#0d0b1e,#0d1117 55%);border-bottom:1px solid var(--brd);padding:16px 20px 12px}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hdr-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
+.hdr-sub{font-size:11px;color:var(--mu)}
+.hearts{display:flex;gap:3px;font-size:20px;line-height:1}
+.xp-row{display:flex;align-items:center;gap:8px}
+.xp-bar-wrap{flex:1;background:var(--brd);border-radius:99px;height:6px}
+.xp-bar{background:linear-gradient(90deg,#3b82f6,#7c3aed);height:100%;border-radius:99px;transition:width .4s}
+.xp-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:#60a5fa;min-width:44px;text-align:right}
+.prog-bar{height:3px;background:var(--brd)}
+.prog-fill{height:100%;background:var(--ac);transition:width .3s}
+.ex-wrap{padding:18px 16px}
+.ex-badge{display:inline-block;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);color:#a371f7;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:10px}
+.ex-topic{font-size:11px;color:var(--mu);margin-bottom:8px;font-weight:600}
+.ex-q{font-size:16px;font-weight:600;line-height:1.55;margin-bottom:16px}
+/* MC */
+.mc-opts{display:flex;flex-direction:column;gap:8px}
+.mc-opt{width:100%;text-align:left;background:var(--sur);border:1.5px solid var(--brd);border-radius:10px;padding:12px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .15s}
+.mc-opt:hover:not(:disabled){border-color:#7c3aed;background:rgba(124,58,237,.05)}
+.mc-opt .ltr{font-family:'Syne',sans-serif;font-weight:700;font-size:11px;color:var(--mu);min-width:18px}
+.mc-opt.ok{border-color:var(--gr);background:rgba(63,185,80,.08);color:#7ee787}.mc-opt.ok .ltr{color:#7ee787}
+.mc-opt.no{border-color:var(--rd);background:rgba(248,81,73,.06);color:#fc8181}.mc-opt.no .ltr{color:#fc8181}
+.mc-opt:disabled{cursor:default}
+/* FILL */
+.fill-input{width:100%;background:var(--sur);border:1.5px solid var(--brd);border-radius:10px;padding:13px 14px;color:var(--tx);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .2s}
+.fill-input:focus{border-color:var(--ac)}
+.fill-input.ok{border-color:var(--gr);color:#7ee787}
+.fill-input.no{border-color:var(--rd);color:#fc8181}
+/* BUILD */
+.build-label{font-size:12px;color:var(--mu);margin-bottom:6px}
+.build-zone{min-height:50px;background:var(--sur2);border:1.5px dashed var(--brd);border-radius:10px;padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;cursor:default}
+.word-chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--sur);border:1px solid var(--brd);border-radius:8px;padding:7px 12px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;user-select:none}
+.chip:hover:not(.used){border-color:var(--ac);background:var(--sur2)}
+.chip.used{opacity:.25;pointer-events:none}
+.chip.in-zone{background:rgba(59,130,246,.1);border-color:var(--ac);color:#60a5fa;cursor:pointer}
+/* FEEDBACK */
+.fbk{display:none;border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6;margin-top:12px}
+.fbk.ok{background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.25);color:#7ee787}
+.fbk.no{background:rgba(248,81,73,.06);border:1px solid rgba(248,81,73,.2);color:#fc8181}
+.fbk.show{display:block}
+.fbk b{color:inherit}
+.submit-row{display:flex;gap:8px;margin-top:14px}
+.btn-check{flex:1;background:var(--ac);color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+.btn-next{flex:1;background:var(--gr);color:#fff;border:none;border-radius:10px;padding:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:none}
+/* GAME OVER */
+#viewDead{display:none;padding:48px 24px;text-align:center}
+.dead-icon{font-size:64px;margin-bottom:16px}
+.dead-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--rd);margin-bottom:8px}
+.dead-sub{color:var(--mu);font-size:14px;margin-bottom:28px;line-height:1.6}
+/* RESULT */
+#viewResult{display:none;padding:32px 20px;text-align:center}
+.res-icon{font-size:60px;margin-bottom:12px}
+.res-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px}
+.res-xp{font-family:'Syne',sans-serif;font-size:40px;font-weight:800;color:#60a5fa;margin:16px 0 6px}
+.res-xp-label{color:var(--mu);font-size:13px;margin-bottom:6px}
+.res-detail{color:var(--mu);font-size:13px;margin-bottom:28px}
+.btn-restart{background:var(--ac);color:#fff;border:none;border-radius:10px;padding:14px 36px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+</style></head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div>
+      <div class="hdr-title">🇬🇧 Práctica Duolingo</div>
+      <div class="hdr-sub">Inglés B1 · Examen Jue 29/04</div>
+    </div>
+    <div class="hearts" id="heartsEl">❤️❤️❤️</div>
+  </div>
+  <div class="xp-row">
+    <div class="xp-bar-wrap"><div class="xp-bar" id="xpBar" style="width:0%"></div></div>
+    <div class="xp-label" id="xpLabel">0 XP</div>
+  </div>
+</div>
+<div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+
+<div id="viewEx">
+  <div class="ex-wrap">
+    <div class="ex-badge" id="typeBadge"></div>
+    <div class="ex-topic" id="exTopic"></div>
+    <div class="ex-q" id="exQ"></div>
+    <div id="exBody"></div>
+    <div class="fbk" id="fbk"></div>
+    <div class="submit-row">
+      <button class="btn-check" id="btnCheck">Comprobar</button>
+      <button class="btn-next" id="btnNext">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<div id="viewDead">
+  <div class="dead-icon">💔</div>
+  <div class="dead-title">¡Sin vidas!</div>
+  <div class="dead-sub">Se te acabaron los corazones.<br>¡Repasá las tarjetas y volvé a intentarlo!</div>
+  <button class="btn-restart" onclick="init()">↺ Volver a intentar</button>
+</div>
+
+<div id="viewResult">
+  <div class="res-icon" id="resIcon"></div>
+  <div class="res-title" id="resTitle"></div>
+  <div class="res-xp" id="resXp"></div>
+  <div class="res-xp-label">XP ganados</div>
+  <div class="res-detail" id="resDetail"></div>
+  <button class="btn-restart" onclick="init()">↺ Practicar de nuevo</button>
+</div>
+
+<script>
+var EX=[
+  // ── MULTIPLE CHOICE (12) ──
+  {t:'mc',topic:'Present Simple',q:'My sister ___ in a hospital.',opts:['work','works','is working','worked'],cor:1,exp:'He/She/It → verbo + <b>s</b>. La respuesta es <b>works</b>.'},
+  {t:'mc',topic:'Present Simple',q:'___ you like coffee?',opts:['Do','Does','Are','Is'],cor:0,exp:'Con I/You/We/They usamos <b>Do</b>.'},
+  {t:'mc',topic:'Present Continuous',q:'Look! It ___ outside.',opts:['rain','rains','is raining','rained'],cor:2,exp:'Acción que ocurre ahora → Present Continuous: <b>is raining</b>.'},
+  {t:'mc',topic:'Adverbs of Frequency',q:'"Siempre" en inglés es:',opts:['never','sometimes','always','usually'],cor:2,exp:'Siempre = <b>always</b> (100%).'},
+  {t:'mc',topic:'Past Simple',q:'She ___ to the cinema yesterday.',opts:['go','goes','is going','went'],cor:3,exp:'Past Simple de <b>go → went</b> (irregular).'},
+  {t:'mc',topic:'Past Simple',q:'He ___ his homework last night. (negativa)',opts:["doesn't do","didn't do","wasn't do","not did"],cor:1,exp:'Negativa Past Simple: <b>didn\'t + verbo base</b>.'},
+  {t:'mc',topic:'Past Continuous',q:'They ___ TV when I arrived.',opts:['watch','watches','were watching','watched'],cor:2,exp:'Acción en progreso interrumpida → Past Continuous: <b>were watching</b>.'},
+  {t:'mc',topic:'Used to',q:'I ___ love vegetables when I was a child.',opts:['use to','used to',"didn't used to","was using to"],cor:1,exp:'Hábito del pasado: <b>used to</b> + verbo base.'},
+  {t:'mc',topic:'Family Vocabulary',q:'The son of my sibling is my ___.',opts:['cousin','nephew','uncle','stepbrother'],cor:1,exp:'El hijo de tu hermano/a es tu <b>nephew</b> (sobrino).'},
+  {t:'mc',topic:'Family Vocabulary',q:'"Padrastro" en inglés es:',opts:['father-in-law','grand-father','stepfather','half-father'],cor:2,exp:'<b>stepfather</b> = padrastro. father-in-law = suegro.'},
+  {t:'mc',topic:'Past Continuous',q:'___ she sleeping when you called?',opts:['Did','Was','Were','Is'],cor:1,exp:'She → <b>Was</b> she sleeping? (Past Continuous con I/he/she/it)'},
+  {t:'mc',topic:'Adjectives',q:'She is a ___ student. (inteligente)',opts:['intelligence','clever','cleverly','clevers'],cor:1,exp:'<b>clever</b> = inteligente. Los adjetivos van antes del sustantivo y no cambian.'},
+  // ── FILL IN THE BLANK (8) ──
+  {t:'fill',topic:'Present Simple',q:'Completá: "She ___ (not / like) spicy food."',ans:"doesn't like",exp:'He/She/It negativa: <b>doesn\'t like</b>. Verbo vuelve a forma base.'},
+  {t:'fill',topic:'Past Simple Irregular',q:'Escribí el Past Simple de "go".',ans:'went',exp:'<b>go → went</b>. Verbo irregular.'},
+  {t:'fill',topic:'Past Simple Irregular',q:'Escribí el Past Simple de "see".',ans:'saw',exp:'<b>see → saw</b>. Verbo irregular.'},
+  {t:'fill',topic:'Past Simple Irregular',q:'Escribí el Past Simple de "make".',ans:'made',exp:'<b>make → made</b>. Verbo irregular.'},
+  {t:'fill',topic:'Past Continuous',q:'Completá: "I ___ (read) when the phone rang."',ans:'was reading',exp:'Past Continuous: <b>was + -ing</b>. Acción interrumpida.'},
+  {t:'fill',topic:'Adverbs of Frequency',q:'Traducí "a veces" al inglés.',ans:'sometimes',exp:'A veces = <b>sometimes</b> (~40%).'},
+  {t:'fill',topic:'Used to',q:'Completá: "I ___ ___ play football." (solía)',ans:'used to',exp:'Hábito del pasado: <b>used to</b> + verbo base.'},
+  {t:'fill',topic:'Family Vocabulary',q:'La hija de tu hermano/a es tu ___ (en inglés).',ans:'niece',exp:'<b>niece</b> = sobrina. nephew = sobrino.'},
+  // ── SENTENCE BUILDER (5) ──
+  {t:'build',topic:'Present Simple',q:'Armá: "Ella siempre come desayuno."',words:['She','always','eats','breakfast','never','lunch'],ans:'She always eats breakfast',exp:'Adverb of frequency <b>always</b> va antes del verbo principal.'},
+  {t:'build',topic:'Present Continuous',q:'Armá: "Ellos están jugando al fútbol ahora."',words:['They','are','playing','football','now','is','were'],ans:'They are playing football now',exp:'Present Continuous: <b>are playing</b> (sujeto They).'},
+  {t:'build',topic:'Past Simple',q:'Armá: "¿Fue ella al cine ayer?"',words:['Did','she','go','to','the','cinema','yesterday','went'],ans:'Did she go to the cinema yesterday',exp:'Pregunta Past Simple: <b>Did + sujeto + verbo base</b>.'},
+  {t:'build',topic:'Past Continuous',q:'Armá: "Él estaba estudiando cuando llegué."',words:['He','was','studying','when','I','arrived','were','study'],ans:'He was studying when I arrived',exp:'Past Continuous interrumpido: <b>was studying when</b> + Past Simple.'},
+  {t:'build',topic:'Used to',q:'Armá: "Ella solía vivir en Buenos Aires."',words:['She','used','to','live','in','Buenos','Aires','use'],ans:'She used to live in Buenos Aires',exp:'<b>used to + verbo base</b>: she used to live.'},
+];
+
+var lives=3,xp=0,idx=0,answered=false,order=[];
+var zoneWords=[];
+
+function init(){
+  lives=3;xp=0;idx=0;answered=false;
+  order=shuffle(EX.slice());
+  show('viewEx');updateHUD();renderEx();
+}
+
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function show(id){['viewEx','viewDead','viewResult'].forEach(function(s){document.getElementById(s).style.display=s===id?'':'none';});}
+
+function updateHUD(){
+  var h='';for(var i=0;i<3;i++)h+=i<lives?'❤️':'🖤';
+  document.getElementById('heartsEl').textContent=h;
+  var maxXP=EX.length*10;
+  document.getElementById('xpBar').style.width=Math.min(xp/maxXP*100,100)+'%';
+  document.getElementById('xpLabel').textContent=xp+' XP';
+  document.getElementById('progFill').style.width=(idx/EX.length*100)+'%';
+}
+
+function renderEx(){
+  if(idx>=order.length){showResult();return;}
+  var e=order[idx];answered=false;
+  var badges={mc:'Opción Múltiple',fill:'Completar',build:'Armar oración'};
+  document.getElementById('typeBadge').textContent=badges[e.t]||e.t;
+  document.getElementById('exTopic').textContent='📖 '+e.topic;
+  document.getElementById('exQ').innerHTML=e.q;
+  document.getElementById('fbk').className='fbk';
+  document.getElementById('fbk').innerHTML='';
+  document.getElementById('btnCheck').style.display='';
+  document.getElementById('btnNext').style.display='none';
+  var body=document.getElementById('exBody');body.innerHTML='';
+
+  if(e.t==='mc'){
+    var div=document.createElement('div');div.className='mc-opts';
+    ['A','B','C','D'].forEach(function(l,i){
+      var b=document.createElement('button');b.className='mc-opt';b.setAttribute('data-i',i);
+      b.innerHTML='<span class="ltr">'+l+'</span><span>'+e.opts[i]+'</span>';
+      b.onclick=function(){if(!answered)doMC(this,e);};
+      div.appendChild(b);
+    });
+    body.appendChild(div);
+    document.getElementById('btnCheck').style.display='none';
+  }
+
+  if(e.t==='fill'){
+    var inp=document.createElement('input');
+    inp.className='fill-input';inp.type='text';inp.placeholder='Escribí tu respuesta...';inp.autocomplete='off';
+    inp.onkeydown=function(ev){if(ev.key==='Enter'&&!answered)doFill(e);};
+    body.appendChild(inp);setTimeout(function(){inp.focus();},50);
+    document.getElementById('btnCheck').onclick=function(){if(!answered)doFill(e);};
+  }
+
+  if(e.t==='build'){
+    zoneWords=[];
+    var srcWords=shuffle(e.words.slice());
+    body.innerHTML='<div class="build-label">Tu oración:</div><div class="build-zone" id="zone"></div><div class="word-chips" id="chips"></div>';
+    renderChips(srcWords);
+    document.getElementById('btnCheck').onclick=function(){if(!answered)doBuild(e);};
+  }
+}
+
+function renderChips(src){
+  var zone=document.getElementById('zone');
+  var chips=document.getElementById('chips');
+  if(!chips)return;
+  chips.innerHTML='';
+  src.forEach(function(w,i){
+    var used=zoneWords.some(function(z){return z.i===i;});
+    var c=document.createElement('span');
+    c.className='chip'+(used?' used':'');c.textContent=w;
+    c.onclick=function(){
+      if(answered||used)return;
+      zoneWords.push({w:w,i:i});
+      var zc=document.createElement('span');zc.className='chip in-zone';zc.textContent=w;zc.setAttribute('data-zi',zoneWords.length-1);
+      zc.onclick=function(){
+        if(answered)return;
+        var zi=parseInt(this.getAttribute('data-zi'));
+        zoneWords.splice(zi,1);
+        this.remove();
+        document.querySelectorAll('#chips .chip').forEach(function(ch,ci){ch.className='chip';});
+        renderChips(src);
+      };
+      zone.appendChild(zc);
+      renderChips(src);
+    };
+    chips.appendChild(c);
+  });
+}
+
+function doMC(btn,e){
+  answered=true;
+  var i=parseInt(btn.getAttribute('data-i'));
+  var ok=(i===e.cor);
+  document.querySelectorAll('.mc-opt').forEach(function(b,j){
+    b.disabled=true;
+    if(j===e.cor)b.classList.add('ok');
+    else if(j===i)b.classList.add('no');
+  });
+  finishQ(ok,e,ok?null:e.opts[e.cor]);
+}
+
+function doFill(e){
+  answered=true;
+  var inp=document.querySelector('.fill-input');
+  var val=inp.value.trim().toLowerCase().replace(/'/g,"'");
+  var ans=e.ans.toLowerCase();
+  var ok=(val===ans);
+  inp.classList.add(ok?'ok':'no');inp.disabled=true;
+  finishQ(ok,e,ok?null:e.ans);
+}
+
+function doBuild(e){
+  answered=true;
+  var built=zoneWords.map(function(z){return z.w;}).join(' ');
+  var ok=built.toLowerCase()===e.ans.toLowerCase();
+  document.querySelectorAll('#zone .chip').forEach(function(c){
+    c.style.background=ok?'rgba(63,185,80,.15)':'rgba(248,81,73,.1)';
+    c.style.borderColor=ok?'var(--gr)':'var(--rd)';
+    c.style.color=ok?'#7ee787':'#fc8181';
+  });
+  finishQ(ok,e,ok?null:e.ans);
+}
+
+function finishQ(ok,e,correct){
+  var fbk=document.getElementById('fbk');
+  fbk.className='fbk '+(ok?'ok':'no')+' show';
+  fbk.innerHTML=(ok?'✓ ¡Correcto! ':'✗ Incorrecto. ')+(correct?'Respuesta: <b>'+correct+'</b>. ':'')+e.exp;
+  if(ok){xp+=10;}else{lives=Math.max(0,lives-1);}
+  updateHUD();
+  document.getElementById('btnCheck').style.display='none';
+  document.getElementById('btnNext').style.display='block';
+  document.getElementById('btnNext').onclick=function(){
+    idx++;
+    if(lives===0){show('viewDead');}else{renderEx();}
+  };
+}
+
+function showResult(){
+  show('viewResult');
+  var pct=xp/(EX.length*10);
+  var emoji,title;
+  if(pct>=0.85){emoji='🏆';title='¡Excelente! ¡Lo dominás todo!';}
+  else if(pct>=0.65){emoji='💪';title='¡Muy bien! ¡Seguí así!';}
+  else if(pct>=0.4){emoji='📚';title='Bien, pero repasá un poco más.';}
+  else{emoji='📖';title='Repasá las tarjetas y volvé.';}
+  document.getElementById('resIcon').textContent=emoji;
+  document.getElementById('resTitle').textContent=title;
+  document.getElementById('resXp').textContent=xp;
+  document.getElementById('resDetail').textContent='Completaste '+EX.length+' ejercicios con '+lives+' vida'+(lives===1?'':'s')+' restante'+(lives===1?'':'s')+'.';
+}
+
+init();
+</script>
+</body></html>
