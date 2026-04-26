@@ -583,10 +583,7 @@ async function handleIn(txt){
     if(correction) showFeedback(correction);
     else hideFeedback();
 
-    const correctionSpeech = correction
-      ? ' The correct form is: ' + correction.right + '.'
-      : '';
-    say((reply || raw) + correctionSpeech);
+    say(reply || raw);
   }catch(e){
     let msg = 'Connection error — try again!';
     if(e.message.includes('429')) msg = 'Too busy right now. Try in a moment!';
