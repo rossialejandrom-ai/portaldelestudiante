@@ -153,12 +153,17 @@ html, body { width:100%; height:100%; background:#000; overflow:hidden; font-fam
 
 /* Current topic label — left of PTT */
 #topic-label {
-  position:fixed; bottom:34px; right:calc(50% + 42px);
+  position:fixed; bottom:32px; right:calc(50% + 42px);
   font-family:'Press Start 2P', monospace;
-  font-size:8px; color:#555; letter-spacing:1px;
-  text-transform:uppercase; pointer-events:none;
-  z-index:50; max-width:130px; text-align:right;
+  font-size:10px; color:#00d4ff;
+  text-shadow:0 0 6px rgba(0,212,255,.4);
+  letter-spacing:1px; text-transform:uppercase;
+  pointer-events:none; z-index:50;
+  max-width:140px; text-align:right;
   line-height:1.4;
+  background:rgba(10,10,20,.85);
+  padding:6px 10px; border-radius:8px;
+  border:1px solid rgba(0,212,255,.3);
 }
 
 /* feedback — corrección gramatical visible */
@@ -233,7 +238,7 @@ html, body { width:100%; height:100%; background:#000; overflow:hidden; font-fam
 <div class="bubble" id="bubble"></div>
 
 <!-- PTT Button -->
-<div id="topic-label"></div>
+<div id="topic-label">Exam Prep</div>
 <button id="ptt-btn" title="Hold to speak">🎤</button>
 <button id="repeat-btn" onclick="repeatLast()" title="Show what Buddy said">💬</button>
 
