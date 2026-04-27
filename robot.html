@@ -308,10 +308,10 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 // FEEDBACK FORMAT: if Gael makes a grammar error, reply normally then add:
 // [CORRECTION: what he said → correct form]
 // Example: "Oh cool! [CORRECTION: I go yesterday → I went yesterday]"
-const FB_RULE = ` GRAMMAR CORRECTION RULES (very lenient):
-ONLY correct Gael when his sentence is MORE THAN 95% wrong — meaning it is extremely different from what it should be (broken grammar, wrong tense entirely, completely incorrect structure). If even half of it is OK, do NOT correct.
-NEVER correct: punctuation, capitalization, proper nouns (especially "Buddy"), small word order issues, missing articles, single-letter typos, anything where the meaning is clear.
-Reply OK in 95%+ of cases. Only flag truly broken English.
+const FB_RULE = ` GRAMMAR CORRECTION RULES (balanced — correct clear errors):
+DO correct any clear grammar error: wrong verb tense (e.g., "I go yesterday" instead of "I went"), subject-verb disagreement (e.g., "She have"), wrong auxiliary (do/does/did/have/has), wrong irregular verb form (e.g., "I goed" → "I went"), wrong word order, age expressed with "have" instead of "be" (e.g., "I have 15 years"), missing third person -s ("She play"), confusing tenses ("I am knowing" → "I know"), wrong preposition that breaks meaning, or clearly wrong vocabulary.
+DO NOT correct: punctuation, capitalization, proper nouns (especially "Buddy"), missing articles when meaning is clear, single typos, or sentences where the grammar is correct even if not the most natural.
+Be helpful — Gael is preparing for an exam, so correct real grammar mistakes that would lose points, but ignore tiny stuff that doesn't matter.
 
 CONVERSATION RULE (mandatory): Your reply MUST always end with a question. Never give a closing statement without a question — Gael needs the question to keep talking. If you have no obvious follow-up, ask a fresh question on a different exam topic.
 
