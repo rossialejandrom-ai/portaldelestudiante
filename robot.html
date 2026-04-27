@@ -125,6 +125,20 @@ html, body { width:100%; height:100%; background:#000; overflow:hidden; font-fam
 .tp-pill:hover { border-color:#444; color:#666; }
 .tp-pill.active { border-color:#00d4ff; color:#000; background:#00d4ff; }
 
+/* ── PTT BUTTON ── */
+#ptt-btn {
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+  width:52px; height:52px; border-radius:50%;
+  background:#0a0a14; border:2px solid #1a1a2e;
+  font-size:20px; line-height:1; cursor:pointer;
+  z-index:50; transition:border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  display:flex; align-items:center; justify-content:center;
+  -webkit-tap-highlight-color:transparent; user-select:none;
+}
+#ptt-btn:active,
+#ptt-btn.recording { border-color:#ff6b9d; background:#150010; box-shadow:0 0 16px #ff6b9d66; }
+#ptt-btn.disabled  { opacity:0.25; pointer-events:none; }
+
 /* feedback — corrección gramatical visible */
 #feedback {
   position:fixed; bottom:0; left:0; right:0;
@@ -195,6 +209,9 @@ html, body { width:100%; height:100%; background:#000; overflow:hidden; font-fam
 <button class="key-btn" onclick="showSetup()">key</button>
 <div class="hint" id="hint"></div>
 <div class="bubble" id="bubble"></div>
+
+<!-- PTT Button -->
+<button id="ptt-btn" title="Hold to speak">🎤</button>
 
 <!-- Feedback strip -->
 <div id="feedback"></div>
@@ -450,7 +467,7 @@ function startListening(){
       handleIn(txt);
     } else {
       setExpr('happy');setDot('');setHint('');
-      setTimeout(startListening,500);
+      pttReset();
     }
   };
 
@@ -458,27 +475,22 @@ function startListening(){
     listeningActive=false;
     if(listenTimeoutTmr){ clearTimeout(listenTimeoutTmr); listenTimeoutTmr=null; }
     setExpr('happy');setDot('');setHint('');
-    setTimeout(startListening,500);
+    pttReset();
   };
 
   recog.onerror=(e)=>{
     listeningActive=false;
     if(listenTimeoutTmr){ clearTimeout(listenTimeoutTmr); listenTimeoutTmr=null; }
-    if(e.error==='not-allowed'){
-      setHint('allow mic in browser!');
-      setDot('');
-      return; // no reintentar
-    }
-    // network, aborted, no-speech → reintentar
-    if(!spk&&!isSetup&&!asleep) setTimeout(startListening,1000);
+    if(e.error==='not-allowed'){ setHint('allow mic in browser!'); setDot(''); }
+    else { setExpr('happy');setDot('');setHint(''); }
+    pttReset();
   };
 
   recog.onend=()=>{
     listeningActive=false;
     if(listenTimeoutTmr){ clearTimeout(listenTimeoutTmr); listenTimeoutTmr=null; }
-    setExpr('happy'); setDot(''); setHint('');
-    // Auto-restart si no está hablando ni en setup ni dormido
-    if(!spk&&!isSetup&&!asleep) setTimeout(startListening,300);
+    if(!spk){ setExpr('happy'); setDot(''); setHint(''); }
+    pttReset();
   };
 
   try{recog.start();}catch(e){listeningActive=false;}
@@ -596,14 +608,15 @@ async function handleIn(txt){
     if(e.message.includes('429')) msg = 'Too busy right now. Try in a moment!';
     if(e.message.includes('401')||e.message.includes('403')) msg = 'API key problem. Tap KEY.';
     showBubble(msg); hist.pop();
+    spk=false;
     setExpr('happy'); setDot(''); setHint('');
-    setTimeout(startListening, 3000);
+    pttEnable();
   }
 }
 
 // ── TTS ──
 function say(txt){
-  if(!window.speechSynthesis){setExpr('happy');setTimeout(startListening,600);return;}
+  if(!window.speechSynthesis){setExpr('happy');pttEnable();return;}
   if(speechSynthesis.speaking)speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(txt);
   u.lang='en-US';u.rate=0.9;u.pitch=1.1;
@@ -616,9 +629,9 @@ function say(txt){
   u.onend=()=>{
     spk=false;stopMouth();setExpr('happy');setDot('');setHint('');
     lastMotion=Date.now();
-    setTimeout(startListening,800);
+    pttEnable();
   };
-  u.onerror=()=>{spk=false;stopMouth();setExpr('happy');setDot('');setTimeout(startListening,2500);};
+  u.onerror=()=>{spk=false;stopMouth();setExpr('happy');setDot('');pttEnable();};
   spk=true;
   speechSynthesis.speak(u);
 }
@@ -733,7 +746,6 @@ function openPanel(){
 }
 function closePanel(){
   document.getElementById('topic-panel').classList.remove('open');
-  if(!spk && !isSetup && !asleep) setTimeout(startListening, 400);
 }
 
 let feedbackTmr = null;
@@ -754,18 +766,39 @@ function hideFeedback(){
   document.getElementById('feedback').classList.remove('show');
 }
 
-// ── TAP TO INTERRUPT ──
-document.addEventListener('click', ()=>{
+// ── PTT LOGIC ──
+const pttBtn = document.getElementById('ptt-btn');
+
+function pttEnable(){ pttBtn.classList.remove('disabled','recording'); }
+function pttReset(){ pttBtn.classList.remove('recording'); }
+
+function pttPress(){
   if(isSetup) return;
+  if(asleep){ wakeUp(); return; }
   if(spk){
+    // interrumpir a BUDDY
     speechSynthesis.cancel();
     spk=false; stopMouth(); setExpr('happy'); setDot(''); setHint('');
     hideFeedback();
-    setTimeout(startListening, 300);
-  } else if(asleep){
-    wakeUp();
   }
-});
+  pttBtn.classList.add('recording');
+  startListening();
+}
+
+function pttRelease(){
+  // si aún está escuchando sin haber captado nada, abortar limpio
+  if(listeningActive){
+    stopListening();
+    setExpr('happy'); setDot(''); setHint('');
+    pttReset();
+  }
+}
+
+pttBtn.addEventListener('mousedown',  e=>{ e.preventDefault(); pttPress(); });
+pttBtn.addEventListener('touchstart',  e=>{ e.preventDefault(); pttPress(); }, {passive:false});
+pttBtn.addEventListener('mouseup',    pttRelease);
+pttBtn.addEventListener('mouseleave', pttRelease);
+pttBtn.addEventListener('touchend',   pttRelease);
 
 // ── START ──
 setExpr('sleeping');
