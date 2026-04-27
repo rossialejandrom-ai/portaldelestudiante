@@ -310,6 +310,8 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 // Example: "Oh cool! [CORRECTION: I go yesterday → I went yesterday]"
 const FB_RULE = ` GRAMMAR CORRECTION RULES (balanced — correct clear errors):
 DO correct any clear grammar error: wrong verb tense (e.g., "I go yesterday" instead of "I went"), subject-verb disagreement (e.g., "She have"), wrong auxiliary (do/does/did/have/has), wrong irregular verb form (e.g., "I goed" → "I went"), wrong word order, age expressed with "have" instead of "be" (e.g., "I have 15 years"), missing third person -s ("She play"), confusing tenses ("I am knowing" → "I know"), wrong preposition that breaks meaning, or clearly wrong vocabulary.
+
+CRITICAL TENSE-MATCHING RULE: Gael MUST answer in the same tense as your question. If you asked in Past Simple, his answer MUST use Past Simple. If you asked in Present Continuous, his answer MUST use Present Continuous. If he answers in the wrong tense (e.g., you asked "What did you do yesterday?" and he says "I play football"), this is a CLEAR error and you MUST correct it. Show WRONG: [his sentence] >>> RIGHT: [same sentence in the correct tense] | RULE: answer must match the tense of the question (e.g., "past simple question → past simple answer").
 DO NOT correct: punctuation, capitalization, proper nouns (especially "Buddy"), missing articles when meaning is clear, single typos, or sentences where the grammar is correct even if not the most natural.
 Be helpful — Gael is preparing for an exam, so correct real grammar mistakes that would lose points, but ignore tiny stuff that doesn't matter.
 
