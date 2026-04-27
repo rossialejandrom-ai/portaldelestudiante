@@ -780,12 +780,8 @@ function pttPress(){
 }
 
 function pttRelease(){
-  // si aún está escuchando sin haber captado nada, abortar limpio
-  if(listeningActive){
-    stopListening();
-    setExpr('happy'); setDot(''); setHint('');
-    pttReset();
-  }
+  // no abortamos — dejamos que el reconocimiento termine y devuelva el resultado
+  pttBtn.classList.remove('recording');
 }
 
 pttBtn.addEventListener('mousedown',  e=>{ e.preventDefault(); pttPress(); });
