@@ -220,12 +220,17 @@ html, body { width:100%; height:100%; background:#000; overflow:hidden; font-fam
 <div id="topic-panel">
   <button class="tp-close" onclick="closePanel()">✕</button>
   <div class="tp-title">[ BUDDY TOPICS ]</div>
-  <div id="tp-active" style="font-size:clamp(0.26rem,1vw,0.36rem);color:#ffd700;margin-bottom:8px;text-align:center;min-height:1em;">Present Simple</div>
+  <div id="tp-active" style="font-size:clamp(0.26rem,1vw,0.36rem);color:#ffd700;margin-bottom:8px;text-align:center;min-height:1em;">⭐ Exam Prep · Units 1–2</div>
+
+  <div class="tp-section-label">▸ examen</div>
+  <div class="tp-grid" style="grid-template-columns:1fr">
+    <button class="tp-pill active" data-l="exam_prep" onclick="setLvl(this)" style="background:rgba(255,215,0,.08);border-color:#ffd700;color:#ffd700">⭐ Exam Prep · Units 1–2 (todos los temas)</button>
+  </div>
 
   <div class="tp-section-label">▸ tenses</div>
   <div class="tp-grid">
-    <button class="tp-pill active" data-l="present_simple"     onclick="setLvl(this)">Present<br>Simple</button>
-    <button class="tp-pill"        data-l="present_continuous" onclick="setLvl(this)">Present<br>Continuous</button>
+    <button class="tp-pill" data-l="present_simple"     onclick="setLvl(this)">Present<br>Simple</button>
+    <button class="tp-pill" data-l="present_continuous" onclick="setLvl(this)">Present<br>Continuous</button>
     <button class="tp-pill"        data-l="past_simple"        onclick="setLvl(this)">Past<br>Simple</button>
     <button class="tp-pill"        data-l="past_continuous"    onclick="setLvl(this)">Past<br>Continuous</button>
     <button class="tp-pill"        data-l="present_perfect"    onclick="setLvl(this)">Present<br>Perfect</button>
@@ -252,7 +257,7 @@ html, body { width:100%; height:100%; background:#000; overflow:hidden; font-fam
 <script>
 // ── STATE ──
 let apiKey       = localStorage.getItem('buddy_groq_key') || '';
-let levels       = ['present_simple']; // array — multi-topic support
+let levels       = ['exam_prep']; // array — multi-topic support
 let hist         = [];
 let spk          = false;
 let mouthTmr     = null;
@@ -289,6 +294,19 @@ Examples:
 NEVER skip Part 2. NEVER merge both parts. Always use ||| as separator.`;
 
 const PROMPTS = {
+  exam_prep:
+    'You are BUDDY, helping Gael prepare for his English exam (Units 1–2). You are a proactive tutor — ALWAYS end every reply with a question that makes him produce English. Cycle through these exam topics one at a time, mixing them naturally:\n' +
+    '1. Present Simple (habits, routines, He/She/It + s, do/does, don\'t/doesn\'t).\n' +
+    '2. Present Continuous (am/is/are + -ing, spelling: dance→dancing, run→running, stative verbs like know/love/want NEVER take -ing).\n' +
+    '3. Adverbs of frequency (always/usually/often/sometimes/rarely/never — BEFORE main verb, AFTER be).\n' +
+    '4. Adjectives (fast/strong/clever/athletic/sporty/flexible/curious/useful + opposites slow/weak/silly/short/old/difficult).\n' +
+    '5. Family vocabulary (parents, siblings, only child, nephew/niece, cousin, uncle/aunt, grandparents, stepfather/stepmother, half-brother, mother-in-law, close-knit family, immediate vs extended).\n' +
+    '6. Past Simple regular (verb + -ed, spelling: stop→stopped, study→studied, dance→danced; -ed pronunciation /t/, /d/, /ɪd/).\n' +
+    '7. Past Simple irregular (go→went, come→came, take→took, give→gave, see→saw, know→knew, think→thought, find→found, say→said, tell→told, write→wrote, read→read, make→made, get→got, have→had, be→was/were, buy→bought, bring→brought, feel→felt, leave→left, meet→met, run→ran, swim→swam, wear→wore, win→won).\n' +
+    '8. Past Continuous (was/were + -ing, interrupted actions with "when", parallel actions with "while").\n' +
+    '9. Used to (past habits no longer true: "I used to play..." / "She didn\'t use to like..." / "Did you use to...?" — NOT for present).\n' +
+    'Strategy: ask ONE concrete question per turn, in English, that forces Gael to use that exact structure. After 2–3 questions on a topic, switch to a different one. Keep the chat flowing — short questions, no long lectures.' + FB_RULE,
+
   present_simple:
     'You are BUDDY, a fun robot friend helping Gael practice Present Simple. Talk about habits, routines, facts, likes/dislikes. Use questions like "What do you usually do?", "Do you like...?", "How often do you...?". Keep the conversation natural.' + FB_RULE,
 
@@ -705,7 +723,7 @@ function init(){
   startBlink();
   speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
   initCamera();
-  setTimeout(()=>say("Hey Gael! I'm Buddy. Let's practice English!"),500);
+  setTimeout(()=>say("Hey Gael! Let's prep for your exam. First question: what do you usually do on weekends?"),500);
   scheduleIdleFace();
 }
 
