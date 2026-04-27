@@ -151,6 +151,16 @@ html, body { width:100%; height:100%; background:#000; overflow:hidden; font-fam
 }
 #repeat-btn:hover,#repeat-btn:active { border-color:#00d4ff; color:#00d4ff; }
 
+/* Current topic label — left of PTT */
+#topic-label {
+  position:fixed; bottom:34px; right:calc(50% + 42px);
+  font-family:'Press Start 2P', monospace;
+  font-size:8px; color:#555; letter-spacing:1px;
+  text-transform:uppercase; pointer-events:none;
+  z-index:50; max-width:130px; text-align:right;
+  line-height:1.4;
+}
+
 /* feedback — corrección gramatical visible */
 #feedback {
   position:fixed; bottom:0; left:0; right:0;
@@ -223,6 +233,7 @@ html, body { width:100%; height:100%; background:#000; overflow:hidden; font-fam
 <div class="bubble" id="bubble"></div>
 
 <!-- PTT Button -->
+<div id="topic-label"></div>
 <button id="ptt-btn" title="Hold to speak">🎤</button>
 <button id="repeat-btn" onclick="repeatLast()" title="Show what Buddy said">💬</button>
 
@@ -292,20 +303,24 @@ const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 // FEEDBACK FORMAT: if Gael makes a grammar error, reply normally then add:
 // [CORRECTION: what he said → correct form]
 // Example: "Oh cool! [CORRECTION: I go yesterday → I went yesterday]"
-const FB_RULE = ` GRAMMAR CORRECTION RULES (mandatory, strict):
-You MUST check every single thing Gael says for grammar errors. Be strict and thorough. Check: verb tenses, subject-verb agreement, irregular verbs, word order, auxiliaries (do/does/did/have/has), articles (a/an/the), prepositions, and vocabulary misuse.
-IMPORTANT — DO NOT correct: (1) any punctuation at all (periods, commas, question marks, exclamation marks — ignore all punctuation completely); (2) capitalization (uppercase/lowercase — ignore completely); (3) proper nouns or names (especially "Buddy" — never flag it); (4) sentences where most of the content is correct — only flag a clear, concrete grammar error that changes the meaning or breaks a rule. If the sentence is mostly right, reply OK.
-Your response format MUST always be exactly two parts separated by |||:
-PART 1: Your short conversational reply (1 sentence max). If there was an error, naturally model the correct form in your reply without pointing it out explicitly.
-PART 2 (ALWAYS include, even if no error): Either the correction or the word OK.
-  - If error found: WRONG: [exact wrong phrase] >>> RIGHT: [correct phrase] | RULE: [very short rule, max 5 words]
-  - If no error: OK
+const FB_RULE = ` GRAMMAR CORRECTION RULES (very lenient):
+ONLY correct Gael when his sentence is MORE THAN 95% wrong — meaning it is extremely different from what it should be (broken grammar, wrong tense entirely, completely incorrect structure). If even half of it is OK, do NOT correct.
+NEVER correct: punctuation, capitalization, proper nouns (especially "Buddy"), small word order issues, missing articles, single-letter typos, anything where the meaning is clear.
+Reply OK in 95%+ of cases. Only flag truly broken English.
+
+CONVERSATION RULE (mandatory): Your reply MUST always end with a question. Never give a closing statement without a question — Gael needs the question to keep talking. If you have no obvious follow-up, ask a fresh question on a different exam topic.
+
+Your response format MUST always be exactly THREE parts separated by |||:
+PART 1: Your short conversational reply (1 sentence max). MUST end with a question (?).
+PART 2: Either the correction or OK.
+  - If broken: WRONG: [phrase] >>> RIGHT: [correct] | RULE: [short rule]
+  - Otherwise: OK
+PART 3: TOPIC: [short topic label of YOUR question, max 3 words] — e.g. "Present Simple", "Past Irregular", "Family", "Adjectives", "Used to", "Adverbs", "Past Continuous".
+
 Examples:
-"I go to school yesterday" → Reply: Oh cool, what did you do there? ||| WRONG: I go yesterday >>> RIGHT: I went yesterday | RULE: past simple irregular verb
-"I have 15 years" → Oh nice! How old are you turning next? ||| WRONG: I have 15 years >>> RIGHT: I am 15 years old | RULE: age uses verb "to be"
-"Yesterday I play football" → That sounds fun, who did you play with? ||| WRONG: I play football >>> RIGHT: I played football | RULE: past simple needs -ed
-"I went to the park" (correct) → Cool! Did you go alone or with friends? ||| OK
-NEVER skip Part 2. NEVER merge both parts. Always use ||| as separator.`;
+"I went to the park" → Cool! Who did you go with? ||| OK ||| TOPIC: Past Simple
+"I go to school yesterday" → Sounds busy! What did you study today? ||| WRONG: I go yesterday >>> RIGHT: I went yesterday | RULE: past simple ||| TOPIC: Past Simple
+NEVER skip any part. ALWAYS use ||| as separator. ALWAYS end PART 1 with a question.`;
 
 const PROMPTS = {
   exam_prep:
@@ -433,7 +448,11 @@ function repeatLast(){
   b.textContent=lastBuddyReply;
   b.className='bubble show';
   if(bubbleTmr)clearTimeout(bubbleTmr);
-  bubbleTmr=setTimeout(()=>b.classList.remove('show'),10000); // 10s para que pueda leerlo
+  bubbleTmr=setTimeout(()=>b.classList.remove('show'),10000);
+  // re-pronunciar también en voz
+  if(window.speechSynthesis && !spk){
+    say(lastBuddyReply);
+  }
 }
 
 function setHint(txt){
@@ -611,27 +630,28 @@ async function handleIn(txt){
   try{
     let raw = await askGemini(txt);
 
-    // Parsear formato: REPLY ||| CORRECTION o OK
-    let reply = raw;
+    // Parsear formato: REPLY ||| CORRECTION o OK ||| TOPIC: ...
+    const parts = raw.split('|||').map(s=>s.trim());
+    let reply = parts[0] || raw;
     let correction = null;
 
-    const sepIdx = raw.indexOf('|||');
-    if(sepIdx !== -1){
-      reply      = raw.slice(0, sepIdx).trim();
-      const part2 = raw.slice(sepIdx + 3).trim();
-      if(part2 && part2.toUpperCase() !== 'OK'){
-        // Parsear: WRONG: x >>> RIGHT: y | RULE: z
-        const wrongMatch = part2.match(/WRONG:\s*(.+?)\s*>>>/i);
-        const rightMatch = part2.match(/>>>\s*RIGHT:\s*(.+?)(?:\s*\|\s*RULE:|$)/i);
-        const ruleMatch  = part2.match(/RULE:\s*(.+)/i);
-        if(wrongMatch && rightMatch){
-          correction = {
-            wrong: wrongMatch[1].trim(),
-            right: rightMatch[1].trim(),
-            rule:  ruleMatch ? ruleMatch[1].trim() : ''
-          };
-        }
+    if(parts[1] && parts[1].toUpperCase() !== 'OK'){
+      const wrongMatch = parts[1].match(/WRONG:\s*(.+?)\s*>>>/i);
+      const rightMatch = parts[1].match(/>>>\s*RIGHT:\s*(.+?)(?:\s*\|\s*RULE:|$)/i);
+      const ruleMatch  = parts[1].match(/RULE:\s*(.+)/i);
+      if(wrongMatch && rightMatch){
+        correction = {
+          wrong: wrongMatch[1].trim(),
+          right: rightMatch[1].trim(),
+          rule:  ruleMatch ? ruleMatch[1].trim() : ''
+        };
       }
+    }
+
+    // Topic
+    if(parts[2]){
+      const tm = parts[2].match(/TOPIC:\s*(.+)/i);
+      if(tm) document.getElementById('topic-label').textContent = tm[1].trim();
     }
 
     if(correction) showFeedback(correction);
