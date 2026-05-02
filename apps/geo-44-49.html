@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geografía – Pág. 44–49</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #1a1a2e;
+    --deep: #16213e;
+    --accent: #f59e0b;
+    --gold: #fbbf24;
+    --green: #4ecdc4;
+    --text: #eaeaea;
+    --soft: #a8b2d8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--sky); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.5) 0%, transparent 100%);
+  }
+  .container { max-width: 700px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+  header { text-align: center; margin-bottom: 28px; animation: fadeDown 0.6s ease; }
+  header h1 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--gold); }
+  header p { color: var(--soft); font-size: 0.92rem; margin-top: 6px; }
+  .page-badge { display: inline-block; background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.35); color: var(--accent); font-size: 0.78rem; font-weight: 800; padding: 3px 12px; border-radius: 99px; letter-spacing: 1px; text-transform: uppercase; margin-top: 10px; }
+
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--gold)); border-radius: 10px; transition: width 0.4s ease; }
+
+  .flip-hint { text-align: center; color: var(--soft); font-size: 0.78rem; margin-bottom: 12px; opacity: 0.7; }
+
+  .card-area { perspective: 1200px; margin-bottom: 20px; }
+  .card { width: 100%; min-height: 270px; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; border-radius: 20px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 24px; text-align: center; }
+  .card-front { background: linear-gradient(135deg, #1a2f1a 0%, #16213e 100%); border: 2px solid rgba(245,158,11,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .card-back  { background: linear-gradient(135deg, #1a1a0a 0%, #2d2b00 100%); border: 2px solid rgba(251,191,36,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: rotateY(180deg); }
+  .card-emoji { font-size: 3rem; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+  .card-term  { font-family: 'Fredoka One', cursive; font-size: 1.9rem; color: var(--gold); margin-bottom: 8px; line-height: 1.15; }
+  .card-hint  { font-size: 0.82rem; color: var(--soft); margin-top: 6px; }
+  .card-answer { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--green); margin-bottom: 10px; line-height: 1.2; }
+  .card-detail { font-size: 0.88rem; color: var(--soft); line-height: 1.55; max-width: 340px; }
+
+  .nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+  .nav-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--soft); background: transparent; color: var(--soft); font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .counter { font-weight: 800; color: var(--soft); font-size: 0.95rem; min-width: 60px; text-align: center; }
+
+  .placeholder-notice { background: rgba(245,158,11,.08); border: 1px dashed rgba(245,158,11,.4); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; text-align: center; color: var(--soft); font-size: 0.83rem; line-height: 1.5; }
+  .placeholder-notice strong { color: var(--gold); }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+  .tab { padding: 7px 16px; border-radius: 20px; border: 2px solid transparent; background: var(--deep); color: var(--soft); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--accent); color: #1a1a2e; border-color: var(--accent); }
+  .tab:hover:not(.active) { border-color: var(--soft); color: white; }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(20px);  } to { opacity:1; transform:translateY(0); } }
+  @keyframes float    { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🌐 Geografía</h1>
+    <p>Tocá la tarjeta para ver la respuesta</p>
+    <div class="page-badge">📖 Páginas 44 – 49</div>
+  </header>
+
+    <div class="tabs">
+    <button class="tab active" onclick="setTopic('all',this)">Todas</button>
+    <button class="tab" onclick="setTopic('deriva',this)">🌍 Deriva</button>
+    <button class="tab" onclick="setTopic('tierra',this)">🌐 Tierra</button>
+    <button class="tab" onclick="setTopic('relieve',this)">🏔 Relieve</button>
+    <button class="tab" onclick="setTopic('procesos',this)">⚡ Procesos</button>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <p class="flip-hint">👆 Tocá la tarjeta para girarla</p>
+
+  <div class="card-area">
+    <div class="card" id="card" onclick="flipCard()">
+      <div class="card-face card-front">
+        <div class="card-emoji" id="front-emoji"></div>
+        <div class="card-term" id="front-term"></div>
+        <p class="card-hint">📖 Tocá para ver la respuesta</p>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-emoji" id="back-emoji"></div>
+        <div class="card-answer" id="back-answer"></div>
+        <div class="card-detail" id="back-detail"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn" onclick="prevCard()">◀</button>
+    <span class="counter" id="counter">1 / 1</span>
+    <button class="nav-btn" onclick="nextCard()">▶</button>
+  </div>
+</div>
+
+<script>
+const allCards = [
+  // ── DERIVA CONTINENTAL ──
+  { topic:'deriva', emoji:'🧑‍🔬', term:'Teoría de la Deriva Continental', answer:'Alfred Wegener (1915)', detail:'Postuló que hace ~200 millones de años los continentes estaban unidos en un único gran continente llamado Pangea, que luego se fragmentó.' },
+  { topic:'deriva', emoji:'🌍', term:'¿Qué es Pangea?', answer:'El supercontinente original', detail:'Hace 200 millones de años todos los continentes actuales estaban unidos formando un único gran continente llamado Pangea.' },
+  { topic:'deriva', emoji:'🧩', term:'1.ª Evidencia de la Deriva', answer:'Forma de los continentes', detail:'Los continentes encajan como piezas de un rompecabezas: América del Sur y África calzan perfectamente.' },
+  { topic:'deriva', emoji:'🦕', term:'2.ª Evidencia de la Deriva', answer:'Fósiles idénticos en distintos continentes', detail:'Se encontraron restos fósiles de la misma especie de plantas y animales en continentes actualmente separados.' },
+  { topic:'deriva', emoji:'🪨', term:'3.ª Evidencia de la Deriva', answer:'Rocas similares en cordilleras alejadas', detail:'Similitud en edad y tipo de rocas que conforman cordilleras en continentes alejados, como los Montes Apalaches (EE.UU.) y los Escandinavos (Europa).' },
+  { topic:'deriva', emoji:'🧊', term:'4.ª Evidencia de la Deriva', answer:'Valles glaciarios en zonas cálidas', detail:'Presencia de antiguos valles glaciarios en zonas actualmente muy calurosas, lo que indica que en algún momento estuvieron en regiones de climas muy fríos.' },
+
+  // ── CAPAS DE LA TIERRA ──
+  { topic:'tierra', emoji:'🌐', term:'Capas de la Tierra', answer:'Corteza · Manto · Núcleo', detail:'La Tierra se divide en tres capas principales: la corteza (crust / corteza), el manto (mantle) y el núcleo (core).' },
+  { topic:'tierra', emoji:'🏝', term:'Corteza (Crust / Corteza)', answer:'Capa exterior de la Tierra', detail:'Dos tipos: corteza oceánica (más delgada) y corteza continental. Sobre ella se mueven las placas tectónicas.' },
+  { topic:'tierra', emoji:'🔥', term:'Manto (Mantle)', answer:'Capa entre la corteza y el núcleo', detail:'Dividido en manto superior (upper) y manto inferior (lower). Contiene material fluido sobre el que "flotan" las placas tectónicas.' },
+  { topic:'tierra', emoji:'⚙️', term:'Núcleo (Core)', answer:'Centro de la Tierra', detail:'Núcleo externo (outer): líquido. Núcleo interno (inner): sólido. Compuesto principalmente de hierro y níquel.' },
+  { topic:'tierra', emoji:'🧩', term:'Placas Tectónicas', answer:'Bloques que conforman la corteza terrestre', detail:'Son bloques rígidos unidos entre sí que forman la corteza. Argentina se encuentra en la Placa Sudamericana. Se apoyan sobre el manto y están en constante movimiento.' },
+  { topic:'tierra', emoji:'🗺', term:'Placas principales del planeta', answer:'7 grandes + varias menores', detail:'Norteamericana, Sudamericana, del Pacífico, Africana, Euroasiática, Australiana y Antártica. Menores: caribeña, de Nazca, filipina, arábiga, de Cocos y escocesa.' },
+
+  // ── TIPOS DE RELIEVE ──
+  { topic:'relieve', emoji:'🏔', term:'Montaña', answer:'Alto relieve terminado en punta', detail:'Formada por el movimiento de placas tectónicas. Tiene importantes irregularidades y pendientes bruscas. Se encuentran en cordilleras o cordones.' },
+  { topic:'relieve', emoji:'🗻', term:'Meseta', answer:'Relieve de pocas irregularidades con planicie', detail:'Más de 500 m de altura, sin grandes irregularidades, con pendientes en forma de barrancos. Las más altas se llaman altiplanos.' },
+  { topic:'relieve', emoji:'🌾', term:'Llanura', answer:'Superficie plana', detail:'Relieve de poca altitud, sin grandes elevaciones. Muy amplia y de pendiente casi nula.' },
+  { topic:'relieve', emoji:'🏞', term:'Valle', answer:'Espacio entre dos montañas', detail:'Su origen puede deberse a la erosión de un río (forma de "V") o de un glaciar (forma de "U").' },
+  { topic:'relieve', emoji:'🌊', term:'Plataforma Continental', answer:'Continuación del continente bajo el agua', detail:'La plataforma continental es la parte del continente que se extiende por debajo del agua hasta unos 200 m de profundidad. Allí pueden localizarse islas.' },
+  { topic:'relieve', emoji:'📉', term:'Talud', answer:'Conexión entre plataforma y fondo oceánico', detail:'Pendiente brusca que conecta la plataforma continental con el fondo oceánico. Marca el límite entre el mar y el océano.' },
+  { topic:'relieve', emoji:'🌑', term:'Fondo Oceánico', answer:'El "piso" del océano', detail:'Mayor profundidad oceánica. Ocupa el 80% del área oceánica. Zona con actividad volcánica y sísmica. Allí se ubican las fosas oceánicas.' },
+  { topic:'relieve', emoji:'⬇️', term:'Fosa Oceánica', answer:'La máxima profundidad del océano', detail:'Se localiza junto a montañas. Es el punto más profundo del océano, formada en zonas de subducción.' },
+  { topic:'relieve', emoji:'⛰', term:'Dorsal', answer:'Extensa cordillera submarina', detail:'Se ubica en el fondo oceánico. Puede emerger sobre el nivel del mar. Tiene actividad volcánica y sísmica. Es zona de expansión del fondo oceánico.' },
+
+  // ── PROCESOS EXÓGENOS ──
+  { topic:'procesos', emoji:'🌬', term:'Procesos Exógenos', answer:'Fenómenos de la superficie por agentes externos', detail:'Son los fenómenos que tienen lugar en la superficie terrestre debido a agentes externos (agua, viento, seres vivos). Forman y modifican los relieves.' },
+  { topic:'procesos', emoji:'💨', term:'Erosión Eólica', answer:'El viento desgasta las superficies', detail:'El viento arrastra sedimentos y los golpea contra las superficies, erosionándolas con el tiempo. Predomina en zonas desérticas y de poca vegetación.' },
+  { topic:'procesos', emoji:'🌧', term:'Erosión Pluvial', answer:'La lluvia erosiona el suelo', detail:'Cuando llueve, el agua recorre los terrenos arrastrando sedimentos y erosionando la superficie.' },
+  { topic:'procesos', emoji:'🏞', term:'Erosión Fluvial', answer:'Los ríos desgastan el terreno por el que corren', detail:'Los ríos erosionan su cauce formando cañones, gargantas y terrazas fluviales. Los ríos de montaña son los más erosivos.' },
+  { topic:'procesos', emoji:'🧊', term:'Erosión Glaciar', answer:'Los glaciares moldean el terreno', detail:'Ocurre en zonas frías cercanas a los polos o en altas montañas. Los glaciares forman valles, lagos, fiordos, colinas y llanuras al moverse.' },
+  { topic:'procesos', emoji:'🌊', term:'Erosión Marina', answer:'El oleaje modifica las costas', detail:'Las costas son afectadas por el oleaje permanentemente. Forma playas, acantilados y otras formas costeras.' },
+  { topic:'procesos', emoji:'🌱', term:'Meteorización', answer:'Descomposición de rocas por cambios bruscos de temperatura', detail:'Puede ser mecánica (cuando las rocas se parten) o química (cuando se afecta su composición por gases o agua).' },
+
+  // ── PROCESOS ENDÓGENOS ──
+  { topic:'procesos', emoji:'🏔', term:'Movimientos Orogénicos', answer:'Forman cadenas montañosas', detail:'Se producen a partir del encuentro de dos placas: una continental y una oceánica. La oceánica (más delgada) se subduce debajo de la continental, formando cordones montañosos.' },
+  { topic:'procesos', emoji:'📦', term:'Movimientos Epirógénicos', answer:'Lentos movimientos verticales de bloques continentales', detail:'Son ascensos y descensos lentos de bloques continentales. Los materiales son duros, no se pliegan sino que se fracturan. Por este movimiento surgen las costas.' },
+  { topic:'procesos', emoji:'↔️', term:'Movimientos Divergentes', answer:'Dos placas oceánicas opuestas que se separan', detail:'Ocurren cuando dos placas oceánicas con direcciones opuestas se separan. El hueco es rellenado por magma que sube del interior, formando nuevas dorsales.' },
+  { topic:'procesos', emoji:'🫨', term:'Movimientos Sísmicos / Terremotos', answer:'Liberación de energía acumulada entre placas', detail:'Las placas en movimiento acumulan energía que se libera de forma brusca (terremoto). En el océano generan maremotos (tsunamis). Las zonas de mayor riesgo forman el Cinturón de Fuego del Pacífico.' },
+  { topic:'procesos', emoji:'🌋', term:'Vulcanismo', answer:'Formación de volcanes en bordes de placa', detail:'Ocurre en zonas de subducción o expansión. Los volcanes emiten lava, gases, vapores y cenizas. Al extinguirse dejan géiseres (vapor) o fumarolas (gases).' },
+  { topic:'procesos', emoji:'🔥', term:'Cinturón de Fuego del Pacífico', answer:'Zona de mayor riesgo sísmico y volcánico', detail:'Es una región que rodea el Océano Pacífico donde se concentra la mayor actividad sísmica y volcánica del planeta, por la presencia de múltiples bordes de placas.' },
+];
+
+let currentTopic = 'all', currentIndex = 0, isFlipped = false, filtered = [];
+
+function getFiltered() { return currentTopic === 'all' ? allCards : allCards.filter(c => c.topic === currentTopic); }
+
+function setTopic(topic, btn) {
+  currentTopic = topic;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentIndex = 0; isFlipped = false;
+  filtered = getFiltered(); render();
+}
+
+function render() {
+  filtered = getFiltered();
+  const c = filtered[currentIndex];
+  if (!c) return;
+  document.getElementById('card').classList.remove('flipped');
+  isFlipped = false;
+  document.getElementById('front-emoji').textContent = c.emoji;
+  document.getElementById('front-term').textContent = c.term;
+  document.getElementById('back-emoji').textContent = c.emoji;
+  document.getElementById('back-answer').textContent = c.answer;
+  document.getElementById('back-detail').textContent = c.detail;
+  document.getElementById('counter').textContent = `${currentIndex + 1} / ${filtered.length}`;
+  document.getElementById('progress').style.width = ((currentIndex + 1) / filtered.length * 100) + '%';
+}
+
+function flipCard() { isFlipped = !isFlipped; document.getElementById('card').classList.toggle('flipped', isFlipped); }
+function nextCard() { filtered = getFiltered(); currentIndex = (currentIndex + 1) % filtered.length; render(); }
+function prevCard() { filtered = getFiltered(); currentIndex = (currentIndex - 1 + filtered.length) % filtered.length; render(); }
+
+filtered = getFiltered(); render();
+</script>
+</body>
+</html>
