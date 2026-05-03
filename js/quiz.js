@@ -76,7 +76,7 @@ window.Portal = window.Portal || {};
 
   window.Portal.initQuickQuiz = function () {
     var pool = Portal.questions.filter(function (q) {
-      return q.subject === 'Historia' || q.subject === 'Inglés';
+      return q.subject === 'Geografía' || q.subject === 'Ciudadanía' || q.subject === 'Inglés';
     });
     qqQuestions = shuffle(pool).slice(0, 5);
     qqIndex = 0; qqCorrect = 0; qqAnswered = false;
