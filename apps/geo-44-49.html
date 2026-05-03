@@ -84,6 +84,9 @@
     <button class="tab" onclick="setTopic('tierra',this)">🌐 Tierra</button>
     <button class="tab" onclick="setTopic('relieve',this)">🏔 Relieve</button>
     <button class="tab" onclick="setTopic('procesos',this)">⚡ Procesos</button>
+    <button class="tab" onclick="setTopic('montana',this)">🗻 Montaña</button>
+    <button class="tab" onclick="setTopic('mineria',this)">⛏ Minería</button>
+    <button class="tab" onclick="setTopic('eventos',this)">🌋 Eventos</button>
   </div>
 
   <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
@@ -156,6 +159,29 @@ const allCards = [
   { topic:'procesos', emoji:'🫨', term:'Movimientos Sísmicos / Terremotos', answer:'Liberación de energía acumulada entre placas', detail:'Las placas en movimiento acumulan energía que se libera de forma brusca (terremoto). En el océano generan maremotos (tsunamis). Las zonas de mayor riesgo forman el Cinturón de Fuego del Pacífico.' },
   { topic:'procesos', emoji:'🌋', term:'Vulcanismo', answer:'Formación de volcanes en bordes de placa', detail:'Ocurre en zonas de subducción o expansión. Los volcanes emiten lava, gases, vapores y cenizas. Al extinguirse dejan géiseres (vapor) o fumarolas (gases).' },
   { topic:'procesos', emoji:'🔥', term:'Cinturón de Fuego del Pacífico', answer:'Zona de mayor riesgo sísmico y volcánico', detail:'Es una región que rodea el Océano Pacífico donde se concentra la mayor actividad sísmica y volcánica del planeta, por la presencia de múltiples bordes de placas.' },
+
+  // ── MONTAÑA Y ACTIVIDADES ECONÓMICAS ──
+  { topic:'montana', emoji:'🏔', term:'Actividades económicas en la montaña', answer:'Agricultura, ganadería y minería', detail:'Las zonas de montaña presentan dificultades por las laderas empinadas y las condiciones climáticas duras. Sus habitantes desarrollaron estrategias para adaptarse al medio.' },
+  { topic:'montana', emoji:'🌿', term:'Terrazas de cultivos', answer:'Escalones construidos en laderas de montaña', detail:'Para contrarrestar la pendiente, se construyen grandes escalones en las laderas usando piedras y capas de materiales fértiles, para aprovechar mejor el agua y la fertilidad del suelo.' },
+  { topic:'montana', emoji:'🫒', term:'Cultivos de alta montaña', answer:'Vid, olivo y papa', detail:'Son los productos que mejor se adaptan a las zonas de alta montaña porque resisten la escasez de agua, el frío y el viento.' },
+  { topic:'montana', emoji:'🐑', term:'Animales de montaña', answer:'Cabras, ovejas, vicuñas y llamas', detail:'Son animales adaptados a la altura, las bajas temperaturas y la falta de agua. Pueden criarse en las zonas de montaña donde otros animales no sobreviven.' },
+  { topic:'montana', emoji:'🚶', term:'Trashumancia', answer:'Cambio estacional de lugares de pastoreo', detail:'Técnica de cría ganadera muy utilizada en todo el mundo. Consiste en cambiar los lugares de pastoreo según la estación del año, para aprovechar mejor las pocas pasturas disponibles en la montaña.' },
+  { topic:'montana', emoji:'🏡', term:'Ganaderos trashumantes', answer:'No son nómadas: tienen asentamientos fijos', detail:'Hacen pastar a sus animales al pie de la montaña en verano (aparecen las mejores pasturas). Cuando comienza el invierno, llevan los animales a las partes más altas, aprovechando las pasturas que crecieron durante el verano.' },
+
+  // ── MINERÍA ──
+  { topic:'mineria', emoji:'⛏', term:'Minería', answer:'Actividad que extrae minerales de la Tierra', detail:'Actividad desarrollada desde el inicio de la humanidad. Pasó de ser artesanal a industrial y a gran escala. Extrae grandes volúmenes de minerales en casi todas partes del mundo.' },
+  { topic:'mineria', emoji:'🪨', term:'Minerales', answer:'Recursos no renovables del interior de la Tierra', detail:'Se formaron en el interior de la Tierra a lo largo de miles de millones de años. Por esa razón se los considera recursos no renovables. Las montañas y volcanes son la mayor fuente de minerales esenciales.' },
+  { topic:'mineria', emoji:'🌄', term:'Explotación a cielo abierto', answer:'Extracción superficial de minerales', detail:'Está prohibida en muchos lugares del mundo porque destruye el paisaje, usa millones de litros de agua diarios y emplea sustancias tóxicas como el cianuro.' },
+  { topic:'mineria', emoji:'🕳', term:'Explotación subterránea', answer:'Minería en el interior de la montaña', detail:'Los trabajadores pasan muchas horas en túneles a gran profundidad o altura (hasta 5.000 metros). Tienen poco oxígeno y están expuestos a altos niveles de contaminación del aire.' },
+  { topic:'mineria', emoji:'💛', term:'Minerales más extraídos', answer:'Oro, plata, cobre, hierro y aluminio', detail:'Oro y plata (joyería), cobre (cables eléctricos), hierro y aluminio (industria de la construcción). Todos son recursos no renovables.' },
+  { topic:'mineria', emoji:'⚠️', term:'Trabajo insalubre', answer:'Labor minera con condiciones dañinas para la salud', detail:'El trabajo minero está considerado insalubre por la exposición a enfermedades respiratorias, poco oxígeno y alta contaminación. Los trabajadores tienen jornadas laborales más cortas que los trabajos tradicionales.' },
+
+  // ── EVENTOS NATURALES EXTREMOS ──
+  { topic:'eventos', emoji:'🇯🇵', term:'Terremoto de Japón 2011', answer:'El terremoto más intenso de la historia japonesa', detail:'Japón se ubica sobre 4 placas: euroasiática, del Pacífico, Filipinas y Ojotks. El terremoto generó un tsunami con olas de hasta 10 metros. Japón se desplazó 3–4 metros al este. Los edificios antisísmicos evitaron que se derrumbaran.' },
+  { topic:'eventos', emoji:'🌊', term:'Tsunami Océano Índico 2004', answer:'26 de diciembre de 2004 · +150.000 fallecidos', detail:'Originado a 4.000 metros de profundidad, 260 km de Indonesia. Afectó las costas de Tailandia, Indonesia, India, Sri Lanka, Somalia, Kenia y las Islas Maldivas. Las consecuencias sociales y económicas fueron devastadoras.' },
+  { topic:'eventos', emoji:'🌋', term:'Erupción volcán Puyehue 2011', answer:'4 de junio de 2011 — Chile · primera erupción en 50 años', detail:'Más de 3.000 evacuados en ciudades chilenas y argentinas. Las nubes de cenizas viajaron hasta los aeropuertos de Ciudad del Cabo (Sudáfrica) y Auckland (Nueva Zelanda). Para el 17 de junio la ceniza había dado la vuelta al mundo.' },
+  { topic:'eventos', emoji:'🏝', term:'Islandia: tierra de volcanes', answer:'Forma parte de la dorsal atlántica', detail:'Su territorio forma parte de la dorsal atlántica, que separa las placas euroasiática y norteamericana. Por ello localiza más de 200 volcanes y presenta gran actividad sísmica. Sus erupciones pueden paralizar el tráfico aéreo europeo.' },
+  { topic:'eventos', emoji:'🏛', term:'El Vesubio y Pompeya', answer:'79 d.C. — erupción que enterró la ciudad de Pompeya', detail:'El 24 de agosto del 79 d.C. el Vesubio sepultó bajo cenizas y piedras la ciudad de Pompeya, matando a miles de personas. El Vesubio erupcionó varias veces hasta marzo de 1944, cuando destruyó varios poblados. Desde entonces está inactivo.' },
 ];
 
 let currentTopic = 'all', currentIndex = 0, isFlipped = false, filtered = [];

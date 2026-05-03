@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geografía – Dinámica de la Tierra</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #1a1a2e;
+    --deep: #16213e;
+    --accent: #0d9488;
+    --gold: #f5a623;
+    --green: #4ecdc4;
+    --text: #eaeaea;
+    --soft: #a8b2d8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--sky); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.5) 0%, transparent 100%);
+  }
+  .container { max-width: 700px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+  header { text-align: center; margin-bottom: 24px; animation: fadeDown 0.6s ease; }
+  header h1 { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--gold); }
+  header p { color: var(--soft); font-size: 0.92rem; margin-top: 6px; }
+  .lang-badge { display: inline-block; background: rgba(13,148,136,.15); border: 1px solid rgba(13,148,136,.4); color: var(--accent); font-size: 0.76rem; font-weight: 800; padding: 3px 12px; border-radius: 99px; letter-spacing: 1px; margin-top: 8px; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
+  .tab { padding: 7px 15px; border-radius: 20px; border: 2px solid transparent; background: var(--deep); color: var(--soft); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+  .tab:hover:not(.active) { border-color: var(--soft); color: white; }
+
+  .modes { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+  .mode-btn { padding: 7px 18px; border-radius: 10px; border: 2px solid var(--green); background: transparent; color: var(--green); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.83rem; cursor: pointer; transition: all 0.2s; }
+  .mode-btn.active { background: var(--green); color: var(--deep); }
+
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--gold)); border-radius: 10px; transition: width 0.4s ease; }
+
+  .flip-hint { text-align: center; color: var(--soft); font-size: 0.78rem; margin-bottom: 12px; opacity: 0.7; }
+
+  /* Card */
+  .card-area { perspective: 1200px; margin-bottom: 20px; }
+  .card { width: 100%; min-height: 290px; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; border-radius: 20px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 24px; text-align: center; }
+  .card-front { background: linear-gradient(135deg, #0a2a28 0%, #16213e 100%); border: 2px solid rgba(13,148,136,0.35); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .card-back  { background: linear-gradient(135deg, #162820 0%, #1e3a30 100%); border: 2px solid rgba(78,205,196,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: rotateY(180deg); }
+
+  .card-emoji  { font-size: 3rem; margin-bottom: 10px; animation: float 3s ease-in-out infinite; }
+  .card-term   { font-family: 'Fredoka One', cursive; font-size: 1.95rem; color: var(--gold); margin-bottom: 8px; line-height: 1.15; }
+  .card-hint   { font-size: 0.8rem; color: var(--soft); margin-top: 4px; }
+
+  .card-term-en   { font-family: 'Fredoka One', cursive; font-size: 1.7rem; color: var(--green); margin-bottom: 6px; line-height: 1.2; }
+  .card-phonetic  { font-size: 0.82rem; color: var(--accent); font-weight: 700; background: rgba(13,148,136,0.15); padding: 3px 12px; border-radius: 20px; margin-bottom: 10px; }
+  .card-def-en    { font-size: 0.87rem; color: var(--text); line-height: 1.5; max-width: 340px; margin-bottom: 10px; }
+  .card-divider   { width: 60px; height: 1px; background: rgba(168,178,216,0.2); margin-bottom: 10px; }
+  .card-def-es    { font-size: 0.78rem; color: var(--soft); line-height: 1.45; max-width: 320px; font-style: italic; }
+
+  .audio-btn { margin-top: 10px; background: var(--accent); border: none; border-radius: 50px; padding: 7px 18px; color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.83rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: transform 0.15s, background 0.2s; }
+  .audio-btn:hover { background: #0a7a71; transform: scale(1.05); }
+  .audio-btn.speaking { background: var(--gold); }
+
+  .nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+  .nav-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--soft); background: transparent; color: var(--soft); font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .counter { font-weight: 800; color: var(--soft); font-size: 0.95rem; min-width: 60px; text-align: center; }
+
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--deep); border: 2px solid var(--gold); border-radius: 20px; padding: 28px 24px; max-width: 380px; width: 100%; animation: fadeUp 0.3s ease; }
+  .modal h3 { font-family: 'Fredoka One', cursive; color: var(--gold); font-size: 1.3rem; margin-bottom: 12px; }
+  .modal p { color: var(--soft); font-size: 0.88rem; margin-bottom: 14px; line-height: 1.5; }
+  .modal ol { padding-left: 20px; color: var(--soft); font-size: 0.9rem; line-height: 2.1; }
+  .modal ol li strong { color: var(--text); }
+  .modal-close { margin-top: 20px; width: 100%; background: var(--accent); border: none; border-radius: 50px; padding: 10px; color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; cursor: pointer; }
+
+  /* Quiz */
+  .quiz-area { animation: fadeUp 0.4s ease; }
+  .score-bar { display: flex; justify-content: space-between; align-items: center; background: var(--deep); border-radius: 12px; padding: 10px 16px; margin-bottom: 16px; font-size: 0.85rem; }
+  .score-badge { font-weight: 800; color: var(--gold); font-size: 1rem; }
+  .quiz-question { background: var(--deep); border: 2px solid rgba(13,148,136,0.25); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 16px; }
+  .q-emoji { font-size: 2.5rem; margin-bottom: 8px; }
+  .q-term { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: var(--gold); margin-bottom: 6px; }
+  .q-sub { color: var(--soft); font-size: 0.85rem; }
+  .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .option-btn { padding: 14px 10px; border-radius: 12px; border: 2px solid rgba(168,178,216,0.2); background: var(--deep); color: var(--text); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .option-btn:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+  .option-btn.correct { background: #1a4a3a; border-color: var(--green); color: var(--green); }
+  .option-btn.wrong   { background: #4a1a2a; border-color: #e94560; color: #e94560; }
+  .result-screen { text-align: center; padding: 40px 20px; animation: fadeUp 0.5s ease; }
+  .result-screen .big-emoji { font-size: 4rem; margin-bottom: 16px; }
+  .result-screen h2 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--gold); margin-bottom: 8px; }
+  .result-screen p { color: var(--soft); margin-bottom: 24px; }
+  .restart-btn { background: var(--accent); border: none; border-radius: 50px; padding: 12px 32px; color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; cursor: pointer; }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(20px);  } to { opacity:1; transform:translateY(0); } }
+  @keyframes float    { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+</style>
+</head>
+<body>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3>🔊 Activar voz en inglés</h3>
+    <p>El audio no funcionó. En Android hay que instalar la voz en inglés:</p>
+    <ol>
+      <li>Abrí <strong>Ajustes</strong> del celular</li>
+      <li>Tocá <strong>Accesibilidad</strong></li>
+      <li>Tocá <strong>Texto a voz</strong></li>
+      <li>Tocá el ⚙️ al lado de <strong>Google TTS</strong></li>
+      <li>Tocá <strong>Instalar datos de voz</strong></li>
+      <li>Elegí <strong>English (United States)</strong> y descargá</li>
+    </ol>
+    <button class="modal-close" onclick="closeModal()">Entendido ✓</button>
+  </div>
+</div>
+
+<div class="container">
+  <header>
+    <h1>🌋 Dinámica de la Tierra</h1>
+    <p>Tocá la tarjeta para ver en inglés</p>
+    <div class="lang-badge">🇦🇷 ES ↔ EN 🇺🇸</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTopic('all',event)">Todas</button>
+    <button class="tab" onclick="setTopic('capas',event)">🌐 Capas</button>
+    <button class="tab" onclick="setTopic('placas',event)">🧩 Placas</button>
+    <button class="tab" onclick="setTopic('vulcanismo',event)">🌋 Vulcanismo</button>
+    <button class="tab" onclick="setTopic('erosion',event)">⚡ Erosión</button>
+    <button class="tab" onclick="setTopic('clima',event)">🌤 Clima</button>
+  </div>
+
+  <div class="modes">
+    <button class="mode-btn active" id="btn-cards" onclick="setMode('cards')">📇 Tarjetas</button>
+    <button class="mode-btn" id="btn-quiz" onclick="setMode('quiz')">🎯 Quiz</button>
+  </div>
+
+  <div id="cards-mode">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <p class="flip-hint">👆 Tocá para ver en inglés</p>
+    <div class="card-area">
+      <div class="card" id="card" onclick="flipCard()">
+        <div class="card-face card-front">
+          <div class="card-emoji" id="front-emoji"></div>
+          <div class="card-term" id="front-term"></div>
+          <p class="card-hint">🇦🇷 Tocá para ver en inglés 🇺🇸</p>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-emoji" id="back-emoji"></div>
+          <div class="card-term-en" id="back-term-en"></div>
+          <div class="card-phonetic" id="back-phonetic"></div>
+          <div class="card-def-en" id="back-def-en"></div>
+          <div class="card-divider"></div>
+          <div class="card-def-es" id="back-def-es"></div>
+          <button class="audio-btn" id="audio-btn" onclick="speakWord(event)">🔊 Escuchar</button>
+        </div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="prevCard()">◀</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button class="nav-btn" onclick="nextCard()">▶</button>
+    </div>
+  </div>
+
+  <div id="quiz-mode" style="display:none">
+    <div id="quiz-inner"></div>
+  </div>
+</div>
+
+<script>
+const allCards = [
+  // ── CAPAS DE LA TIERRA ──
+  { topic:'capas', emoji:'🌐', term:'Corteza', term_en:'Crust', phonetic:'krust',
+    def_en:'The hard, thin outer layer of the Earth. Divided into oceanic and continental crust.',
+    def_es:'Capa rocosa externa y fina de la Tierra. Se divide en corteza oceánica y continental.' },
+  { topic:'capas', emoji:'🌊', term:'Corteza Oceánica', term_en:'Oceanic Crust', phonetic:'oh-shee-AN-ik krust',
+    def_en:'The thinner type of crust (about 7 km thick) that lies under the oceans.',
+    def_es:'Tipo de corteza más delgada (unos 7 km) que se encuentra bajo los océanos.' },
+  { topic:'capas', emoji:'🗻', term:'Corteza Continental', term_en:'Continental Crust', phonetic:'kon-ti-NEN-tal krust',
+    def_en:'The thicker type of crust (35–70 km) that forms the continents. Can exceed 70 km under mountain ranges.',
+    def_es:'Tipo de corteza más gruesa (35–70 km) que forma los continentes. Puede superar los 70 km en zonas montañosas.' },
+  { topic:'capas', emoji:'🔥', term:'Manto', term_en:'Mantle', phonetic:'MAN-tel',
+    def_en:'Rocky layer between the crust and the core, extending to 2900 km depth. Contains over 82% of Earth\'s volume.',
+    def_es:'Capa rocosa entre la corteza y el núcleo, hasta 2900 km de profundidad. Contiene más del 82% del volumen de la Tierra.' },
+  { topic:'capas', emoji:'💧', term:'Núcleo Externo', term_en:'Outer Core', phonetic:'OW-ter kor',
+    def_en:'The liquid layer of the Earth\'s core, about 2270 km thick, composed mainly of iron and nickel.',
+    def_es:'Capa líquida del núcleo terrestre, de unos 2270 km de grosor, compuesta principalmente de hierro y níquel.' },
+  { topic:'capas', emoji:'⚙️', term:'Núcleo Interno', term_en:'Inner Core', phonetic:'IN-er kor',
+    def_en:'The solid center of the Earth composed of iron and nickel. Despite extreme temperatures, it behaves as a solid due to enormous pressure.',
+    def_es:'Centro sólido de la Tierra compuesto de hierro y níquel. A pesar de la alta temperatura, se comporta como sólido por la enorme presión.' },
+
+  // ── PLACAS TECTÓNICAS ──
+  { topic:'placas', emoji:'🧩', term:'Placas Tectónicas', term_en:'Tectonic Plates', phonetic:'tek-TON-ik pleyts',
+    def_en:'Large rigid blocks that make up the Earth\'s crust. They move constantly relative to each other.',
+    def_es:'Grandes bloques rígidos que forman la corteza terrestre. Se mueven constantemente unas respecto de las otras.' },
+  { topic:'placas', emoji:'♨️', term:'Corrientes de Convección', term_en:'Convection Currents', phonetic:'kon-VEK-shon KUR-ents',
+    def_en:'Movements caused by temperature changes: warm materials rise, cooler and denser materials sink.',
+    def_es:'Movimientos provocados por cambios de temperatura: los materiales cálidos son más ligeros y suben; los fríos son más densos y se hunden.' },
+  { topic:'placas', emoji:'💥', term:'Bordes Convergentes', term_en:'Convergent Boundaries', phonetic:'kon-VER-jent BOWN-da-reez',
+    def_en:'Destructive plate edges where two plates collide; one plate is subducted beneath the other, sinking into the mantle. Can form mountains.',
+    def_es:'Bordes destructivos donde dos placas chocan; una desciende por debajo de la otra hundiéndose en el manto. Pueden formar cordilleras.' },
+  { topic:'placas', emoji:'↔️', term:'Bordes Divergentes', term_en:'Divergent Boundaries', phonetic:'dy-VER-jent BOWN-da-reez',
+    def_en:'Constructive plate edges where two plates separate; magma rises from the mantle to create new oceanic floor.',
+    def_es:'Bordes constructivos donde dos placas se separan; el magma asciende del manto para crear nuevo suelo oceánico.' },
+  { topic:'placas', emoji:'↕️', term:'Bordes Transformantes', term_en:'Transform Boundaries', phonetic:'TRANS-form BOWN-da-reez',
+    def_en:'Passive plate edges where two plates slide laterally past each other. No crust is created or destroyed.',
+    def_es:'Bordes pasivos donde dos placas se desplazan lateralmente una respecto de la otra. No se crea ni destruye corteza.' },
+  { topic:'placas', emoji:'⬇️', term:'Subducción', term_en:'Subduction', phonetic:'sub-DUK-shon',
+    def_en:'Process where an oceanic plate is pushed beneath a continental plate and sinks into the mantle.',
+    def_es:'Proceso en el que una placa oceánica desciende por debajo de una placa continental hundiéndose en el manto.' },
+
+  // ── VULCANISMO Y SISMOS ──
+  { topic:'vulcanismo', emoji:'🌋', term:'Vulcanismo', term_en:'Volcanism', phonetic:'VOL-ka-ni-zum',
+    def_en:'All phenomena related to the rise of magma or molten rocks from Earth\'s interior to the surface.',
+    def_es:'Todos los fenómenos relacionados con el ascenso del magma o rocas fundidas desde el interior de la Tierra a la superficie.' },
+  { topic:'vulcanismo', emoji:'🏔', term:'Volcán', term_en:'Volcano', phonetic:'vol-KEY-noh',
+    def_en:'The structure formed when magma reaches the surface and solidifies. Repeated eruptions build up a volcanic cone.',
+    def_es:'Estructura que se forma cuando el magma llega a la superficie y se solidifica. Erupciones repetidas forman el cono volcánico.' },
+  { topic:'vulcanismo', emoji:'🔴', term:'Magma', term_en:'Magma', phonetic:'MAG-ma',
+    def_en:'Molten rock found inside the Earth. When it reaches the surface through an eruption it is called lava.',
+    def_es:'Roca fundida que se encuentra en el interior de la Tierra. Cuando alcanza la superficie a través de una erupción se llama lava.' },
+  { topic:'vulcanismo', emoji:'🫨', term:'Sismo', term_en:'Seism / Earthquake', phonetic:'SY-zum',
+    def_en:'A vibration of the Earth produced by a rapid release of energy, usually caused by movement along a fault.',
+    def_es:'Vibración de la Tierra producida por una rápida liberación de energía, generalmente causada por el movimiento a lo largo de una falla.' },
+  { topic:'vulcanismo', emoji:'🏚', term:'Terremoto', term_en:'Earthquake', phonetic:'ERTH-kweyk',
+    def_en:'A violent seismic event that occurs on land. Can cause major destruction to buildings and infrastructure.',
+    def_es:'Sismo muy violento que se produce en el continente. Puede causar gran destrucción en edificios e infraestructura.' },
+  { topic:'vulcanismo', emoji:'🌊', term:'Tsunami', term_en:'Tsunami', phonetic:'tsoo-NAH-mee',
+    def_en:'Giant waves produced by a seismic event on the ocean floor. Can travel across entire ocean basins.',
+    def_es:'Olas gigantescas producidas por un sismo en el fondo oceánico. Pueden desplazarse a través de toda la cuenca oceánica.' },
+
+  // ── EROSIÓN Y PROCESOS ──
+  { topic:'erosion', emoji:'🌏', term:'Procesos Endógenos', term_en:'Endogenous Processes', phonetic:'en-DOJ-e-nus PROS-es-ez',
+    def_en:'Processes that occur inside the Earth: earthquakes, volcanoes, faulting (fracturing), and folding.',
+    def_es:'Procesos que ocurren dentro de la Tierra: terremotos, volcanes, fallamiento (fractura) y plegamiento.' },
+  { topic:'erosion', emoji:'🌿', term:'Procesos Exógenos', term_en:'Exogenous Processes', phonetic:'eks-OJ-e-nus PROS-es-ez',
+    def_en:'Processes on the Earth\'s surface caused by external agents (water, wind, living beings). They shape and transform landforms.',
+    def_es:'Procesos en la superficie terrestre causados por agentes externos (agua, viento, seres vivos). Forman y modifican los relieves.' },
+  { topic:'erosion', emoji:'🪨', term:'Meteorización', term_en:'Weathering', phonetic:'WETH-er-ing',
+    def_en:'Disintegration of rocks in the place where they are found on the Earth\'s surface, caused by temperature, water, or chemical agents.',
+    def_es:'Desintegración de rocas en el lugar donde se encuentran en la superficie terrestre, causada por temperatura, agua o agentes químicos.' },
+  { topic:'erosion', emoji:'💨', term:'Erosión', term_en:'Erosion', phonetic:'i-ROH-zhon',
+    def_en:'Transport and deposition of sediment materials resulting from weathering. The type depends on the agent that produces it.',
+    def_es:'Transporte y depositación de materiales sedimentarios resultado de la meteorización. El tipo depende del agente que la produce.' },
+  { topic:'erosion', emoji:'🏞', term:'Erosión Fluvial', term_en:'Fluvial Erosion', phonetic:'FLOO-vee-al i-ROH-zhon',
+    def_en:'Erosion produced by rivers, which carry loose material along their course. Sediments accumulate in areas without slope.',
+    def_es:'Erosión producida por ríos, que arrastran material suelto a lo largo de su curso. Los sedimentos se acumulan en zonas sin pendiente.' },
+  { topic:'erosion', emoji:'🌧', term:'Erosión Pluvial', term_en:'Pluvial Erosion', phonetic:'PLOO-vee-al i-ROH-zhon',
+    def_en:'Erosion produced by rainfall. Raindrops impact soil with little vegetation, deteriorating surface materials and causing soil wash.',
+    def_es:'Erosión producida por las lluvias. El impacto de las gotas en suelo con poca vegetación deteriora los materiales superficiales.' },
+  { topic:'erosion', emoji:'🌊', term:'Erosión Marina', term_en:'Marine Erosion', phonetic:'ma-REEN i-ROH-zhon',
+    def_en:'Erosion by waves from seas and oceans that strongly impact the coast and modify its shape.',
+    def_es:'Erosión por las olas de mares y océanos que impactan con fuerza la costa y modifican su forma.' },
+  { topic:'erosion', emoji:'🧊', term:'Erosión Glaciar', term_en:'Glacial Erosion', phonetic:'GLEY-shal i-ROH-zhon',
+    def_en:'Erosion caused by glaciers in high mountain areas and polar regions. As glaciers move, they drag large blocks of rock.',
+    def_es:'Erosión causada por glaciares en zonas de alta montaña y regiones polares. Al moverse, los glaciares arrastran grandes bloques de roca.' },
+  { topic:'erosion', emoji:'🌬', term:'Erosión Eólica', term_en:'Aeolian Erosion', phonetic:'ee-OH-lee-an i-ROH-zhon',
+    def_en:'Erosion caused by wind. Particles carried by the wind strike rocks or soil. Predominates in arid climates.',
+    def_es:'Erosión causada por el viento. Las partículas que arrastra golpean rocas o suelo. Predomina en climas áridos.' },
+
+  // ── CLIMA ──
+  { topic:'clima', emoji:'🌤', term:'Clima', term_en:'Climate', phonetic:'KLY-met',
+    def_en:'The long-term average weather conditions (temperature, precipitation, winds) in a region.',
+    def_es:'Las condiciones atmosféricas promedio a largo plazo (temperatura, precipitaciones, vientos) de una región.' },
+  { topic:'clima', emoji:'⛅', term:'Tiempo Atmosférico', term_en:'Weather', phonetic:'WETH-er',
+    def_en:'The short-term state of the atmosphere at a specific place and time (today\'s rain, tomorrow\'s sun).',
+    def_es:'Estado momentáneo de la atmósfera en un lugar y momento específicos (la lluvia de hoy, el sol de mañana).' },
+  { topic:'clima', emoji:'🌡', term:'Temperatura', term_en:'Temperature', phonetic:'TEM-per-a-cher',
+    def_en:'The degree of heat or cold in the air at a given place and time, measured in degrees Celsius.',
+    def_es:'El grado de calor o frío del aire en un lugar y momento dado, medido en grados Celsius.' },
+  { topic:'clima', emoji:'📊', term:'Presión Atmosférica', term_en:'Atmospheric Pressure', phonetic:'at-mos-FER-ik PRESH-er',
+    def_en:'The weight of the air column above a surface. It decreases with altitude and influences wind formation.',
+    def_es:'El peso de la columna de aire sobre una superficie. Disminuye con la altitud e influye en la formación de vientos.' },
+  { topic:'clima', emoji:'💨', term:'Vientos', term_en:'Winds', phonetic:'windz',
+    def_en:'Movement of air from high-pressure areas to low-pressure areas. Deflected by the Coriolis effect.',
+    def_es:'Movimiento del aire desde zonas de alta presión hacia zonas de baja presión. Son desviados por el efecto Coriolis.' },
+  { topic:'clima', emoji:'💧', term:'Humedad', term_en:'Humidity', phonetic:'hyoo-MID-i-tee',
+    def_en:'The amount of water vapor present in the air. High humidity with high temperature increases the perceived heat.',
+    def_es:'La cantidad de vapor de agua presente en el aire. Alta humedad con alta temperatura aumenta la sensación de calor.' },
+  { topic:'clima', emoji:'🌧', term:'Precipitaciones', term_en:'Precipitation', phonetic:'pre-sip-i-TAY-shon',
+    def_en:'Water that falls from the atmosphere to the surface: rain, snow, sleet, or hail.',
+    def_es:'Agua que cae de la atmósfera a la superficie: lluvia, nieve, aguanieve o granizo.' },
+  { topic:'clima', emoji:'🌀', term:'Efecto Coriolis', term_en:'Coriolis Effect', phonetic:'kor-ee-OH-lis i-FEKT',
+    def_en:'The deflection of winds (and ocean currents) caused by the Earth\'s rotation. Winds curve instead of moving in straight lines.',
+    def_es:'La desviación de los vientos (y corrientes oceánicas) causada por la rotación de la Tierra. Los vientos se curvan en lugar de seguir líneas rectas.' },
+];
+
+let currentTopic = 'all', currentMode = 'cards', currentIndex = 0, isFlipped = false, filtered = [];
+let quizCards = [], quizIndex = 0, score = 0, answered = false;
+
+function getFiltered() { return currentTopic === 'all' ? allCards : allCards.filter(c => c.topic === currentTopic); }
+
+function setTopic(topic, e) {
+  currentTopic = topic;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  currentIndex = 0; isFlipped = false; filtered = getFiltered();
+  currentMode === 'cards' ? renderCard() : startQuiz();
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + mode).classList.add('active');
+  filtered = getFiltered();
+  if (mode === 'cards') {
+    document.getElementById('cards-mode').style.display = 'block';
+    document.getElementById('quiz-mode').style.display = 'none';
+    currentIndex = 0; isFlipped = false; renderCard();
+  } else {
+    document.getElementById('cards-mode').style.display = 'none';
+    document.getElementById('quiz-mode').style.display = 'block';
+    startQuiz();
+  }
+}
+
+function renderCard() {
+  filtered = getFiltered();
+  const c = filtered[currentIndex]; if (!c) return;
+  document.getElementById('card').classList.remove('flipped'); isFlipped = false;
+  document.getElementById('front-emoji').textContent = c.emoji;
+  document.getElementById('front-term').textContent = c.term;
+  document.getElementById('back-emoji').textContent = c.emoji;
+  document.getElementById('back-term-en').textContent = c.term_en;
+  document.getElementById('back-phonetic').textContent = '🔤 ' + c.phonetic;
+  document.getElementById('back-def-en').textContent = c.def_en;
+  document.getElementById('back-def-es').textContent = c.def_es;
+  document.getElementById('counter').textContent = `${currentIndex + 1} / ${filtered.length}`;
+  document.getElementById('progress').style.width = ((currentIndex + 1) / filtered.length * 100) + '%';
+}
+
+function flipCard() { isFlipped = !isFlipped; document.getElementById('card').classList.toggle('flipped', isFlipped); }
+function nextCard() { filtered = getFiltered(); currentIndex = (currentIndex + 1) % filtered.length; isFlipped = false; renderCard(); }
+function prevCard() { filtered = getFiltered(); currentIndex = (currentIndex - 1 + filtered.length) % filtered.length; isFlipped = false; renderCard(); }
+
+function speak(text, btnEl) {
+  if (!('speechSynthesis' in window)) { openModal(); return; }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'en-US'; utter.rate = 0.85;
+  const voices = window.speechSynthesis.getVoices();
+  const enVoice = voices.find(v => v.lang.startsWith('en'));
+  if (enVoice) utter.voice = enVoice;
+  if (btnEl) { btnEl.classList.add('speaking'); utter.onend = () => btnEl.classList.remove('speaking'); }
+  utter.onerror = () => { if (btnEl) btnEl.classList.remove('speaking'); openModal(); };
+  window.speechSynthesis.speak(utter);
+  setTimeout(() => { if (btnEl && btnEl.classList.contains('speaking') && !window.speechSynthesis.speaking) { btnEl.classList.remove('speaking'); openModal(); } }, 1500);
+}
+
+function speakWord(e) {
+  e.stopPropagation();
+  filtered = getFiltered();
+  const c = filtered[currentIndex]; if (!c) return;
+  speak(c.term_en, document.getElementById('audio-btn'));
+}
+
+function openModal()  { document.getElementById('modal').classList.add('open'); }
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+
+function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
+
+function startQuiz() {
+  filtered = getFiltered(); quizCards = shuffle(filtered); quizIndex = 0; score = 0; answered = false;
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion() {
+  const container = document.getElementById('quiz-inner');
+  if (quizIndex >= quizCards.length) { showResult(container); return; }
+  answered = false;
+  const c = quizCards[quizIndex];
+  const others = filtered.filter(x => x.term_en !== c.term_en);
+  const options = shuffle([c, ...shuffle(others).slice(0, 3)]);
+  const safe = t => t.replace(/'/g, "\\'");
+  container.innerHTML = `
+    <div class="score-bar">
+      <span>Pregunta ${quizIndex + 1} / ${quizCards.length}</span>
+      <span class="score-badge">✅ ${score}</span>
+    </div>
+    <div class="quiz-area">
+      <div class="quiz-question">
+        <div class="q-emoji">${c.emoji}</div>
+        <div class="q-term">${c.term}</div>
+        <div class="q-sub">¿Cómo se dice en inglés?</div>
+      </div>
+      <div class="quiz-options">
+        ${options.map(o => `<button class="option-btn" onclick="checkAnswer(this,'${safe(o.term_en)}','${safe(c.term_en)}')">${o.term_en}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+function checkAnswer(btn, selected, correct) {
+  if (answered) return; answered = true;
+  document.querySelectorAll('.option-btn').forEach(b => { b.disabled = true; if (b.textContent.trim() === correct) b.classList.add('correct'); });
+  if (selected === correct) { btn.classList.add('correct'); score++; } else btn.classList.add('wrong');
+  setTimeout(() => { quizIndex++; renderQuizQuestion(); }, 1200);
+}
+
+function showResult(container) {
+  const pct = Math.round(score / quizCards.length * 100);
+  const emoji = pct >= 80 ? '🏆' : pct >= 50 ? '💪' : '📚';
+  const msg = pct >= 80 ? '¡Excelente dominio del inglés!' : pct >= 50 ? '¡Bien! Seguí practicando.' : 'Repasá las tarjetas y volvé a intentar.';
+  container.innerHTML = `<div class="result-screen"><div class="big-emoji">${emoji}</div><h2>${score} / ${quizCards.length}</h2><p>${msg}<br><span style="color:var(--gold)">${pct}% correcto</span></p><button class="restart-btn" onclick="startQuiz()">🔄 Jugar de nuevo</button></div>`;
+}
+
+filtered = getFiltered(); renderCard();
+</script>
+</body>
+</html>
