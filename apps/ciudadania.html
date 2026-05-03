@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciudadanía – Bloque 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #0f1729;
+    --deep: #0a1020;
+    --accent: #3b82f6;
+    --gold: #60a5fa;
+    --green: #34d399;
+    --text: #eaeaea;
+    --soft: #93b4d8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--sky); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.4) 0%, transparent 100%);
+  }
+  .container { max-width: 700px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+  header { text-align: center; margin-bottom: 28px; animation: fadeDown 0.6s ease; }
+  header h1 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--gold); }
+  header p { color: var(--soft); font-size: 0.92rem; margin-top: 6px; }
+  .page-badge { display: inline-block; background: rgba(59,130,246,.15); border: 1px solid rgba(59,130,246,.35); color: var(--accent); font-size: 0.78rem; font-weight: 800; padding: 3px 12px; border-radius: 99px; letter-spacing: 1px; text-transform: uppercase; margin-top: 10px; }
+
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--gold)); border-radius: 10px; transition: width 0.4s ease; }
+
+  .flip-hint { text-align: center; color: var(--soft); font-size: 0.78rem; margin-bottom: 12px; opacity: 0.7; }
+
+  .card-area { perspective: 1200px; margin-bottom: 20px; }
+  .card { width: 100%; min-height: 270px; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; border-radius: 20px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 24px; text-align: center; }
+  .card-front { background: linear-gradient(135deg, #0f1f3a 0%, #0a1020 100%); border: 2px solid rgba(59,130,246,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .card-back  { background: linear-gradient(135deg, #0a1a2e 0%, #0d1f3a 100%); border: 2px solid rgba(96,165,250,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: rotateY(180deg); }
+  .card-emoji { font-size: 3rem; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+  .card-term  { font-family: 'Fredoka One', cursive; font-size: 1.9rem; color: var(--gold); margin-bottom: 8px; line-height: 1.15; }
+  .card-hint  { font-size: 0.82rem; color: var(--soft); margin-top: 6px; }
+  .card-answer { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--green); margin-bottom: 10px; line-height: 1.2; }
+  .card-detail { font-size: 0.88rem; color: var(--soft); line-height: 1.55; max-width: 340px; }
+
+  .nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+  .nav-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--soft); background: transparent; color: var(--soft); font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .counter { font-weight: 800; color: var(--soft); font-size: 0.95rem; min-width: 60px; text-align: center; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+  .tab { padding: 7px 16px; border-radius: 20px; border: 2px solid transparent; background: var(--deep); color: var(--soft); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .tab:hover:not(.active) { border-color: var(--soft); color: white; }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes float    { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🏛 Ciudadanía</h1>
+    <p>Tocá la tarjeta para ver la respuesta</p>
+    <div class="page-badge">📖 Bloque 1 · Cap. 1 y 2</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTopic('all',this)">Todas</button>
+    <button class="tab" onclick="setTopic('libertad',this)">🗽 Libertad</button>
+    <button class="tab" onclick="setTopic('dignidad',this)">🏛 Dignidad</button>
+    <button class="tab" onclick="setTopic('historia',this)">📜 Historia</button>
+    <button class="tab" onclick="setTopic('reconocimiento',this)">🤝 Reconocimiento</button>
+    <button class="tab" onclick="setTopic('responsabilidad',this)">⚡ Responsabilidad</button>
+    <button class="tab" onclick="setTopic('democracia',this)">🗳 Democracia</button>
+    <button class="tab" onclick="setTopic('normas',this)">📋 Normas</button>
+    <button class="tab" onclick="setTopic('tipos',this)">⚖️ Tipos</button>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <p class="flip-hint">👆 Tocá la tarjeta para girarla</p>
+
+  <div class="card-area">
+    <div class="card" id="card" onclick="flipCard()">
+      <div class="card-face card-front">
+        <div class="card-emoji" id="front-emoji"></div>
+        <div class="card-term" id="front-term"></div>
+        <p class="card-hint">📖 Tocá para ver la respuesta</p>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-emoji" id="back-emoji"></div>
+        <div class="card-answer" id="back-answer"></div>
+        <div class="card-detail" id="back-detail"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn" onclick="prevCard()">◀</button>
+    <span class="counter" id="counter">1 / 1</span>
+    <button class="nav-btn" onclick="nextCard()">▶</button>
+  </div>
+</div>
+
+<script>
+const allCards = [
+
+  // ── LIBERTAD ──
+  { topic:'libertad', emoji:'🗽', term:'Libertad individual', answer:'Pensamientos, gustos, deseos y acciones propias', detail:'Se relaciona con todo lo que cada persona piensa, desea y hace. Es un derecho de los seres humanos, aunque está condicionada por la sociedad en que se vive.' },
+  { topic:'libertad', emoji:'🤝', term:'Libertad política o social', answer:'La que resulta de las relaciones entre miembros de una comunidad', detail:'No suprime la libertad individual sino que la condiciona. Se reconoce como la libertad "propiamente humana" porque somos seres sociales y no podemos vivir aislados.' },
+  { topic:'libertad', emoji:'🔗', term:'Relacion entre libertad individual y política', answer:'Son conceptos estrechamente unidos', detail:'La libertad individual (expresión, pensamiento) y la política (decidir y actuar según convicciones) no pueden pensarse por separado. Una condiciona y complementa a la otra.' },
+  { topic:'libertad', emoji:'⚠️', term:'Limitaciones a la libertad', answer:'Pobreza, discriminación, falta de educación y salud', detail:'Cuando las personas atraviesan estas situaciones no pueden elegir libremente qué vida vivir. La libertad queda restringida y la dignidad se convierte en un anhelo más que en una realidad.' },
+  { topic:'libertad', emoji:'💭', term:'Libertad como valor social', answer:'Uno de los valores más importantes de las sociedades actuales', detail:'Para comprender qué es y sus alcances, hay que reflexionar sobre dos formas relacionadas: la libertad individual y la libertad política o social.' },
+
+  // ── DIGNIDAD ──
+  { topic:'dignidad', emoji:'✨', term:'Dignidad humana', answer:'Cualidad propia de todas las personas', detail:'Se funda en el hecho de ser sujetos conscientes, sociales y estar dotados de inteligencia y libertad. No depende del género, educación ni condición social.' },
+  { topic:'dignidad', emoji:'📖', term:'Etimología de "dignidad"', answer:'Calidad de digno · del adjetivo "dignos" = valioso', detail:'La palabra dignidad viene del adjetivo "dignos" que significa valioso. Por eso, cada persona es valiosa por el solo hecho de ser persona.' },
+  { topic:'dignidad', emoji:'⚖️', term:'Dignidad e igualdad', answer:'Los seres humanos nacen con dignidad, lo que los iguala entre si', detail:'La dignidad no solo iguala a las personas sino que también permite que puedan poner en práctica sus derechos. Las personas tienen dignidad y por eso sus derechos deben ser reconocidos y respetados.' },
+  { topic:'dignidad', emoji:'🔐', term:'Dignidad y libertad', answer:'Conceptos estrechamente unidos: no hay vidas dignas sin libertades', detail:'No es posible pensar vidas dignas sin libertades individuales (como la libertad de expresión) ni sin libertades políticas (actuar de acuerdo a las propias convicciones). Cuando la libertad está limitada, la dignidad se convierte en una lucha.' },
+  { topic:'dignidad', emoji:'💙', term:'Merecimiento del respeto', answer:'Cada persona merece respeto solo por ser persona', detail:'No hace falta demostrar nada ni cumplir condiciones. La dignidad es inherente al ser humano: toda persona es unica y posee los mismos derechos.' },
+  { topic:'dignidad', emoji:'🌐', term:'Dignidad en la sociedad actual', answer:'Muchas personas aun no pueden vivir con dignidad plena', detail:'Alrededor del 30% de los latinoamericanos son pobres y el 10% vive en pobreza extrema (CEPAL). No poder satisfacer necesidades básicas restringe las posibilidades reales de desarrollar una vida digna.' },
+
+  // ── HISTORIA DE LA LIBERTAD ──
+  { topic:'historia', emoji:'🏛', term:'Libertad en la Grecia antigua', answer:'Solo para varones libres, mayores, con propiedad y nativos', detail:'Mujeres, niños, extranjeros y esclavos no tenían libertad individual. La mayoría de los habitantes no eran políticamente libres: debían destinar trabajo a sus patrones a cambio de residencia y protección.' },
+  { topic:'historia', emoji:'⛓', term:'Esclavitud en Grecia', answer:'Condicion considerada "natural" · causas: herencia, deudas o guerra', detail:'Segun Aristóteles, el esclavo es por naturaleza de otro, no de si mismo. Se podía ser esclavo por herencia (nacido de esclavos), por deudas o por ser prisionero de guerra. El esclavo no tenia libertad individual ni política.' },
+  { topic:'historia', emoji:'🗳', term:'Libertad política en Grecia', answer:'Obligaba a los ciudadanos a intervenir en asuntos públicos y de gobierno', detail:'La libertad política era exclusiva de varones libres, mayores de edad, con propiedad y nativos de la ciudad. Implicaba el deber de participar activamente en la vida pública y de gobierno.' },
+  { topic:'historia', emoji:'✝️', term:'Libertad en la Edad Media (S.V–XIV)', answer:'Don entregado por Dios · muy influenciada por el pensamiento cristiano', detail:'La libertad estaba ligada a la religión. Era entendida como un don divino y como voluntad libre para elegir entre lo bueno y lo malo. Fue un periodo de feudalismo donde cada señor imponía sus propias normas.' },
+  { topic:'historia', emoji:'🏭', term:'Libertad en la Modernidad', answer:'Libertad individual como condicion natural del ser humano · surgimiento del capitalismo', detail:'Con el Renacimiento surge el capitalismo: la libertad individual paso a no depender del Estado sino de la naturaleza del ser humano. La libertad individual se priorizó sobre la política para sostener el trabajo asalariado libre, aunque las condiciones laborales muchas veces eran duras.' },
+  { topic:'historia', emoji:'🌍', term:'Libertad contemporánea', answer:'Condicion propia del ser humano · derechos individuales articulados con la libertad política', detail:'Hoy se reconoce un ámbito propio donde cada persona actua libremente. Las libertades individuales son propuestas como derechos. Se articulan con la libertad política para lograr una vida social justa.' },
+
+  // ── RECONOCIMIENTO ──
+  { topic:'reconocimiento', emoji:'🤝', term:'Reconocimiento', answer:'Proceso por el que una persona es vista como igual por los otros', detail:'Para que las personas sean respetadas en sus derechos es preciso que cada individuo sea reconocido tanto en forma individual como grupal. El reconocimiento "humaniza" a las personas.' },
+  { topic:'reconocimiento', emoji:'🔄', term:'Reciprocidad del reconocimiento', answer:'Reconocer al otro implica que el otro también nos reconoce', detail:'El reconocimiento es una relación reciproca: de alli la estrecha relación entre reciprocidad y reconocimiento de los otros. Constituye una relación de personas tanto en forma individual como grupal.' },
+  { topic:'reconocimiento', emoji:'🌈', term:'Diversidad y reconocimiento', answer:'Reconocer a otro es reconocerse a uno mismo · la diversidad es fundamental', detail:'Para lograr el reconocimiento es fundamental respetar la diversidad en tanto pluralidad de culturas, etnias, religiones e ideas. En el trato cotidiano, somos como un espejo para los demas.' },
+  { topic:'reconocimiento', emoji:'🏛', term:'Reconocimiento y dignidad', answer:'La dignidad es la base para ser reconocidos como iguales', detail:'Todos los seres humanos son iguales y tienen derechos. Esto implica que las personas deben ser reconocidas como tales, con libertad de ser diferentes. La libertad de ser distintos es fundamental.' },
+  { topic:'reconocimiento', emoji:'📢', term:'Lucha por el reconocimiento', answer:'A lo largo de la historia, muchos grupos lucharon por el reconocimiento de sus derechos', detail:'Ejemplos: los trabajadores, los pueblos originarios por su tierra y cultura, la lucha por la identidad sexual. El reconocimiento incluye la posibilidad de reclamar derechos ante el Estado y la sociedad.' },
+
+  // ── RESPONSABILIDAD ──
+  { topic:'responsabilidad', emoji:'⚡', term:'Libertad y responsabilidad', answer:'La libertad implica consecuencias que pueden afectar a otras personas', detail:'Los actos de una o varias personas pueden causar consecuencias graves para otros. Por eso, la responsabilidad puede incluir sanciones legales. Las personas siempre tienen consecuencias en sus acciones.' },
+  { topic:'responsabilidad', emoji:'🧠', term:'Responsabilidad moral', answer:'Interna · por voluntad propia y consciencia del acto', detail:'Si una persona no es plenamente consciente de sus actos o si actua sin responsabilidad, no puede ser responsabilizada. La responsabilidad moral depende de que la persona actue por voluntad propia y sea consciente de lo que hace.' },
+  { topic:'responsabilidad', emoji:'⚖️', term:'Responsabilidad legal', answer:'El Estado puede sancionar el incumplimiento de las leyes', detail:'Exige cumplimiento bajo castigo. Las leyes plantean limites a la libertad con normativas y sanciones. A diferencia de la responsabilidad moral, la legal no siempre requiere que la persona sea consciente.' },
+  { topic:'responsabilidad', emoji:'🗝', term:'Condicion para la responsabilidad', answer:'Ser una persona consciente de sus actos', detail:'Para decidir en forma autónoma y responsable es necesario ser consciente del acto. Los paises plantean limites a la libertad a traves de leyes y grados de responsabilidad segun la situación.' },
+  { topic:'responsabilidad', emoji:'🌐', term:'Responsabilidad social', answer:'Los actos individuales también afectan a la comunidad', detail:'La libertad está dotada de valores y practicas de la comunidad. Cada persona es responsable no solo de sus actos individuales, sino también del impacto que estos generan en la sociedad.' },
+
+  // ── DEMOCRACIA ──
+  { topic:'democracia', emoji:'🗳', term:'Libertad y democracia', answer:'La libertad individual y social dependen de la organización política del lugar donde se vive', detail:'Los pueblos, ciudades y paises tienen reglas, normas y leyes que regulan y organizan las actividades públicas. Dicen que está prohibido hacer y también que está permitido.' },
+  { topic:'democracia', emoji:'🏛', term:'Democracia', answer:'Forma de gobierno en que los ciudadanos pueden proponer, debatir y modificar las normas', detail:'Directamente o por medio de sus representantes, los ciudadanos participan en la creación de las normas. Es la forma de gobierno que mejor articula la libertad individual con la vida en sociedad.' },
+  { topic:'democracia', emoji:'📜', term:'Libertad política en democracia', answer:'La libertad individual se articula con la libertad política = vida en sociedad', detail:'En democracia, la libertad individual no existe de forma aislada. Se articula con la libertad social para lograr una convivencia justa. La libertad politica es la que mejor expresa esta articulación.' },
+  { topic:'democracia', emoji:'📋', term:'Funcion de las leyes en democracia', answer:'Organizan las actividades públicas y regulan lo permitido y lo prohibido', detail:'Las leyes en democracia son propuestas y debatidas por los ciudadanos o sus representantes. A diferencia de regimenes autoritarios, en democracia las leyes pueden cuestionarse y modificarse.' },
+
+  // ── NORMAS ──
+  { topic:'normas', emoji:'🗣', term:'Normas en la Antigüedad', answer:'Se transmitian oralmente · basadas en la religión · debiles y fáciles de modificar', detail:'En las primeras sociedades las normas se pasaban de generación en generación de forma oral. Estaban basadas en creencias religiosas, lo que las hacia vulnerables a cambios segun quien tuviera el poder.' },
+  { topic:'normas', emoji:'🪨', term:'Código de Hammurabi', answer:'El código de leyes escrito más antiguo · 1700 a.C. · Mesopotamia asiática', detail:'Cuando las civilizaciones crecieron, las normas comenzaron a escribirse sobre piedra o madera tallada para que no se pudieran modificar. El Código de Hammurabi fue creado por el Rey de Babilonia.' },
+  { topic:'normas', emoji:'📚', term:'Código', answer:'Conjunto de leyes', detail:'Un código es una recopilación organizada de leyes. Los primeros códigos surgieron para dar permanencia y claridad a las normas de una sociedad, evitando que fueran alteradas por quienes estaban en el poder.' },
+  { topic:'normas', emoji:'🏰', term:'Normas en la Edad Media (S.IX–XII)', answer:'Feudalismo · cada feudo y su señor imponía su propia ley', detail:'Las normas eran locales y dependian del señor feudal. Este sistema era poco justo porque no habia igualdad ni universalidad: las reglas cambiaban segun el territorio y el poder del señor.' },
+  { topic:'normas', emoji:'🏛', term:'Normas en la Edad Moderna (S.XV–hoy)', answer:'Acordadas por el Parlamento · escritas y universales', detail:'Con el surgimiento del Estado moderno, las normas comenzaron a ser debatidas y aprobadas por organismos representativos como el Parlamento. Son escritas y se aplican de forma universal en el territorio.' },
+  { topic:'normas', emoji:'🎯', term:'Objetivo de las normas', answer:'Ordenar y regular la sociedad · bien común', detail:'Las normas buscan armonizar y conciliar los intereses de todos. Su objetivo es dar a todas las personas lo que necesitan y generar un beneficio para toda la sociedad, no solo para algunos grupos.' },
+
+  // ── TIPOS DE NORMAS ──
+  { topic:'tipos', emoji:'📏', term:'Tipos de normas', answer:'Modos de conducta que regulan la vida en sociedad', detail:'Las normas son diferentes segun la sociedad y la epoca. Pueden ser morales, sociales o juridicas/legales. Todas buscan regular el comportamiento humano, aunque difieren en su obligatoriedad y sanciones.' },
+  { topic:'tipos', emoji:'💭', term:'Normas morales', answer:'Lo bueno y lo malo · valores de las personas', detail:'Valoran el actuar humano como bueno o malo de acuerdo a valores o creencias religiosas. Se necesita que las personas sean libres para que puedan asumir las consecuencias y hacerse responsables.' },
+  { topic:'tipos', emoji:'👥', term:'Normas sociales', answer:'Modos de conducta aceptados dentro de un grupo social', detail:'Son reglas no escritas que se comparten en una comunidad. Su incumplimiento genera una sanción social (desaprobación, exclusión). Varian segun la sociedad, el contexto y la época.' },
+  { topic:'tipos', emoji:'⚖️', term:'Normas juridicas o legales', answer:'Exigen cumplimiento · creadas por el Estado · regulan acciones individuales y colectivas', detail:'Son creadas por una autoridad (el Estado) y su incumplimiento implica una sancion. Son irretroactivas: no se pueden aplicar a hechos anteriores a su creación. Regulan actividades individuales o colectivas.' },
+  { topic:'tipos', emoji:'📜', term:'Las leyes', answer:'Las normas más complejas · obligatorias para todos · vinculadas a la Constitución', detail:'Las leyes son creadas, modificadas y derogadas por el Estado. Son obligatorias para todos los habitantes. La Constitución es la norma suprema: todas las leyes deben respetar sus principios.' },
+  { topic:'tipos', emoji:'✅', term:'Legitimidad de las normas', answer:'Una norma es legítima cuando se asocia a la condición humana y fue elaborada de forma válida', detail:'Las normas sociales son legitimas cuando reflejan valores compartidos. Las leyes son legitimas cuando fueron creadas por los mecanismos institucionales correctos (elaboración y promulgación formal).' },
+  { topic:'tipos', emoji:'🔒', term:'Obligatoriedad y sanción', answer:'Las normas deben cumplirse · si no, corresponde una pena o castigo', detail:'Las normas sociales tienen sanciones informales (desaprobación social). Las leyes tienen sanciones formales: multas, prohibiciones o penas que el Estado tiene la obligación de aplicar.' },
+];
+
+let currentTopic = 'all', currentIndex = 0, isFlipped = false, filtered = [];
+
+function getFiltered() { return currentTopic === 'all' ? allCards : allCards.filter(c => c.topic === currentTopic); }
+
+function setTopic(topic, btn) {
+  currentTopic = topic;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentIndex = 0; isFlipped = false;
+  filtered = getFiltered(); render();
+}
+
+function render() {
+  filtered = getFiltered();
+  const c = filtered[currentIndex];
+  if (!c) return;
+  document.getElementById('card').classList.remove('flipped');
+  isFlipped = false;
+  document.getElementById('front-emoji').textContent = c.emoji;
+  document.getElementById('front-term').textContent = c.term;
+  document.getElementById('back-emoji').textContent = c.emoji;
+  document.getElementById('back-answer').textContent = c.answer;
+  document.getElementById('back-detail').textContent = c.detail;
+  document.getElementById('counter').textContent = `${currentIndex + 1} / ${filtered.length}`;
+  document.getElementById('progress').style.width = ((currentIndex + 1) / filtered.length * 100) + '%';
+}
+
+function flipCard() { isFlipped = !isFlipped; document.getElementById('card').classList.toggle('flipped', isFlipped); }
+function nextCard() { filtered = getFiltered(); currentIndex = (currentIndex + 1) % filtered.length; render(); }
+function prevCard() { filtered = getFiltered(); currentIndex = (currentIndex - 1 + filtered.length) % filtered.length; render(); }
+
+filtered = getFiltered(); render();
+</script>
+</body>
+</html>
