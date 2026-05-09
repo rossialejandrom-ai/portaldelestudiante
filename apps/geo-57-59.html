@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geografía – Clima y Tiempo</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #1a1a2e;
+    --deep: #16213e;
+    --accent: #f59e0b;
+    --gold: #fbbf24;
+    --green: #4ecdc4;
+    --text: #eaeaea;
+    --soft: #a8b2d8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: var(--sky); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 20% 90%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,0.5) 0%, transparent 100%);
+  }
+  .container { max-width: 700px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+  header { text-align: center; margin-bottom: 28px; animation: fadeDown 0.6s ease; }
+  header h1 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--gold); }
+  header p { color: var(--soft); font-size: 0.92rem; margin-top: 6px; }
+  .page-badge { display: inline-block; background: rgba(245,158,11,.15); border: 1px solid rgba(245,158,11,.35); color: var(--accent); font-size: 0.78rem; font-weight: 800; padding: 3px 12px; border-radius: 99px; letter-spacing: 1px; text-transform: uppercase; margin-top: 10px; }
+
+  .progress-bar { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--gold)); border-radius: 10px; transition: width 0.4s ease; }
+
+  .flip-hint { text-align: center; color: var(--soft); font-size: 0.78rem; margin-bottom: 12px; opacity: 0.7; }
+
+  .card-area { perspective: 1200px; margin-bottom: 20px; }
+  .card { width: 100%; min-height: 270px; position: relative; transform-style: preserve-3d; transition: transform 0.55s cubic-bezier(0.4,0,0.2,1); cursor: pointer; }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; inset: 0; border-radius: 20px; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 24px; text-align: center; }
+  .card-front { background: linear-gradient(135deg, #1a2f1a 0%, #16213e 100%); border: 2px solid rgba(245,158,11,0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+  .card-back  { background: linear-gradient(135deg, #1a1a0a 0%, #2d2b00 100%); border: 2px solid rgba(251,191,36,0.4); box-shadow: 0 8px 32px rgba(0,0,0,0.4); transform: rotateY(180deg); }
+  .card-emoji { font-size: 3rem; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+  .card-term  { font-family: 'Fredoka One', cursive; font-size: 1.9rem; color: var(--gold); margin-bottom: 8px; line-height: 1.15; }
+  .card-hint  { font-size: 0.82rem; color: var(--soft); margin-top: 6px; }
+  .card-answer { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--green); margin-bottom: 10px; line-height: 1.2; }
+  .card-detail { font-size: 0.88rem; color: var(--soft); line-height: 1.55; max-width: 340px; }
+
+  .nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+  .nav-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--soft); background: transparent; color: var(--soft); font-size: 1.2rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .nav-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .counter { font-weight: 800; color: var(--soft); font-size: 0.95rem; min-width: 60px; text-align: center; }
+
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+  .tab { padding: 7px 16px; border-radius: 20px; border: 2px solid transparent; background: var(--deep); color: var(--soft); font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+  .tab.active { background: var(--accent); color: #1a1a2e; border-color: var(--accent); }
+  .tab:hover:not(.active) { border-color: var(--soft); color: white; }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(20px);  } to { opacity:1; transform:translateY(0); } }
+  @keyframes float    { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🌦 Geografía</h1>
+    <p>Tocá la tarjeta para ver la respuesta</p>
+    <div class="page-badge">📖 Clima y Tiempo · Bloque 2</div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="setTopic('all',this)">Todas</button>
+    <button class="tab" onclick="setTopic('clima',this)">🌦 Clima</button>
+    <button class="tab" onclick="setTopic('movimientos',this)">🔄 Movimientos</button>
+    <button class="tab" onclick="setTopic('elementos',this)">🌡 Elementos</button>
+    <button class="tab" onclick="setTopic('atmosfera',this)">🌫 Atmósfera</button>
+    <button class="tab" onclick="setTopic('vientos',this)">💨 Vientos</button>
+    <button class="tab" onclick="setTopic('registro',this)">📊 Registro</button>
+    <button class="tab" onclick="setTopic('factores',this)">🌐 Factores</button>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <p class="flip-hint">👆 Tocá la tarjeta para girarla</p>
+
+  <div class="card-area">
+    <div class="card" id="card" onclick="flipCard()">
+      <div class="card-face card-front">
+        <div class="card-emoji" id="front-emoji"></div>
+        <div class="card-term" id="front-term"></div>
+        <p class="card-hint">📖 Tocá para ver la respuesta</p>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-emoji" id="back-emoji"></div>
+        <div class="card-answer" id="back-answer"></div>
+        <div class="card-detail" id="back-detail"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn" onclick="prevCard()">◀</button>
+    <span class="counter" id="counter">1 / 1</span>
+    <button class="nav-btn" onclick="nextCard()">▶</button>
+  </div>
+</div>
+
+<script>
+const allCards = [
+
+  // ── CLIMA Y TIEMPO ──
+  { topic:'clima', emoji:'🌦', term:'Clima vs Tiempo', answer:'Clima = promedio de 10 años · Tiempo = estado en un momento dado', detail:'El clima es el promedio de temperatura, humedad, precipitaciones y vientos en un lugar durante un período de 10 años. El tiempo es el estado de la atmósfera en un momento y lugar determinado.' },
+  { topic:'clima', emoji:'🌡', term:'Elementos del clima', answer:'Temperatura · Humedad · Precipitaciones · Presión · Nubosidad · Vientos', detail:'El clima se compone de seis elementos fundamentales, cuya combinación genera distintos tipos de clima en el mundo.' },
+  { topic:'clima', emoji:'🌍', term:'Localización geográfica y clima', answer:'La posición de la Tierra determina las estaciones y los climas', detail:'La localización de los climas y la sucesión de las estaciones del año dependen de los movimientos de la Tierra y de su eje inclinado.' },
+  { topic:'clima', emoji:'🥵', term:'Sensación térmica', answer:'Temperatura que siente el cuerpo humano', detail:'La sensación térmica es la temperatura que percibe el cuerpo humano, afectada tanto por la humedad como por el viento. En verano es más alta que la temperatura real; en invierno, más baja.' },
+  { topic:'clima', emoji:'🧊', term:'Climas fríos', answer:'Temperatura media anual menor a 10°C', detail:'Los climas fríos registran una temperatura media anual de 10 grados o menos. Se ubican en zonas polares y de alta montaña.' },
+  { topic:'clima', emoji:'☀️', term:'Climas cálidos', answer:'Temperatura media anual mayor a 20°C', detail:'Los climas cálidos registran más de 20°C de temperatura media anual. Se ubican principalmente en zonas tropicales, cerca del Ecuador.' },
+
+  // ── MOVIMIENTOS DE LA TIERRA ──
+  { topic:'movimientos', emoji:'🔄', term:'Movimiento de Rotación', answer:'Giro sobre su propio eje · 24 horas · produce el día y la noche', detail:'La Tierra gira sobre su propio eje en sentido oeste-este. Tarda 24 horas en completar una vuelta. Este movimiento genera la alternancia entre el día (lado iluminado) y la noche (lado oscuro).' },
+  { topic:'movimientos', emoji:'🌏', term:'Movimiento de Traslación', answer:'Orbita alrededor del Sol · 365 días y 6 horas · produce las 4 estaciones', detail:'La Tierra recorre una órbita elíptica alrededor del Sol. Tarda 365 días y 6 horas. Este movimiento, junto con la inclinación del eje, produce las cuatro estaciones del año.' },
+  { topic:'movimientos', emoji:'📅', term:'Año bisiesto', answer:'Cada 4 años se suma 1 día al mes de febrero', detail:'Como la traslación dura 365 días y 6 horas, cada cuatro años se acumulan 24 horas extra (6h × 4), que se agregan como un día más al mes de febrero.' },
+  { topic:'movimientos', emoji:'☀️', term:'Solsticio de verano en el Hemisferio Norte', answer:'21 de junio · el Sol es más perpendicular sobre el Trópico de Cáncer', detail:'El 21 de junio los rayos solares llegan más perpendiculares al Trópico de Cáncer. El Hemisferio Norte vive el verano; el Hemisferio Sur, el invierno.' },
+  { topic:'movimientos', emoji:'🌞', term:'Solsticio de verano en el Hemisferio Sur', answer:'21 de diciembre · el Sol es más perpendicular sobre el Trópico de Capricornio', detail:'El 21 de diciembre los rayos solares llegan más perpendiculares al Trópico de Capricornio. El Hemisferio Sur vive el verano; el Hemisferio Norte, el invierno.' },
+  { topic:'movimientos', emoji:'🌑', term:'Círculo Polar Ártico en invierno', answer:'El Polo Norte tiene una noche que dura tres meses', detail:'Contrariamente, el Polo Sur estará iluminado todo el invierno del Hemisferio Norte. En el Círculo Polar Ártico, la noche puede durar hasta tres meses. Para recorrer toda una vuelta alrededor del Sol, nuestro planeta demora 365 días y 6 horas.' },
+
+  // ── ELEMENTOS DEL CLIMA ──
+  { topic:'elementos', emoji:'🌡', term:'Temperatura', answer:'Grado de calor de la atmósfera · se mide en °C con termómetro', detail:'Es el grado de calor de la atmósfera en un lugar determinado. Se mide en grados Celsius (°C) con un termómetro. La temperatura media se calcula promediando las temperaturas de un período.' },
+  { topic:'elementos', emoji:'📊', term:'Temperatura media', answer:'Promedio de temperaturas de un período (día, mes, año o más)', detail:'Con el dato de temperatura media se puede clasificar el tipo de clima. Los climas fríos registran menos de 10°C, los templados entre 10 y 20°C, y los cálidos más de 20°C.' },
+  { topic:'elementos', emoji:'↕️', term:'Amplitud térmica', answer:'Diferencia entre temperatura máxima y mínima registradas', detail:'La amplitud térmica es la diferencia entre la temperatura máxima y mínima registradas en un período. Los climas secos tienen mayor amplitud térmica; los húmedos, menor.' },
+  { topic:'elementos', emoji:'🌧', term:'Precipitaciones', answer:'Caída de agua líquida o sólida · pluviómetro/nivómetro en mm', detail:'Las precipitaciones son la caída de agua en forma líquida (lluvia) o sólida (nieve o granizo). Se miden en milímetros (mm) con pluviómetro o nivómetro. Pueden clasificarse en regulares e irregulares.' },
+  { topic:'elementos', emoji:'📆', term:'Precipitaciones regulares e irregulares', answer:'Regulares: misma cantidad todo el año · Irregulares: dependen de la estación', detail:'Las precipitaciones regulares tienen cantidades similares a lo largo de las cuatro estaciones. Las irregulares se producen con mayor intensidad en una o dos estaciones del año.' },
+  { topic:'elementos', emoji:'⛈', term:'Lluvia de convección', answer:'El calor evapora el agua; sube perpendicularmente y forma tormentas', detail:'Ocurre cuando el calor del suelo evapora el agua, que sube de forma perpendicular generando nubes de tormenta. Es típica de verano. Las nubes crecen hasta convertirse en grandes cumulonimbos.' },
+  { topic:'elementos', emoji:'⛰', term:'Lluvia orográfica', answer:'Masa de aire húmedo choca con una cordillera, asciende y precipita', detail:'Una masa de aire cargada de humedad se eleva al chocar con la cordillera, se condensa y precipita. Las zonas donde las aguas se evaporan constantemente producen lluvias permanentes.' },
+  { topic:'elementos', emoji:'🌬', term:'Lluvia de frente', answer:'Masa de aire frío y masa de aire cálido se encuentran y forman frentes', detail:'Las lluvias de frente se producen cuando una masa de aire frío y una masa de aire cálido y seco se encuentran. Se forman frentes que generan precipitaciones. Son más frecuentes en zonas de latitudes medias.' },
+  { topic:'elementos', emoji:'💧', term:'Humedad', answer:'Porcentaje de vapor de agua en la atmósfera · se mide con higrómetro', detail:'La humedad es la cantidad de vapor de agua presente en la atmósfera. Se mide con un higrómetro. Las zonas más calidas tienen mayor evaporación y por lo tanto más humedad.' },
+  { topic:'elementos', emoji:'🌡', term:'Humedad relativa', answer:'Cantidad de humedad que puede contener el aire a cierta temperatura', detail:'El aire caliente tiene mayor capacidad de retener humedad que el aire frío. Cuando la temperatura aumenta, la humedad relativa disminuye (relación inversa). El aire frío se llena de vapor de agua muy rápido porque tiene poca capacidad.' },
+  { topic:'elementos', emoji:'❄️', term:'Aire frío y humedad', answer:'Contrae · denso · se hunde · pocas moléculas de vapor', detail:'El aire frío se contrae, es muy denso y se hunde. Las moléculas se comprimen y hay poco espacio para la humedad. El vapor de agua llena rápidamente el aire frío porque tiene baja capacidad de retención.' },
+  { topic:'elementos', emoji:'🌤', term:'Nubosidad', answer:'Presencia de nubes · se mide en octavos (1/8 a 8/8)', detail:'La nubosidad indica qué parte del cielo está cubierta de nubes. Se mide en octavos: 1/8 es casi despejado y 8/8 es cielo completamente cubierto. Se registra por observación directa.' },
+
+  // ── COMPOSICIÓN DE LA ATMÓSFERA ──
+  { topic:'atmosfera', emoji:'🌐', term:'Composición de la atmósfera', answer:'78% nitrógeno · 21% oxígeno · 1% otros gases', detail:'La atmósfera está compuesta principalmente por nitrógeno (78%) y oxígeno (21%). El 1% restante incluye otros gases como dióxido de carbono, además de cenizas volcánicas y otras partículas.' },
+  { topic:'atmosfera', emoji:'🌱', term:'Tropósfera', answer:'0 a 12 km · se desarrolla la vida · difícil respirar en cimas altas', detail:'Es la capa más cercana a la superficie terrestre. Va de 0 a 12 km de altitud. Es donde se desarrolla la vida y se producen los fenómenos meteorológicos. En las cimas de alta montaña es difícil respirar.' },
+  { topic:'atmosfera', emoji:'🛡', term:'Estratósfera', answer:'12 a 50 km · contiene la capa de ozono que filtra los rayos UV', detail:'Va de 12 a 50 km de altitud. Contiene la capa de ozono que filtra los rayos ultravioletas del Sol, protegiendo la vida en la Tierra. Alcanza hasta 50 km.' },
+  { topic:'atmosfera', emoji:'🌫', term:'Mesósfera', answer:'50 a 80 km · disminuye el ozono y la concentración de gases', detail:'Va de 50 a 80 km de altitud. En esta capa disminuye el ozono y la concentración de gases que lo forman. Es la capa donde se desintegran la mayoría de los meteoritos.' },
+  { topic:'atmosfera', emoji:'📻', term:'Termósfera', answer:'80 a 500 km · transmisión de ondas radiotelegráficas', detail:'Va de 80 a 500 km de altitud. En esta capa se transmiten las ondas radiotelegráficas, ya que las partículas que la componen permiten la transmisión. También se producen las auroras boreales.' },
+  { topic:'atmosfera', emoji:'🚀', term:'Exósfera', answer:'Desde 500 km · límite exterior · inicio del espacio interplanetario', detail:'Se inicia a los 500 km de altitud. Es el límite exterior de la atmósfera, donde comienza el espacio interplanetario. Las partículas son muy escasas y se mueven a grandes velocidades.' },
+
+  // ── VIENTOS ──
+  { topic:'vientos', emoji:'⚖️', term:'Presión atmosférica', answer:'Peso que ejerce la atmósfera sobre la superficie · barómetro en hPa', detail:'La presión atmosférica es el peso que ejerce la atmósfera sobre la superficie terrestre. Se mide con barómetro en hectopascales (hPa). El aire frío es más pesado y desciende; el cálido es más liviano y asciende.' },
+  { topic:'vientos', emoji:'🔢', term:'1013 hPa — clave del pronóstico', answer:'Mayor a 1013 hPa = buen tiempo · Menor = precipitaciones', detail:'Para pronosticar el tiempo se observa la presión atmosférica. Si supera los 1013 hPa el tiempo será bueno. Si es menor, las condiciones serán malas y aumentarán las probabilidades de precipitaciones.' },
+  { topic:'vientos', emoji:'💨', term:'Vientos', answer:'Masas de aire en movimiento de alta presión a baja presión', detail:'Los vientos son masas de aire que se desplazan desde zonas de alta presión (anticiclones) hacia zonas de baja presión (ciclones). Su velocidad se mide en km/h con anemómetro y su dirección con veleta o manga.' },
+  { topic:'vientos', emoji:'♨️', term:'Movimiento horizontal del aire', answer:'Causado por convección — calentamiento desigual de la superficie', detail:'El calentamiento desigual de la superficie terrestre hace que el aire cálido suba y el frío baje, creando una celda de convección. Este movimiento genera el desplazamiento horizontal del aire: los vientos van de zonas de alta presión a zonas de baja presión.' },
+  { topic:'vientos', emoji:'🌀', term:'Efecto Coriolis', answer:'La rotación terrestre curva los fluidos', detail:'La rotación de la Tierra hace que los vientos (y otros fluidos) se curven. En el Hemisferio Norte los vientos se curvan hacia la derecha. En el Hemisferio Sur, hacia la izquierda.' },
+  { topic:'vientos', emoji:'🌍', term:'Vientos globales — Alisios', answer:'Soplan hacia el Ecuador · permanentes · dirección constante todo el año', detail:'Los vientos Alisios son permanentes: soplan siempre en la misma dirección hacia el Ecuador, desde las zonas subtropicales (alta presión) hacia el Ecuador (baja presión). Son los vientos más regulares del planeta.' },
+  { topic:'vientos', emoji:'🌐', term:'Vientos globales — Westerlies y Polares', answer:'Westerlies: latitudes medias · Polares: zonas de alta latitud', detail:'Los Vientos del Oeste (Westerlies) soplan en las latitudes medias (30° a 60°) y llevan el tiempo desde el océano hacia los continentes. Los Vientos Polares del Este soplan desde los polos hacia las latitudes subpolares.' },
+  { topic:'vientos', emoji:'⏰', term:'Vientos estacionarios', answer:'Cambian de dirección según la estación del año', detail:'Son vientos que no tienen una dirección fija todo el año, sino que cambian con la estación. El Monzón de Asia es el ejemplo más conocido: en verano sopla desde el mar hacia el continente, trayendo lluvias; en invierno, al revés.' },
+  { topic:'vientos', emoji:'🗻', term:'Vientos locales', answer:'Soplan en zonas geográficas específicas', detail:'Son vientos que soplan en áreas muy concretas, normalmente relacionados con la geografía local. El Zonda en Argentina es un viento local cálido y seco que sopla desde la cordillera de los Andes hacia el centro del país.' },
+  { topic:'vientos', emoji:'🌀', term:'Ciclón', answer:'Sistema de vientos giratorios alrededor de un centro de baja presión', detail:'Un ciclón es un gran sistema de vientos rotatorios alrededor de un centro de baja presión atmosférica. Tiene alta temperatura y genera vientos fuertes, lluvias, tormentas y a veces inundaciones.' },
+  { topic:'vientos', emoji:'🔆', term:'Anticiclón', answer:'Sistema meteorológico de alta presión atmosférica en su centro', detail:'Un anticiclón es un sistema meteorológico caracterizado por zonas de alta presión atmosférica en su centro. Tiene baja temperatura y genera tiempo estable, despejado y sin precipitaciones.' },
+
+  // ── REGISTRO DEL CLIMA ──
+  { topic:'registro', emoji:'🔬', term:'Instrumentos meteorológicos', answer:'Termómetro · pluviómetro · higrómetro · barómetro · anemómetro · veleta', detail:'Termómetro (temperatura en °C), pluviómetro/nivómetro (precipitaciones en mm), higrómetro (humedad en %), barómetro (presión en hPa), anemómetro (velocidad del viento en km/h), veleta o manga (dirección del viento).' },
+  { topic:'registro', emoji:'🏢', term:'Estaciones meteorológicas', answer:'Ubican en ciudades y aeropuertos · miden permanentemente', detail:'Son instrumentos muy precisos ubicados especialmente en las principales ciudades. Las mediciones se realizan permanentemente y se divulgan cada hora. También se encuentran en zonas menos pobladas, en estaciones de ferrocarril y aeropuertos.' },
+  { topic:'registro', emoji:'🌥', term:'Nubosidad — medición', answer:'Observacion directa · escala en octavos 1/8 a 8/8', detail:'La nubosidad se mide por observacion directa. La escala va de 1/8 (casi despejado) a 8/8 (cielo completamente cubierto). Cuando el cielo esta cubierto, la temperatura diaria varia menos.' },
+  { topic:'registro', emoji:'🏙', term:'Ciudad vs Campo — temperatura', answer:'Ciudad: mas caliente · Campo: mas fresco', detail:'En la ciudad, el color gris del cemento y las edificaciones retienen el calor y la temperatura es mas elevada. En el campo, las temperaturas son mas bajas: la vegetacion rechaza los rayos solares, los vientos circulan libremente y la contaminacion del aire es menor.' },
+  { topic:'registro', emoji:'📡', term:'Pronostico del tiempo', answer:'Requiere registros permanentes y analisis de los elementos del clima', detail:'Para pronosticar el tiempo es necesario tener un registro permanente de los elementos del clima. Por ejemplo, si la presion supera los 1013 hPa el tiempo sera bueno; si es menor, las condiciones del tiempo seran malas y las probabilidades de precipitaciones aumentaran.' },
+
+  // ── FACTORES DEL CLIMA ──
+  { topic:'factores', emoji:'🌐', term:'6 Factores del clima', answer:'Latitud · Altitud · Distancia al mar · Dirección del viento · Corrientes · Relieve', detail:'Los 6 factores que determinan el clima de un lugar: latitud, altitud, distancia al mar, dirección del viento, corrientes marinas y relieve. Cada uno influye en la temperatura, la humedad y las precipitaciones.' },
+  { topic:'factores', emoji:'📍', term:'Latitud / Latitude', answer:'Determina la temperatura según la distancia al Ecuador', detail:'Cuanto más cerca del Ecuador, más caliente (rayos más perpendiculares). Cuanto más cerca de los polos, más frío. La latitud es el factor más importante para determinar la temperatura de un lugar.' },
+  { topic:'factores', emoji:'⛰', term:'Altitud / Height', answer:'Mayor altitud = menor temperatura', detail:'Cada 100 metros de altura, la temperatura baja aproximadamente 0,6°C. Las montañas son más frías que los valles aunque estén en la misma latitud.' },
+  { topic:'factores', emoji:'🌊', term:'Distancia al mar / Distance to the sea', answer:'Costa = húmedo y moderado · Interior = más extremo', detail:'Las zonas costeras tienen climas más húmedos y con menor amplitud térmica (el mar regula la temperatura). Las zonas del interior continental tienen veranos más calurosos e inviernos más fríos.' },
+  { topic:'factores', emoji:'💨', term:'Dirección del viento / Wind direction', answer:'Determina qué masas de aire llegan al lugar', detail:'Los vientos que vienen del mar traen humedad y lluvias. Los vientos que vienen del interior continental traen aire seco. La dirección del viento determina qué características climáticas predominan.' },
+  { topic:'factores', emoji:'🌡', term:'Corrientes marinas / Ocean Currents', answer:'Cálidas = más calor y lluvia · Frías = más seco y frío', detail:'Las corrientes marinas cálidas aumentan la temperatura y la humedad de las costas cercanas. Las corrientes frías producen el efecto contrario: climas más fríos y secos, como la Corriente de Humboldt en América del Sur.' },
+  { topic:'factores', emoji:'🗺', term:'Relieve / Relief', answer:'Las montañas influyen en la temperatura y las precipitaciones', detail:'El relieve actúa como barrera para las masas de aire. El lado que recibe el viento tiene más lluvia (barlovento); el lado contrario es más seco (sotavento). También genera el efecto orográfico en las precipitaciones.' },
+  { topic:'factores', emoji:'🌍', term:'5 Zonas térmicas de la Tierra', answer:'1 caliente · 2 templadas · 2 frías (Ártico y Antártico)', detail:'Según las temperaturas, la Tierra se divide en 5 zonas: una zona caliente (entre los trópicos), dos zonas templadas (entre los trópicos y los polos) y dos zonas frías (en el Ártico y la Antártida). La latitud determina esta distribución.' },
+  { topic:'factores', emoji:'🌡', term:'Barómetro — Historia', answer:'Inventado por Torricelli en 1643 · Mayor presión al nivel del mar (1013 mb)', detail:'El barómetro fue inventado por Evangelista Torricelli en 1643. Mide la presión en milíbares (mb) o pulgadas. La mayor presión se registra al nivel del mar: 1013 mb. La presión disminuye con la altitud.' },
+
+];
+
+let currentTopic = 'all', currentIndex = 0, isFlipped = false, filtered = [];
+
+function getFiltered() { return currentTopic === 'all' ? allCards : allCards.filter(c => c.topic === currentTopic); }
+
+function setTopic(topic, btn) {
+  currentTopic = topic;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  currentIndex = 0; isFlipped = false;
+  filtered = getFiltered(); render();
+}
+
+function render() {
+  filtered = getFiltered();
+  const c = filtered[currentIndex];
+  if (!c) return;
+  document.getElementById('card').classList.remove('flipped');
+  isFlipped = false;
+  document.getElementById('front-emoji').textContent = c.emoji;
+  document.getElementById('front-term').textContent = c.term;
+  document.getElementById('back-emoji').textContent = c.emoji;
+  document.getElementById('back-answer').textContent = c.answer;
+  document.getElementById('back-detail').textContent = c.detail;
+  document.getElementById('counter').textContent = `${currentIndex + 1} / ${filtered.length}`;
+  document.getElementById('progress').style.width = ((currentIndex + 1) / filtered.length * 100) + '%';
+}
+
+function flipCard() { isFlipped = !isFlipped; document.getElementById('card').classList.toggle('flipped', isFlipped); }
+function nextCard() { filtered = getFiltered(); currentIndex = (currentIndex + 1) % filtered.length; render(); }
+function prevCard() { filtered = getFiltered(); currentIndex = (currentIndex - 1 + filtered.length) % filtered.length; render(); }
+
+filtered = getFiltered(); render();
+</script>
+</body>
+</html>
