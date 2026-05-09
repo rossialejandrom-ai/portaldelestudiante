@@ -11,6 +11,7 @@ window.Portal.apps = {
   'geo':          'apps/geo.html',
   'geo-44-49':    'apps/geo-44-49.html',
   'geo-earth':    'apps/geo-earth.html',
+  'geo-57-59':    'apps/geo-57-59.html',
   'eng-cards':    'apps/eng-cards.html',
   'eng-practice': 'apps/eng-practice.html',
   'eng-exam':     'apps/eng-exam.html',
