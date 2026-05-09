@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lengua — Tarjetas</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--sur:#161b22;--sur2:#1c2330;--brd:#2d333b;--ac:#3b82f6;--tx:#e6edf3;--mu:#8b949e;--R:12px}
+*{box-sizing:border-box;margin:0;padding:0}html,body{height:100%}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;max-width:620px;margin:0 auto;min-height:100vh}
+.hdr{background:linear-gradient(155deg,#0b1830,#0d1117 55%);border-bottom:1px solid var(--brd);padding:22px 20px 16px;text-align:center}
+.pill{display:inline-block;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:#60a5fa;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 14px;border-radius:99px;margin-bottom:8px}
+.hdr h1{font-family:'Syne',sans-serif;font-size:clamp(18px,5vw,26px);font-weight:800;line-height:1.2}
+.hdr h1 em{color:#60a5fa;font-style:normal}
+.hdr .sub{color:var(--mu);font-size:12px;margin-top:4px}
+.idx-body{padding:16px}
+.idx-section{margin-bottom:20px}
+.idx-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:10px;padding-left:2px}
+.idx-grid{display:flex;flex-direction:column;gap:6px}
+.idx-item{display:flex;align-items:center;gap:12px;background:var(--sur);border:1px solid var(--brd);border-radius:var(--R);padding:12px 14px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;width:100%}
+.idx-item:hover{border-color:var(--ac);background:var(--sur2)}
+.idx-icon{font-size:22px;flex-shrink:0}
+.idx-info{flex:1}
+.idx-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+.idx-count{color:var(--mu);font-size:12px;margin-top:2px}
+.idx-arr{color:var(--mu);font-size:18px}
+.card-hdr{display:flex;align-items:center;gap:8px;padding:14px 16px;border-bottom:1px solid var(--brd);background:var(--sur)}
+.card-back-btn{background:none;border:1px solid var(--brd);border-radius:8px;color:var(--tx);font-size:13px;padding:6px 12px;cursor:pointer}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;flex:1}
+.card-prog{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--ac)}
+.prog-bar{height:3px;background:var(--brd)}
+.prog-fill{height:100%;background:var(--ac);border-radius:99px;transition:width .3s}
+.fc-wrap{padding:16px}
+.fc{perspective:1000px;height:230px;cursor:pointer;user-select:none;margin-bottom:10px}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.fc.flip .fc-inner{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;padding:20px;display:flex;flex-direction:column;justify-content:center;border:1px solid var(--brd)}
+.fc-front{background:var(--sur);border-color:var(--ac);align-items:center;text-align:center}
+.fc-back{background:var(--sur2);transform:rotateY(180deg);align-items:flex-start;overflow-y:auto}
+.fc-q{font-family:'Syne',sans-serif;font-size:clamp(14px,3.5vw,19px);font-weight:700;line-height:1.4}
+.fc-hint{color:var(--mu);font-size:11px;margin-top:10px}
+.fc-ans{font-size:13px;line-height:1.8;color:var(--tx)}
+.fc-ans b{color:#60a5fa}
+.flip-hint{text-align:center;color:var(--mu);font-size:11px;margin-bottom:10px}
+.fc-btns{display:flex;gap:8px}
+.fc-btn{flex:1;padding:11px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none}
+.fc-btn.prev{background:var(--sur);color:var(--tx);border:1px solid var(--brd)}
+.fc-btn.next{background:var(--ac);color:#fff}
+</style></head>
+<body>
+<div class="hdr">
+  <div class="pill">LENGUA · 2</div>
+  <h1>Tarjetas de <em>Lengua</em></h1>
+  <div class="sub">Tildacion · Puntuacion · Gramatica</div>
+</div>
+
+<div id="viewIndex">
+  <div class="idx-body">
+    <div class="idx-section"><div class="idx-title">🔤 Tildacion</div><div class="idx-grid" id="g1"></div></div>
+    <div class="idx-section"><div class="idx-title">✏️ Puntuacion</div><div class="idx-grid" id="g2"></div></div>
+    <div class="idx-section"><div class="idx-title">📖 Gramatica</div><div class="idx-grid" id="g3"></div></div>
+  </div>
+</div>
+
+<div id="viewCard" style="display:none">
+  <div class="card-hdr">
+    <button class="card-back-btn" id="backBtn">← Volver</button>
+    <div class="card-title" id="ctitle"></div>
+    <div class="card-prog" id="cprog"></div>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="pfill"></div></div>
+  <div class="fc-wrap">
+    <div class="fc" id="fc">
+      <div class="fc-inner">
+        <div class="fc-face fc-front"><div class="fc-q" id="fcQ"></div><div class="fc-hint">Toca para ver la respuesta</div></div>
+        <div class="fc-face fc-back"><div class="fc-ans" id="fcA"></div></div>
+      </div>
+    </div>
+    <div class="flip-hint" id="flipHint">🔄 Toca la tarjeta para girarla</div>
+    <div class="fc-btns">
+      <button class="fc-btn prev" id="prevBtn">← Anterior</button>
+      <button class="fc-btn next" id="nextBtn">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var T=[
+  {u:1,title:'Clasificacion segun acentuacion',icon:'🔤',c:[
+    {f:'¿Que es el acento?',b:'Fenomeno fonologico: la silaba que se pronuncia <b>mas fuerte</b> que las otras de la misma palabra.<br><br>No confundir con la <b>tilde</b>, que es una marca ortografica (escrita).'},
+    {f:'¿Que son palabras agudas?',b:'Se acentuan en la <b>ULTIMA silaba</b>.<br><br>Ej: co-ra-<b>zon</b>, es-cri-<b>tor</b>, ca-<b>fe</b>'},
+    {f:'¿Que son palabras graves?',b:'Se acentuan en la <b>PENULTIMA silaba</b>.<br><br>Ej: <b>mar</b>-mol, <b>li</b>-bro, <b>cam</b>-po'},
+    {f:'¿Que son palabras esdrujulas?',b:'Se acentuan en la <b>ANTEPENULTIMA silaba</b>.<br><br>Ej: <b>fo</b>-to-gra-fo, <b>mu</b>-si-ca, <b>me</b>-di-co'},
+    {f:'¿Que son palabras sobresdrujulas?',b:'Se acentuan en la silaba <b>anterior a la antepenultima</b>.<br><br>Ej: <b>pre</b>-ci-sa-men-te, <b>mar</b>-que-se-lo<br><br>Siempre llevan tilde.'},
+    {f:'¿Cuando llevan tilde las agudas?',b:'Cuando terminan en <b>n, s o vocal</b>.<br><br>✔ cancion, mani, cafe<br>✗ reloj, salud (no terminan en n, s o vocal)'},
+    {f:'¿Cuando llevan tilde las graves?',b:'Cuando <b>NO</b> terminan en n, s o vocal.<br><br>✔ femur, arbol, lapiz<br>✗ libro, casas, imagen (terminan en vocal, s o n → no llevan)'},
+    {f:'¿Cuando llevan tilde las esdrujulas y sobresdrujulas?',b:'<b>Siempre llevan tilde.</b><br><br>Ej: genero, telefono, indiquemelo, musica'},
+  ]},
+  {u:1,title:'Diptongo, Triptongo y Hiato',icon:'🌊',c:[
+    {f:'¿Que es un diptongo?',b:'Union de una vocal <b>abierta</b> (a, e, o) y una <b>cerrada</b> (i, u), o de <b>dos cerradas</b>, en una sola silaba.<br><br>Ej: pai-sa-no, cuida-do, mio-pe'},
+    {f:'¿Tipos de diptongos?',b:'• <b>Abierta + cerrada:</b> paisano, pauta<br>• <b>Cerrada + abierta:</b> viaje, miope<br>• <b>Dos cerradas:</b> cuidado, triunfo'},
+    {f:'¿Que es un triptongo?',b:'Union de <b>tres vocales en una sola silaba</b>.<br>Esquema: <b>cerrada + abierta + cerrada</b><br><br>Ej: Gua-le-guay-chu, se-miau-to-ma-ti-co'},
+    {f:'¿Que es un hiato?',b:'Separacion de dos vocales contiguas en <b>diferentes silabas</b>.<br><br>• Dos abiertas: a-e-re-o<br>• Abierta + cerrada tonica: ma-iz<br>• Cerrada tonica + abierta: ti-o'},
+    {f:'¿Donde va la tilde en un diptongo?',b:'Sobre la <b>vocal abierta</b> (a, e, o).<br>Si ambas son cerradas, sobre la <b>segunda</b>.<br><br>Ej: a-cua-ti-co, man-sion, a-cui-fe-ro'},
+  ]},
+  {u:1,title:'Casos especiales de tildacion',icon:'⚠️',c:[
+    {f:'Caso especial: vocal cerrada tonica + vocal abierta',b:'Si la vocal <b>cerrada es tonica</b>, lleva tilde para marcar que hay <b>hiato</b> (no diptongo).<br><br>Ej: ba-ul, te-ni-a, Ma-ri-a'},
+    {f:'Adverbios terminados en -mente',b:'Llevan tilde solo si el <b>adjetivo original</b> ya la lleva.<br><br>✔ rapido → rapidamente<br>✗ preciso → precisamente (sin tilde)'},
+    {f:'Palabras compuestas',b:'Se tildan como <b>una sola palabra</b>, sin importar si sus bases llevan tilde por separado.<br><br>Ej: balon-ces-to → grave terminada en vocal → <b>no lleva tilde</b>'},
+  ]},
+  {u:1,title:'Tilde diacritica',icon:'⚖️',c:[
+    {f:'aun / aun (con tilde)',b:'<b>aun</b> (sin tilde): incluso, ni siquiera<br>Ej: Aun no llegaron.<br><br><b>aun</b> (con tilde): todavia<br>Ej: Aun sigo aca.'},
+    {f:'de / de (con tilde)',b:'<b>de</b> (sin tilde): preposicion<br>Ej: Una taza de te.<br><br><b>de</b> (con tilde): verbo dar conjugado<br>Ej: Quiere que le de la razon.'},
+    {f:'el / el (con tilde)',b:'<b>el</b> (sin tilde): articulo<br>Ej: el libro<br><br><b>el</b> (con tilde): pronombre personal<br>Ej: El no trajo el uniforme.'},
+    {f:'mas / mas (con tilde)',b:'<b>mas</b> (sin tilde): conjuncion adversativa (= pero)<br>Ej: Queria ir, mas no pude.<br><br><b>mas</b> (con tilde): adverbio de cantidad<br>Ej: No quiero mas mate.'},
+    {f:'mi / mi (con tilde)',b:'<b>mi</b> (sin tilde): pronombre posesivo o nota musical<br>Ej: mi gato, la nota mi<br><br><b>mi</b> (con tilde): pronombre personal<br>Ej: Mi madre me lo trajo a mi.'},
+    {f:'se / se (con tilde)',b:'<b>se</b> (sin tilde): pronombre personal<br>Ej: Se fue temprano.<br><br><b>se</b> (con tilde): conjugacion de saber o ser<br>Ej: Se cree que no lo se.'},
+    {f:'si / si (con tilde)',b:'<b>si</b> (sin tilde): conjuncion condicional o nota musical<br>Ej: Si llueve, no salgo.<br><br><b>si</b> (con tilde): adverbio de afirmacion o pronombre personal<br>Ej: Si, quiero ir.'},
+    {f:'te / te (con tilde)',b:'<b>te</b> (sin tilde): pronombre personal<br>Ej: Te llamo despues.<br><br><b>te</b> (con tilde): sustantivo (infusion)<br>Ej: ¿Queres que te prepare un te?'},
+    {f:'tu / tu (con tilde)',b:'<b>tu</b> (sin tilde): pronombre posesivo<br>Ej: tu mochila<br><br><b>tu</b> (con tilde): pronombre personal<br>Ej: ¿Tu traes tu propia computadora?'},
+    {f:'Pronombres relativos vs. enfaticos',b:'<b>Sin tilde</b> (relativos): que, quien, donde, cuando, cuanto<br>Ej: La casa donde vivo.<br><br><b>Con tilde</b> (interrogativos/exclamativos): que, quien, donde, como, cuando, cuanto<br>Ej: ¿Donde vives?'},
+  ]},
+  {u:2,title:'El punto y puntos suspensivos',icon:'.',c:[
+    {f:'¿Para que sirve el punto?',b:'Indica que se completo el sentido de una idea.<br><br>• <b>Punto seguido:</b> sigue la idea en el mismo parrafo<br>• <b>Punto y aparte:</b> fin de parrafo<br>• <b>Punto final:</b> fin del texto'},
+    {f:'¿Donde NO va el punto?',b:'• Despues de <b>signos de cierre</b> (? o )<br>• Despues de <b>puntos suspensivos</b><br>• En <b>titulos, subtitulos o indices</b><br>• En <b>abreviaturas</b> dentro de oracion (Sr., Dra.)'},
+    {f:'¿Para que sirven los puntos suspensivos?',b:'Tres usos principales:<br>1. <b>Pausa/vacilacion</b> del hablante: Tengo una duda...<br>2. <b>Frase en suspenso:</b> Y el ganador es...<br>3. <b>Omision en cita</b> (entre corchetes): [...] '},
+    {f:'¿Cuando van los puntos suspensivos entre corchetes?',b:'Cuando se <b>omite un fragmento</b> dentro de una cita textual:<br><br>"Los caballeros partieron [...] a los bosques del norte."'},
+    {f:'¿Se agrega un cuarto punto a los puntos suspensivos?',b:'<b>No.</b> Cuando la frase queda en suspenso, solo se usan los tres puntos.<br><br>Si la oracion termino antes: se puede agregar el punto final <b>despues</b> de los suspensivos.'},
+  ]},
+  {u:2,title:'La coma y el punto y coma',icon:',',c:[
+    {f:'¿Cuales son los usos de la coma?',b:'• <b>Vocativo:</b> Senores, pasen.<br>• <b>Enumeracion:</b> Leimos cuentos, novelas y poemas.<br>• <b>Aposicion:</b> Uter, rey de Bretana, llego.<br>• <b>Conectores adversativos:</b> pero, aunque, sino<br>• <b>Despues de una condicion:</b> Si venis, te espero.<br>• <b>Predicado no verbal:</b> Arturo, rey de Bretana.'},
+    {f:'¿Que es un vocativo?',b:'Palabra o expresion que <b>identifica al destinatario</b>. Se separa con coma.<br><br>Ej: "Senores, pasen por aca."<br>Ej: "Ana, veni un momento."'},
+    {f:'¿Que es una aposicion?',b:'Elemento que <b>explica o especifica</b> al sustantivo anterior. Se separa con comas.<br><br>Ej: "Uter Pendragon, rey de Bretana, estaba enamorado de lady Igraine."'},
+    {f:'¿Cuando va la coma antes de un conector?',b:'Antes de <b>conectores adversativos</b>: pero, aunque, sino, sin embargo.<br><br>Ej: Estoy cansado, pero igual ire.<br>Ej: No es azul, sino verde.'},
+    {f:'¿Donde NO va la coma?',b:'<b>Entre sujeto y predicado verbal.</b><br><br>✗ Arturo, se convirtio en rey de Bretana.<br>✔ Arturo se convirtio en rey de Bretana.'},
+    {f:'¿Para que sirve el punto y coma?',b:'Dos usos:<br>1. Entre oraciones <b>yuxtapuestas</b> con proximidad semantica:<br>"Nadie volvio a hablar del tema; la desaparicion seguia siendo un misterio."<br><br>2. En <b>enumeraciones cuyos elementos ya tienen comas</b>:<br>"El primero, a la izquierda; el segundo, a la derecha."'},
+  ]},
+  {u:3,title:'Clases de palabras',icon:'📚',c:[
+    {f:'¿Cuantas y cuales son las clases de palabras?',b:'<b>9 clases:</b><br>1. Sustantivos<br>2. Adjetivos<br>3. Verbos<br>4. Adverbios<br>5. Pronombres<br>6. Articulos<br>7. Preposiciones<br>8. Conjunciones<br>9. Interjecciones'},
+    {f:'¿Que estudia el aspecto morfologico?',b:'La <b>FORMA</b> de las palabras.<br>Como estan construidas internamente.<br><br>Ej: morfemas, afijos, desinencias'},
+    {f:'¿Que estudia el aspecto semantico?',b:'El <b>SIGNIFICADO</b> de las palabras.<br><br>Ej: si un sustantivo es propio, comun, concreto, abstracto...'},
+    {f:'¿Que estudia el aspecto sintactico?',b:'La <b>FUNCION</b> de las palabras dentro de la oracion.<br><br>Ej: sujeto, predicado, modificador'},
+    {f:'¿Que estudia el aspecto pragmatico?',b:'La <b>INTENCION</b> comunicativa del hablante segun el contexto.<br><br>Ej: si la oracion es una orden, un pedido, una queja...'},
+    {f:'¿Cual es la cadena linguistica?',b:'<b>Palabra → Oracion → Texto</b><br><br>Las palabras forman oraciones, y las oraciones forman textos.'},
+  ]},
+  {u:3,title:'Estructura de las palabras',icon:'🔬',c:[
+    {f:'¿Que es la morfologia?',b:'El estudio de la <b>estructura interna</b> de las palabras y sus morfemas.<br><br>Las palabras estan compuestas por unidades llamadas <b>morfemas</b>.'},
+    {f:'¿Que es un morfema?',b:'La unidad <b>minima con significado</b>.<br><br>Ej: SUB-MAR-INO tiene 3 morfemas:<br>• <b>SUB</b> (prefijo)<br>• <b>MAR</b> (base/raiz)<br>• <b>INO</b> (sufijo)'},
+    {f:'¿Que es la base o raiz?',b:'El morfema <b>mas importante</b>: contiene el significado lexico imprescindible.<br><br>Ej: <b>MAR</b> en submarino<br>Ej: <b>SOL</b> en soleado'},
+    {f:'¿Que es un afijo?',b:'Morfema que se <b>adjunta a la base</b>. Tipos:<br>• <b>Prefijo:</b> va delante (sub-, in-, pre-)<br>• <b>Sufijo:</b> va detras (-ino, -idad, -mente)'},
+    {f:'¿Que aporta el prefijo?',b:'Va <b>delante</b> de la base. Puede aportar:<br>• Negacion: <b>in</b>posible<br>• Anterioridad: <b>pre</b>vision<br>• Posicion: <b>sub</b>marino, <b>ex</b>presidente<br>• Vuelta atras: <b>des</b>arreglar'},
+    {f:'¿Que aporta el sufijo?',b:'Va <b>detras</b> de la base. Puede aportar:<br>• Genero: amig<b>a</b><br>• Numero: cas<b>as</b><br>• Tiempo: am<b>e</b><br>• Cambia clase gramatical: casa → cas<b>ero</b> (sust. → adj.)'},
+  ]},
+  {u:3,title:'Procesos de formacion de palabras',icon:'🔧',c:[
+    {f:'¿Que es la derivacion?',b:'El proceso <b>mas comun</b> de formacion de palabras.<br>Se agregan prefijos y/o sufijos a una base.<br><br>Ej: im-posible, sub-marino, tranquili-dad'},
+    {f:'¿Que es la derivacion por prefijacion?',b:'Se agrega un <b>prefijo</b> delante de la base para formar nuevas palabras.<br><br>Ej: <b>im</b>-posible, <b>ex</b>-presidente, <b>sub</b>-terrano'},
+    {f:'¿Que es la derivacion por sufijacion?',b:'Se agrega un <b>sufijo</b> detras de la base. Puede cambiar la clase gramatical.<br><br>Ej: tranquilo → tranquili-<b>dad</b> (adj. → sust.)<br>Ej: pequeno → peque-<b>nito</b> (adj. → adj.)'},
+    {f:'¿Que es la parasintesis?',b:'Se agrega un <b>prefijo Y un sufijo</b> al mismo tiempo.<br>Sin uno de los dos, la palabra <b>no existe</b>.<br><br>Ej: en-loque-cer (no existe *enloque ni *loquecer)'},
+    {f:'¿Que es la composicion?',b:'Unir <b>dos bases</b> para formar una nueva palabra.<br><br>Ej: lavar + ropa = <b>lavarropas</b><br>Ej: claro + oscuro = <b>claroscuro</b><br>Ej: agri + dulce = <b>agridulce</b>'},
+  ]},
+  {u:3,title:'Los sustantivos',icon:'🏷️',c:[
+    {f:'¿Que es un sustantivo?',b:'Clase de palabra que representa <b>objetos, personas, relaciones o fenomenos</b> concebidos como entidades.<br><br>Ej: libro, Ana, amistad, tormenta'},
+    {f:'¿Propios vs. comunes?',b:'<b>Propios:</b> designan una entidad especifica, se escriben con <b>MAYUSCULA</b>.<br>Ej: Buenos Aires, Martin<br><br><b>Comunes:</b> designan categorias genericas.<br>Ej: ciudad, chico'},
+    {f:'¿Tipos de sustantivos propios?',b:'• <b>Antroponimos:</b> nombres de personas (Ana, Nicolas)<br>• <b>Patronimicos:</b> apellidos del padre (Martinez, Rodriguez)<br>• <b>Toponimos:</b> nombres de lugares (Mar del Plata)<br>• <b>Autorreferenciales:</b> entidad concreta y especifica (el tango)'},
+    {f:'¿Que es un patronimico?',b:'Apellido derivado del nombre del <b>padre o antepasado masculino</b>.<br><br>Ej: <b>Martinez</b> (de Martin)<br>Ej: <b>Rodriguez</b> (de Rodrigo)'},
+    {f:'¿Que es un toponimo?',b:'Nombre propio de un <b>lugar geografico</b>.<br><br>Ej: Mar del Plata, Bariloche, Cordoba, Buenos Aires'},
+    {f:'¿Individuales vs. colectivos?',b:'<b>Individuales:</b> designan un solo objeto.<br>Ej: libro, corbata<br><br><b>Colectivos:</b> designan un grupo de entidades.<br>Ej: cardumen, familia, alumnado'},
+    {f:'¿Concretos vs. abstractos?',b:'<b>Concretos:</b> perceptibles por los sentidos.<br>Ej: mesa, gato, lluvia<br><br><b>Abstractos:</b> inmateriales, no perceptibles.<br>Ej: verdad, belleza, estudio, recreo'},
+    {f:'¿Contables vs. incontables?',b:'<b>Contables:</b> se pueden contar.<br>Ej: un libro, dos libros<br><br><b>Incontables:</b> designan sustancias, no se pueden contar.<br>Ej: arena, agua, aire (no se dice "dos aguas")'},
+    {f:'¿Como se forma el genero en sustantivos animados?',b:'Con variacion de <b>desinencia</b>:<br>Ej: amigo/amiga, actor/actriz<br><br>Algunas formas <b>no varian</b> (persona, gente) y el genero se marca con articulo o adjetivo:<br>el estudiante / la estudiante'},
+    {f:'¿Que son las estrategias de genero no-binarias?',b:'Uso de <b>-e</b>, <b>@</b> o <b>x</b> para evitar el masculino generico.<br><br>Ej: amigue, todxs, chic@s<br><br>La RAE <b>no las acepta</b>, aunque cada vez mas hablantes las utilizan.'},
+    {f:'¿Reglas para formar el plural?',b:'• Vocal sin tilde → agrega <b>-s</b>: dias, besos<br>• Consonante o vocal tonica → agrega <b>-es</b>: reyes, ombues<br>• Terminados en -s o -x → <b>no varian</b>: la crisis / las crisis<br>• Solo plural: gafas, trabalenguas'},
+  ]},
+  {u:3,title:'Proceso de escritura',icon:'✍️',c:[
+    {f:'¿Cuales son los pasos del proceso de escritura?',b:'<b>1. Planificacion</b><br><b>2. Borrador</b><br><b>3. Revision</b><br><b>4. Version Definitiva</b>'},
+    {f:'¿Que es la planificacion?',b:'<b>Primera etapa.</b> Se define:<br>• el tema<br>• el destinatario<br>• el proposito<br>• la estructura del texto<br><br>Es pensar el texto <b>antes</b> de escribirlo.'},
+    {f:'¿Que es el borrador?',b:'<b>Segunda etapa.</b> Se escribe la primera version del texto.<br><br>No tiene que ser perfecta: es para explorar ideas y organizar el contenido.'},
+    {f:'¿Que es la version definitiva?',b:'<b>Etapa final.</b> Texto revisado y corregido, listo para presentar.<br><br>Pasos anteriores: planificacion → borrador → <b>revision</b> → version definitiva.'},
+  ]},
+];
+
+var cur=null,ci=0,flipped=false;
+function renderIndex(){
+  document.getElementById('viewIndex').style.display='';
+  document.getElementById('viewCard').style.display='none';
+  ['g1','g2','g3'].forEach(function(id){document.getElementById(id).innerHTML='';});
+  T.forEach(function(t){
+    var b=document.createElement('button');
+    b.className='idx-item';
+    b.innerHTML='<span class="idx-icon">'+t.icon+'</span><div class="idx-info"><div class="idx-name">'+t.title+'</div><div class="idx-count">'+t.c.length+' tarjetas</div></div><span class="idx-arr">›</span>';
+    b.onclick=function(){openT(t);};
+    var gid=t.u===1?'g1':t.u===2?'g2':'g3';
+    document.getElementById(gid).appendChild(b);
+  });
+}
+function openT(t){cur=t;ci=0;flipped=false;
+  document.getElementById('viewIndex').style.display='none';
+  document.getElementById('viewCard').style.display='';
+  document.getElementById('ctitle').textContent=t.title;
+  renderC();
+}
+function renderC(){
+  var c=cur.c[ci];
+  document.getElementById('cprog').textContent=(ci+1)+'/'+cur.c.length;
+  document.getElementById('pfill').style.width=((ci+1)/cur.c.length*100)+'%';
+  var fc=document.getElementById('fc');
+  fc.classList.remove('flip');flipped=false;
+  document.getElementById('fcQ').innerHTML=c.f;
+  document.getElementById('fcA').innerHTML=c.b;
+  document.getElementById('flipHint').style.display='';
+  document.getElementById('nextBtn').textContent=ci===cur.c.length-1?'Finalizar ✓':'Siguiente →';
+}
+document.getElementById('fc').onclick=function(){
+  flipped=!flipped;this.classList.toggle('flip',flipped);
+  document.getElementById('flipHint').style.display=flipped?'none':'';
+};
+document.getElementById('backBtn').onclick=renderIndex;
+document.getElementById('prevBtn').onclick=function(){if(ci>0){ci--;renderC();}};
+document.getElementById('nextBtn').onclick=function(){
+  if(ci<cur.c.length-1){ci++;renderC();}else{renderIndex();}
+};
+renderIndex();
+</script>
+</body></html>

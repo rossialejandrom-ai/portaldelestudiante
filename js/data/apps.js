@@ -8,6 +8,7 @@ window.Portal.apps = {
   'hist-exam':    'apps/hist-exam.html',
   'hist-practice':'apps/hist-practice.html',
   'ciudadania':   'apps/ciudadania.html',
+  'lengua-cards': 'apps/lengua-cards.html',
   'geo':          'apps/geo.html',
   'geo-44-49':    'apps/geo-44-49.html',
   'geo-earth':    'apps/geo-earth.html',
